@@ -1,12 +1,12 @@
-[![CircleCI](https://dl.circleci.com/status-badge/img/gh/giantswarm/strimzi/tree/main.svg?style=svg)](https://dl.circleci.com/status-badge/redirect/gh/giantswarm/strimzi/tree/main)
-[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/giantswarm/strimzi/badge)](https://securityscorecards.dev/viewer/?uri=github.com/giantswarm/strimzi)
+[![CircleCI](https://dl.circleci.com/status-badge/img/gh/giantswarm/strimzi-kafka-operator/tree/main.svg?style=svg)](https://dl.circleci.com/status-badge/redirect/gh/giantswarm/strimzi-kafka-operator/tree/main)
+[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/giantswarm/strimzi-kafka-operator/badge)](https://securityscorecards.dev/viewer/?uri=github.com/giantswarm/strimzi-kafka-operator)
 
 [Guide about how to manage an app on Giant Swarm](https://handbook.giantswarm.io/docs/dev-and-releng/app-developer-processes/adding_app_to_appcatalog/)
 
-# strimzi chart
+# strimzi-kafka-operator chart
 
-Giant Swarm offers a strimzi App which can be installed in workload clusters.
-Here, we define the strimzi chart with its templates and default configuration.
+Giant Swarm offers a strimzi-kafka-operator App which can be installed in workload clusters.
+Here, we define the strimzi-kafka-operator chart with its templates and default configuration.
 
 **What is this app?**
 
