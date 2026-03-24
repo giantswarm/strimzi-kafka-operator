@@ -82,6 +82,11 @@ strimzi-kafka-operator:
       # renovate: datasource=docker depName=gsoci.azurecr.io/giantswarm/strimzi/kafka-bridge
       tag: "0.33.1"
 
+  # -- Number of operator replicas. Strimzi uses leader election so only one
+  # replica is active at a time; additional replicas are hot standbys.
+  # Requires replicas >= 2 for the PodDisruptionBudget to allow node drains.
+  replicas: 2
+
   # -- Operator resource limits (tune based on number of Kafka clusters watched).
   resources:
     requests:
