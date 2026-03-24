@@ -1,34 +1,49 @@
 {{/* vim: set filetype=mustache: */}}
+
 {{/*
 Expand the name of the chart.
 */}}
-{{- define "name" -}}
-{{- .Chart.Name | trunc 63 | trimSuffix "-" -}}
-{{- end -}}
+{{- define "strimzi-kafka-operator.name" -}}
+{{- .Chart.Name | trunc 63 | trimSuffix "-" }}
+{{- end }}
+
+{{/*
+Create a default fully qualified app name.
+Truncated at 63 chars because some Kubernetes name fields are limited to this.
+If release name contains the chart name it will be used as a full name.
+*/}}
+{{- define "strimzi-kafka-operator.fullname" -}}
+{{- if contains .Chart.Name .Release.Name }}
+{{- .Release.Name | trunc 63 | trimSuffix "-" }}
+{{- else }}
+{{- printf "%s-%s" .Release.Name .Chart.Name | trunc 63 | trimSuffix "-" }}
+{{- end }}
+{{- end }}
 
 {{/*
 Create chart name and version as used by the chart label.
 */}}
-{{- define "chart" -}}
-{{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" -}}
-{{- end -}}
+{{- define "strimzi-kafka-operator.chart" -}}
+{{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
+{{- end }}
 
 {{/*
 Common labels
 */}}
-{{- define "labels.common" -}}
-app: {{ include "name" . | quote }}
-{{ include "labels.selector" . }}
-app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
+{{- define "strimzi-kafka-operator.labels" -}}
+helm.sh/chart: {{ include "strimzi-kafka-operator.chart" . }}
+{{ include "strimzi-kafka-operator.selectorLabels" . }}
+{{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
-application.giantswarm.io/team: {{ index .Chart.Annotations "io.giantswarm.application.team" | quote }}
-helm.sh/chart: {{ include "chart" . | quote }}
-{{- end -}}
+{{- end }}
+app.kubernetes.io/managed-by: {{ .Release.Service }}
+application.giantswarm.io/team: {{ index .Chart.Annotations "io.giantswarm.application.team" | default "atlas" | quote }}
+{{- end }}
 
 {{/*
 Selector labels
 */}}
-{{- define "labels.selector" -}}
-app.kubernetes.io/name: {{ include "name" . | quote }}
-app.kubernetes.io/instance: {{ .Release.Name | quote }}
-{{- end -}}
+{{- define "strimzi-kafka-operator.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "strimzi-kafka-operator.name" . }}
+app.kubernetes.io/instance: {{ .Release.Name }}
+{{- end }}

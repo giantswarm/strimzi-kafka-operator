@@ -1,0 +1,33 @@
+{{- if and (index .Values "strimzi-kafka-operator").enabled .Values.kyvernoPolicyExceptions.enabled }}
+apiVersion: kyverno.io/v2
+kind: PolicyException
+metadata:
+  name: {{ include "strimzi-kafka-operator.fullname" . }}
+  namespace: {{ .Values.kyvernoPolicyExceptions.namespace | quote }}
+  labels:
+    {{- include "strimzi-kafka-operator.labels" . | nindent 4 }}
+spec:
+  exceptions:
+    # The operator reads its own config from a ConfigMap mounted as a volume,
+    # which requires a writable tmpdir — this conflicts with readOnlyRootFilesystem
+    # unless an emptyDir is provided (handled by upstream chart via tmpDir).
+    - policyName: require-read-only-root-filesystem
+      ruleNames:
+        - require-read-only-root-filesystem
+    # The operator runs as a non-root user but the upstream chart does not set
+    # runAsNonRoot in the pod spec by default — we set it in our values.yaml,
+    # but keep this exception for clusters with strict enforcement.
+    - policyName: require-run-as-nonroot
+      ruleNames:
+        - require-run-as-nonroot
+  match:
+    any:
+      - resources:
+          kinds:
+            - Pod
+          namespaces:
+            - {{ .Release.Namespace | quote }}
+          selector:
+            matchLabels:
+              {{- include "strimzi-kafka-operator.selectorLabels" . | nindent 14 }}
+{{- end }}

@@ -1,0 +1,40 @@
+strimzi-kafka-operator {{ .Chart.AppVersion }} has been deployed.
+
+The Strimzi Cluster Operator is now running in namespace {{ .Release.Namespace }}.
+{{- $upstreamValues := index .Values "strimzi-kafka-operator" }}
+It watches for Kafka custom resources in: {{ if $upstreamValues.watchAnyNamespace }}all namespaces{{ else if $upstreamValues.watchNamespaces }}{{ join ", " $upstreamValues.watchNamespaces }}{{ else }}{{ .Release.Namespace }}{{ end }}.
+
+To create a Kafka cluster, apply a Kafka CR:
+
+  kubectl apply -f - <<EOF
+  apiVersion: kafka.strimzi.io/v1beta2
+  kind: Kafka
+  metadata:
+    name: my-cluster
+    namespace: {{ .Release.Namespace }}
+  spec:
+    kafka:
+      replicas: 3
+      listeners:
+        - name: plain
+          port: 9092
+          type: internal
+          tls: false
+      storage:
+        type: ephemeral
+    zookeeper:
+      replicas: 3
+      storage:
+        type: ephemeral
+    entityOperator:
+      topicOperator: {}
+      userOperator: {}
+  EOF
+
+CRDs installed: {{ .Values.crds.install }}
+NetworkPolicy:  {{ if .Values.networkPolicy.enabled }}enabled ({{ .Values.networkPolicy.flavor }}){{ else }}disabled{{ end }}
+
+
+For full documentation see:
+  https://github.com/giantswarm/strimzi-kafka-operator-app
+  https://strimzi.io/documentation/

@@ -1,0 +1,31 @@
+# CI test values for helm ct lint / helm template.
+# Used by chart-testing (ct) and local validation.
+# Disables components that require cloud infrastructure or specific CNIs.
+
+crds:
+  # Skip CRD installation during lint; CRD YAML is too large for dry-run.
+  install: false
+
+networkPolicy:
+  # Disable: kind clusters used in CI have no Cilium or advanced NetworkPolicy.
+  enabled: false
+
+kyvernoPolicyExceptions:
+  # Disable: no Kyverno in CI kind clusters.
+  enabled: false
+
+strimzi-kafka-operator:
+  replicas: 1
+
+  # Use gsoci images (same as production defaults).
+  defaultImageRegistry: gsoci.azurecr.io
+  defaultImageRepository: giantswarm/strimzi
+  defaultImageTag: "0.51.0"
+
+  resources:
+    requests:
+      cpu: 200m
+      memory: 384Mi
+    limits:
+      cpu: 1000m
+      memory: 384Mi

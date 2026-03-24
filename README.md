@@ -1,68 +1,153 @@
-[![CircleCI](https://dl.circleci.com/status-badge/img/gh/giantswarm/strimzi-kafka-operator/tree/main.svg?style=svg)](https://dl.circleci.com/status-badge/redirect/gh/giantswarm/strimzi-kafka-operator/tree/main)
-[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/giantswarm/strimzi-kafka-operator/badge)](https://securityscorecards.dev/viewer/?uri=github.com/giantswarm/strimzi-kafka-operator)
+[![CircleCI](https://dl.circleci.com/status-badge/img/gh/giantswarm/strimzi-kafka-operator-app/tree/main.svg?style=svg)](https://dl.circleci.com/status-badge/redirect/gh/giantswarm/strimzi-kafka-operator-app/tree/main)
+[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/giantswarm/strimzi-kafka-operator-app/badge)](https://securityscorecards.dev/viewer/?uri=github.com/giantswarm/strimzi-kafka-operator-app)
 
-[Guide about how to manage an app on Giant Swarm](https://handbook.giantswarm.io/docs/dev-and-releng/app-developer-processes/adding_app_to_appcatalog/)
+# strimzi-kafka-operator app
 
-# strimzi-kafka-operator chart
-
-Giant Swarm offers a strimzi-kafka-operator App which can be installed in workload clusters.
-Here, we define the strimzi-kafka-operator chart with its templates and default configuration.
+Giant Swarm app wrapping the [Strimzi Kafka Operator](https://strimzi.io/), which manages
+Apache Kafka clusters natively on Kubernetes via custom resources (CRDs).
 
 **What is this app?**
-
-**Why did we add it?**
+Strimzi simplifies running Kafka on Kubernetes by providing a Kubernetes-native way to
+deploy and manage Kafka clusters, topics, users, and connectors through CRDs.
 
 **Who can use it?**
+Teams that need to run Apache Kafka on Giant Swarm workload clusters.
 
 ## Installing
 
-There are several ways to install this app onto a workload cluster.
+Deploy via the Giant Swarm App Platform:
 
-- [Using GitOps to instantiate the App](https://docs.giantswarm.io/tutorials/continuous-deployment/apps/add-appcr/)
-- By creating an [App resource](https://docs.giantswarm.io/reference/platform-api/crd/apps.application.giantswarm.io) using the platform API as explained in [Getting started with App Platform](https://docs.giantswarm.io/tutorials/fleet-management/app-platform/).
+```yaml
+apiVersion: application.giantswarm.io/v1alpha1
+kind: App
+metadata:
+  name: strimzi-kafka-operator
+  namespace: <cluster-id>
+spec:
+  name: strimzi-kafka-operator
+  namespace: strimzi-system
+  version: 0.1.0
+  catalog: giantswarm
+```
+
+Or using GitOps — see [Adding an App via GitOps](https://docs.giantswarm.io/tutorials/continuous-deployment/apps/add-appcr/).
 
 ## Configuring
 
-### values.yaml
-
-**This is an example of a values file you could upload using our web interface.**
+### Key values
 
 ```yaml
-# values.yaml
+# CRD management (disable if you manage CRDs externally)
+crds:
+  install: true
 
+# NetworkPolicy flavor — matches your cluster's CNI
+networkPolicy:
+  enabled: true
+  flavor: cilium        # "cilium" | "kubernetes"
+
+# Kyverno policy exceptions
+kyvernoPolicyExceptions:
+  enabled: true
+  namespace: giantswarm
+
+# Upstream overrides (see full list in values.yaml)
+strimzi-kafka-operator:
+  watchNamespaces: []   # empty = watch only release namespace
+  watchAnyNamespace: false
+  replicas: 1
 ```
 
-### Sample App CR and ConfigMap for the management cluster
+See [helm/strimzi-kafka-operator/values.yaml](helm/strimzi-kafka-operator/values.yaml) for all options.
 
-If you have access to the Kubernetes API on the management cluster, you could create the App CR and ConfigMap directly.
-
-Here is an example that would install the app to workload cluster `abc12`:
+### Sample App CR
 
 ```yaml
-# appCR.yaml
-
+apiVersion: application.giantswarm.io/v1alpha1
+kind: App
+metadata:
+  name: strimzi-kafka-operator
+  namespace: <cluster-id>
+spec:
+  name: strimzi-kafka-operator
+  namespace: strimzi-system
+  version: 0.1.0
+  catalog: giantswarm
+  userConfig:
+    configMap:
+      name: strimzi-kafka-operator-user-values
+      namespace: <cluster-id>
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: strimzi-kafka-operator-user-values
+  namespace: <cluster-id>
+data:
+  values: |
+    networkPolicy:
+      enabled: true
+      flavor: cilium
+    strimzi-kafka-operator:
+      watchAnyNamespace: true
 ```
 
-```yaml
-# user-values-configmap.yaml
+## Images
 
+All images are sourced from `gsoci.azurecr.io` (retagged from upstream `quay.io/strimzi`).
+
+| Image | Tag |
+|---|---|
+| `gsoci.azurecr.io/giantswarm/strimzi/operator` | `0.51.0` |
+| `gsoci.azurecr.io/giantswarm/strimzi/kafka` | `0.51.0-kafka-<ver>` |
+| `gsoci.azurecr.io/giantswarm/strimzi/kafka-bridge` | `0.33.1` |
+| `gsoci.azurecr.io/giantswarm/strimzi/kaniko-executor` | `0.51.0` |
+| `gsoci.azurecr.io/giantswarm/strimzi/buildah` | `0.51.0` |
+| `gsoci.azurecr.io/giantswarm/strimzi/maven-builder` | `0.51.0` |
+
+## CRD management
+
+CRDs are placed in `helm/strimzi-kafka-operator/templates/crds/` (not Helm's `crds/` directory).
+This means CRDs are **updated on `helm upgrade`** (Helm's `crds/` dir only installs, never upgrades).
+
+The annotation `helm.sh/resource-policy: keep` prevents CRD deletion on `helm uninstall`,
+protecting any existing Kafka CR data.
+
+### After a version bump (Renovate PR)
+
+When Renovate bumps the chart version in `Chart.yaml`, re-extract the CRDs:
+
+```bash
+make sync-crds
+git add helm/strimzi-kafka-operator/templates/crds/
+git commit -m "Sync CRDs for strimzi-kafka-operator v<new-version>"
 ```
-
-See our [full reference on how to configure apps](https://docs.giantswarm.io/tutorials/fleet-management/app-platform/app-configuration/) for more details.
 
 ## Compatibility
 
-This app has been tested to work with the following workload cluster release versions:
+| App version | Upstream chart | Kubernetes |
+|---|---|---|
+| 0.1.x | strimzi-kafka-operator 0.51.0 | 1.27+ |
 
-- _add release version_
+## Development
 
-## Limitations
+```bash
+# Update upstream chart dependency
+helm dep update helm/strimzi-kafka-operator
 
-Some apps have restrictions on how they can be deployed.
-Not following these limitations will most likely result in a broken deployment.
+# Re-extract CRDs after version bump
+make sync-crds
 
-- _add limitation_
+# Lint
+helm lint helm/strimzi-kafka-operator --values helm/strimzi-kafka-operator/ci/default-values.yaml
+
+# Template render (dry-run)
+helm template strimzi-kafka-operator helm/strimzi-kafka-operator \
+  --values helm/strimzi-kafka-operator/ci/default-values.yaml --debug
+```
 
 ## Credit
 
-- {APP HELM REPOSITORY}
+- Upstream: [strimzi/strimzi-kafka-operator](https://github.com/strimzi/strimzi-kafka-operator)
+- Helm chart: [Strimzi Helm charts](https://github.com/strimzi/strimzi-kafka-operator/tree/main/helm-charts/helm3/strimzi-kafka-operator)
+- ArtifactHub: [strimzi-kafka-operator](https://artifacthub.io/packages/helm/strimzi/strimzi-kafka-operator)

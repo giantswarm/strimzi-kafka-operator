@@ -1,0 +1,6 @@
+---
+# chart-testing (ct) configuration.
+# https://github.com/helm/chart-testing
+
+chart-repos:
+  - strimzi=https://strimzi.io/charts/

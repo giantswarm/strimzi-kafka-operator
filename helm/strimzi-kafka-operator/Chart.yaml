@@ -2,30 +2,27 @@
 # for details and background.
 
 apiVersion: v2
-
-# Version of the packaged app
-appVersion: 0.0.1
-
-# Make sure your name DOES NOT end in "app" or "-app".
 name: strimzi-kafka-operator
-
-# Please describe what the app provides in a sentence or two.
-description: Please add description
-
-# URL of the GitHub repository that is the source of this Chart.yaml file.
-home: https://github.com/giantswarm/strimzi-kafka-operator
-
-# If you have an icon/logo, you should add it to https://github.com/giantswarm/web-assets
-# and set the final URL here.
-icon: https://s.giantswarm.io/app-icons/giantswarm/1/light.svg
-
-sources:
-- https://github.com/some-org/some-repo
+description: >
+  Giant Swarm app wrapping the Strimzi Kafka Operator, which manages Apache Kafka
+  clusters natively on Kubernetes via custom resources.
+type: application
+# version is replaced by app-build-suite with the git tag
 version: 0.0.0-dev
+# appVersion tracks the upstream strimzi-kafka-operator version
+appVersion: "0.51.0"
+home: https://github.com/giantswarm/strimzi-kafka-operator-app
+## TODO configure the icon field with a custom app icon (see https://docs.giantswarm.io/reference/platform-api/chart-metadata/#icon)
+icon: https://s.giantswarm.io/app-icons/strimzi-kafka-operator/1/light.svg
+sources:
+  - https://github.com/strimzi/strimzi-kafka-operator
+  - https://github.com/giantswarm/strimzi-kafka-operator
 annotations:
-  # Adapt to 'giantswarm' if this application is not to be deployed by customers
   io.giantswarm.application.audience: all
-  # Adapt to 'true' if Giant Swarm takes responsibility for this app where it's deplyed
-  io.giantswarm.application.managed: "false"
-  # used through .Chart.Annotations . Please replace TEAM-NAME with your team's short name, e. g. 'shield'  for team-shield
-  io.giantswarm.application.team: TEAM-NAME
+  io.giantswarm.application.managed: "true"
+  io.giantswarm.application.team: atlas
+dependencies:
+  - name: strimzi-kafka-operator
+    version: "0.51.0"
+    repository: https://strimzi.io/charts/
+    condition: strimzi-kafka-operator.enabled

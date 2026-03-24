@@ -1,6 +1,35 @@
 {
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
     // Base config - https://github.com/giantswarm/renovate-presets/blob/main/default.json5
     "github>giantswarm/renovate-presets:default.json5",
+  ],
+  // Track standalone `tag:` fields in values.yaml files that are annotated with
+  // a Renovate inline comment. The preset's `registry:` patterns do not cover
+  // the `tag:` key name, so this custom manager is needed.
+  //
+  // Usage in values.yaml:
+  //   # renovate: datasource=docker depName=gsoci.azurecr.io/giantswarm/strimzi/kafka-bridge
+  //   tag: "0.33.1"
+  "customManagers": [
+    {
+      "customType": "regex",
+      "managerFilePatterns": ["^helm/.+/values\\.yaml$"],
+      "matchStrings": [
+        "renovate: datasource=(?<datasource>[^ ]+) depName=(?<depName>[^\n]+)\n\\s+tag: \"(?<currentValue>[^\"]+)\"",
+      ],
+    },
+  ],
+  // After a Helm dependency bump, re-extract CRDs from the new upstream tgz.
+  "packageRules": [
+    {
+      "matchPackageNames": ["strimzi-kafka-operator"],
+      "matchDatasources": ["helm"],
+      "postUpgradeTasks": {
+        "commands": ["make sync-crds"],
+        "fileFilters": ["helm/strimzi-kafka-operator/templates/crds/**"],
+        "executionMode": "branch",
+      },
+    },
   ],
 }
