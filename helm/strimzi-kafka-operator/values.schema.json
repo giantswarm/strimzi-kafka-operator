@@ -41,6 +41,21 @@
       },
       "additionalProperties": false
     },
+    "verticalPodAutoscaler": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "Create a VerticalPodAutoscaler for the operator. Requires VPA CRDs on the cluster."
+        },
+        "updateMode": {
+          "type": "string",
+          "enum": ["Auto", "Recreate", "Initial", "Off"],
+          "description": "VPA update mode: Auto/Recreate restart pods to apply recommendations; Initial applies only at creation; Off disables updates."
+        }
+      },
+      "additionalProperties": false
+    },
     "podMonitor": {
       "type": "object",
       "properties": {

@@ -24,6 +24,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `make show-images` Makefile target listing all images that require retagging.
 - Renovate `customManager` to track `kafka-bridge` tag independently from the operator version.
 - Renovate `postUpgradeTasks` to run `make sync-crds` automatically after a chart version bump.
+- PodDisruptionBudget enabled via upstream chart's built-in support (`podDisruptionBudget.enabled: true`, `minAvailable: 1`).
+- TopologySpreadConstraints to spread operator pods across nodes (`whenUnsatisfiable: ScheduleAnyway`).
+- VerticalPodAutoscaler template (`verticalPodAutoscaler.enabled`, disabled by default; requires VPA CRDs on the cluster).
 
 ### Images (strimzi-kafka-operator v0.51.0, Kafka 4.x)
 
