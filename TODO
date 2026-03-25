@@ -1,2 +1,15 @@
-Add the ksm metrics from the strimzi operator https://github.com/strimzi/strimzi-kafka-operator/blob/main/examples/metrics/kube-state-metrics/configmap.yaml
-Add alerts and rules from https://github.com/strimzi/strimzi-kafka-operator/blob/main/examples/metrics/kube-state-metrics?
+Observability:
+- Add KSM metrics from the strimzi operator https://github.com/strimzi/strimzi-kafka-operator/blob/main/examples/metrics/kube-state-metrics/configmap.yaml
+- Add PrometheusRule template with alerts (broker down, replication lag, high latency, disk space) from https://github.com/strimzi/strimzi-kafka-operator/blob/main/examples/metrics/kube-state-metrics
+- Write runbooks for each critical alert
+
+Testing (apptest-framework on WCs):
+- Basic deployment + integration test: install app, deploy Kafka CR, verify pods ready, verify metrics endpoint
+- Upgrade/rollback test: bump chart version, verify topic/message persistence
+- Chaos test: delete operator pod, verify leader election and recovery
+
+Documentation:
+- Auth/authz examples: KafkaUser, SASL/SCRAM, mTLS, cert-manager integration
+- Backup/DR docs: MirrorMaker2 for cross-cluster replication, PVC snapshot approach (Velero), retention policy config
+- Operational runbook: broker down, scale brokers, rebalance with Cruise Control
+- Troubleshooting guide: OOM, disk full, ISR shrinkage, common misconfigurations
