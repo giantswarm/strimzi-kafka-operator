@@ -36,6 +36,15 @@ To create a Kafka cluster, apply a Kafka CR in your target namespace
   https://strimzi.io/docs/operators/latest/deploying#deploying-kafka-cluster-kraft-str
 
 CRDs installed: {{ .Values.crds.install }}
+{{- if .Values.crds.install }}
+  NOTE: the bundled subchart also ships CRDs in its crds/ dir. Skip it so this
+  chart's templates manage CRD installs and upgrades instead:
+    Flux:    spec.install.crds: Skip  (HelmRelease)
+             Alternatively: spec.install.crds: CreateReplace + spec.upgrade.crds: CreateReplace
+             lets Flux manage CRDs directly — set crds.install: false in that case.
+    ArgoCD:  skipCrds: true           (Application .spec.source.helm)
+    Helm:    --skip-crds
+{{- end }}
 NetworkPolicy:  {{ if .Values.networkPolicy.enabled }}enabled ({{ .Values.networkPolicy.flavor }}){{ else }}disabled{{ end }}
 
 

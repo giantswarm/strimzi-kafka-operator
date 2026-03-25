@@ -1,3 +1,4 @@
+{{- if .Values.crds.install }}
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
@@ -5983,3 +5984,4 @@ spec:
                   type: integer
                   description: The current number of pods being used to provide this resource.
               description: The status of the Kafka MirrorMaker 2 cluster.
+{{- end }}

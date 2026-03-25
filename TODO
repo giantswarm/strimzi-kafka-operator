@@ -1,0 +1,2 @@
+Add the ksm metrics from the strimzi operator https://github.com/strimzi/strimzi-kafka-operator/blob/main/examples/metrics/kube-state-metrics/configmap.yaml
+Add alerts and rules from https://github.com/strimzi/strimzi-kafka-operator/blob/main/examples/metrics/kube-state-metrics?
