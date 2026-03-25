@@ -32,7 +32,10 @@ spec:
         - port: 6443
           protocol: TCP
     # Allow operator to reach Kafka components on all ports.
-    # Kafka uses many dynamic ports per topology; restricting here is impractical
-    # without full knowledge of each cluster's port configuration.
-    - {}
+    # Kafka uses many dynamic ports per topology; restricting per-port here is
+    # impractical without full knowledge of each cluster's port configuration.
+    # Restricted to cluster-internal pods only (no external egress).
+    - to:
+        - namespaceSelector: {}
+          podSelector: {}
 {{- end }}

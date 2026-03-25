@@ -121,8 +121,16 @@ strimzi-kafka-operator:
   # -- Keep Strimzi-generated NetworkPolicies for Kafka component pods.
   generateNetworkPolicy: true
 
-  # -- Watch all namespaces for Kafka CRs (default behaviour).
-  watchAnyNamespace: false
+  # -- Enable leader election. Must be true when replicas > 1 to avoid
+  # multiple active operators writing conflicting state.
+  leaderElection:
+    enable: true
+
+  # -- Watch all namespaces for Kafka CRs.
+  # Set to false and configure watchNamespaces if you want to restrict the
+  # operator to specific namespaces (e.g. in a shared cluster where teams
+  # manage their own operators).
+  watchAnyNamespace: true
 
   # -- PodDisruptionBudget for the operator Deployment.
   # Ensures at least one replica is available during voluntary disruptions
@@ -133,6 +141,8 @@ strimzi-kafka-operator:
 
   # -- TopologySpreadConstraints spread operator pods across nodes.
   # Uses ScheduleAnyway so scheduling is never blocked on single-node clusters.
+  # NOTE: requires upstream PR https://github.com/strimzi/strimzi-kafka-operator/pull/12560
+  # to be merged before these values have any effect.
   topologySpreadConstraints:
     - maxSkew: 1
       topologyKey: kubernetes.io/hostname
@@ -145,7 +155,7 @@ strimzi-kafka-operator:
   # The tenant label enables GS log ingestion for the operator pod.
   # Docs: https://docs.giantswarm.io/overview/observability/data-management/data-ingestion/
   labels:
-    "observability.giantswarm.io/tenant": atlas
+    "observability.giantswarm.io/tenant": giantswarm
 
   # -- Grafana dashboards shipped with the upstream chart (9 dashboards).
   # Covers: Kafka, KRaft, KafkaConnect, MirrorMaker2, Bridge, CruiseControl,
