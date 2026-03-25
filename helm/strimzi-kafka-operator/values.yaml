@@ -174,7 +174,7 @@ strimzi-kafka-operator:
   # Disabled by default — enable and set your Grafana organization to activate.
   # Docs: https://docs.giantswarm.io/overview/observability/dashboard-management/dashboard-creation/
   dashboards:
-    enabled: false
+    enabled: true
     # GS uses ConfigMap label 'app.giantswarm.io/kind: dashboard' for dashboard discovery.
     label: "app.giantswarm.io/kind"
     labelValue: "dashboard"
