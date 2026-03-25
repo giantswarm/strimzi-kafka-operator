@@ -1,0 +1,28 @@
+# PodMonitor for the Entity Operator (topic + user operator sidecar).
+# Exposes metrics on port healthcheck (8080).
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: strimzi-entity-operator
+  namespace: strimzi-system
+  labels:
+    observability.giantswarm.io/tenant: giantswarm
+spec:
+  namespaceSelector:
+    any: true
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: entity-operator
+  podMetricsEndpoints:
+    - port: healthcheck
+      path: /metrics
+      scheme: http
+      interval: 60s
+      scrapeTimeout: 30s
+      relabelings:
+        - sourceLabels: [__meta_kubernetes_namespace]
+          targetLabel: namespace
+          action: replace
+        - sourceLabels: [__meta_kubernetes_pod_name]
+          targetLabel: kubernetes_pod_name
+          action: replace

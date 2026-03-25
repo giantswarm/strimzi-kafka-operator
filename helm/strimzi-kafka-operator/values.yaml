@@ -10,15 +10,25 @@
 # CRDs are placed in templates/crds/ (not helm's crds/ dir) so they are
 # updated on `helm upgrade`. The `helm.sh/resource-policy: keep` annotation
 # prevents deletion on `helm uninstall` to protect user data.
+#
+# The bundled subchart also ships CRDs in its crds/ dir, which Helm installs
+# without ownership metadata — conflicting with this chart's templates. Skip it:
+#   Flux:    spec.install.crds: Skip (HelmRelease) — templates/crds/ handles lifecycle.
+#            Or use CreateReplace/CreateReplace and set crds.install: false to let
+#            Flux own CRD lifecycle from the subchart's crds/ dir instead.
+#   ArgoCD:  skipCrds: true (Application .spec.source.helm) — templates/crds/ handles lifecycle.
+#   Helm:    --skip-crds
 crds:
-  # Set to false if you manage CRDs externally (e.g. via a separate CRD chart).
+  # Requires pairing with --skip-crds / spec.install.crds: Skip / skipCrds: true
+  # so the subchart's crds/ dir is skipped — see comment above for details.
+  # Set to false to let Flux manage CRDs via CreateReplace instead.
   install: true
 
 # -- VerticalPodAutoscaler for the operator Deployment.
 # Requires the VPA CRD to be installed on the cluster (available on most GS CAPI clusters).
 # Disabled by default; enable per-installation if VPA is available.
 verticalPodAutoscaler:
-  enabled: false
+  enabled: true
   # "Auto" | "Recreate" | "Initial" | "Off"
   updateMode: "Auto"
 
@@ -32,10 +42,6 @@ networkPolicy:
   # "kubernetes" → standard NetworkPolicy
   flavor: cilium
 
-# -- KyvernoPolicyException to exempt the operator from GS Kyverno policies.
-kyvernoPolicyExceptions:
-  enabled: true
-  namespace: giantswarm
 
 # -- PrometheusRule with alerts for the Strimzi Cluster Operator.
 # Requires the PrometheusRule CRD (monitoring.coreos.com/v1) to be installed.
@@ -56,6 +62,24 @@ podMonitor:
   # The tenant label routes metrics to the correct Grafana Organization.
   labels:
     "observability.giantswarm.io/tenant": giantswarm
+
+# -- Grafana dashboards (9 dashboards: Kafka, KRaft, KafkaConnect, MirrorMaker2,
+# Bridge, CruiseControl, Exporter, OAuth, Operators).
+# The upstream chart's dashboard template is disabled because the JSON files lack
+# "uid" fields required by the GS admission webhook. This wrapper manages the
+# ConfigMaps instead, using JSONs extracted and UID-patched via `make sync-dashboards`.
+# Docs: https://docs.giantswarm.io/overview/observability/dashboard-management/dashboard-creation/
+dashboards:
+  enabled: true
+  # namespace defaults to .Release.Namespace when empty.
+  namespace: ""
+  # GS uses ConfigMap label 'app.giantswarm.io/kind: dashboard' for dashboard discovery.
+  label: "app.giantswarm.io/kind"
+  labelValue: "dashboard"
+  annotations:
+    # Set to your Grafana organization slug.
+    "observability.giantswarm.io/organization": "Shared Org"
+    "observability.giantswarm.io/folder": Kafka
 
 # -----------------------------------------------------------------------
 # Upstream strimzi-kafka-operator chart values.
@@ -124,6 +148,15 @@ strimzi-kafka-operator:
     seccompProfile:
       type: RuntimeDefault
 
+  # -- Use the restricted pod security provider so all Strimzi-generated pods
+  # (Kafka brokers, EntityOperator, etc.) get capabilities.drop=ALL,
+  # allowPrivilegeEscalation=false, runAsNonRoot=true, and seccompProfile=RuntimeDefault
+  # injected automatically. This satisfies GS Kyverno strict policies without
+  # needing a KyvernoPolicyException.
+  extraEnvs:
+    - name: STRIMZI_POD_SECURITY_PROVIDER_CLASS
+      value: io.strimzi.plugin.security.profiles.impl.RestrictedPodSecurityProvider
+
   # -- Disable the upstream-built-in NetworkPolicy for the operator pod.
   # We use our own GS-flavoured policy above (networkPolicy.enabled).
   operatorNetworkPolicy:
@@ -168,13 +201,15 @@ strimzi-kafka-operator:
   labels:
     "observability.giantswarm.io/tenant": giantswarm
 
-  # -- Grafana dashboards shipped with the upstream chart (9 dashboards).
-  # Covers: Kafka, KRaft, KafkaConnect, MirrorMaker2, Bridge, CruiseControl,
-  # Exporter, OAuth, and Operators.
-  # Disabled by default — enable and set your Grafana organization to activate.
-  # Docs: https://docs.giantswarm.io/overview/observability/dashboard-management/dashboard-creation/
+  # -- Subchart dashboard template disabled permanently.
+  # Two reasons we manage dashboards in the wrapper instead:
+  # 1. The upstream JSONs lack "uid" fields required by the GS admission webhook
+  #    (dashboardconfigmap.observability.giantswarm.io).
+  # 2. The subchart ships JMX-based dashboards; we use the strimzi-metrics-reporter
+  #    dashboards (+ strimzi-kafka-exporter) which require metricsConfig.type: strimziMetricsReporter.
+  # Dashboards are managed via the wrapper's dashboards: block and synced with `make sync-dashboards`.
   dashboards:
-    enabled: true
+    enabled: false
     # GS uses ConfigMap label 'app.giantswarm.io/kind: dashboard' for dashboard discovery.
     label: "app.giantswarm.io/kind"
     labelValue: "dashboard"
