@@ -6,12 +6,12 @@ crds:
   # Skip CRD installation during lint; CRD YAML is too large for dry-run.
   install: false
 
-networkPolicy:
-  # Disable: kind clusters used in CI have no Cilium or advanced NetworkPolicy.
+dashboards:
+  # Disable during lint; no Grafana in CI.
   enabled: false
 
-kyvernoPolicyExceptions:
-  # Disable: no Kyverno in CI kind clusters.
+networkPolicy:
+  # Disable: kind clusters used in CI have no Cilium or advanced NetworkPolicy.
   enabled: false
 
 podMonitor:

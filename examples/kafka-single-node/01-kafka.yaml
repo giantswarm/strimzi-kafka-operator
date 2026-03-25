@@ -1,0 +1,42 @@
+apiVersion: kafka.strimzi.io/v1
+kind: Kafka
+metadata:
+  name: my-cluster
+  namespace: strimzi-system
+  annotations:
+    strimzi.io/node-pools: enabled
+    strimzi.io/kraft: enabled
+spec:
+  kafka:
+    version: 4.2.0
+    metadataVersion: "4.2-IV1"
+    listeners:
+      - name: plain
+        port: 9092
+        type: internal
+        tls: false
+      - name: tls
+        port: 9093
+        type: internal
+        tls: true
+    config:
+      # Prevent races between the Topic Operator and apps auto-creating topics.
+      auto.create.topics.enable: "false"
+      # Single-node safe defaults (increase for multi-node clusters).
+      default.replication.factor: 1
+      min.insync.replicas: 1
+      offsets.topic.replication.factor: 1
+      transaction.state.log.replication.factor: 1
+      transaction.state.log.min.isr: 1
+    # Expose metrics natively via the Strimzi Metrics Reporter on port 9404.
+    # No ConfigMap required — the reporter is built into the Kafka image since Strimzi 0.44.
+    metricsConfig:
+      type: strimziMetricsReporter
+  entityOperator:
+    topicOperator: {}
+    userOperator: {}
+  # Kafka Exporter — exposes per-topic and per-consumer-group metrics (lag, offsets, etc.)
+  # on the same tcp-prometheus port (9404) as the broker, so 04-podmonitor-kafka.yaml covers it.
+  kafkaExporter:
+    topicRegex: ".*"
+    groupRegex: ".*"
