@@ -14,6 +14,10 @@ kyvernoPolicyExceptions:
   # Disable: no Kyverno in CI kind clusters.
   enabled: false
 
+podMonitor:
+  # Disable: no Prometheus CRDs in CI kind clusters.
+  enabled: false
+
 strimzi-kafka-operator:
   replicas: 1
 

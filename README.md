@@ -53,9 +53,10 @@ kyvernoPolicyExceptions:
 
 # Upstream overrides (see full list in values.yaml)
 strimzi-kafka-operator:
-  watchNamespaces: []   # empty = watch only release namespace
-  watchAnyNamespace: false
-  replicas: 1
+  # Default: true (watches all namespaces — recommended for a platform operator).
+  # Set to false and use watchNamespaces to restrict to specific namespaces.
+  watchAnyNamespace: true
+  replicas: 2
 ```
 
 See [helm/strimzi-kafka-operator/values.yaml](helm/strimzi-kafka-operator/values.yaml) for all options.
