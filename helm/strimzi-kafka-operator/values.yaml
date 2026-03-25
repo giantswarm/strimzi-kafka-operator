@@ -51,6 +51,9 @@ podMonitor:
   # The tenant label routes metrics to the correct Grafana Organization.
   labels:
     "observability.giantswarm.io/tenant": giantswarm
+  # -- PodMonitors for Kafka workloads managed by the operator (cross-namespace).
+  workloads:
+    enabled: true
 
 # -- Grafana dashboards (9 dashboards: Kafka, KRaft, KafkaConnect, MirrorMaker2,
 # Bridge, CruiseControl, Exporter, OAuth, Operators).
@@ -198,4 +201,11 @@ strimzi-kafka-operator:
   #    dashboards (+ strimzi-kafka-exporter) which require metricsConfig.type: strimziMetricsReporter.
   # Dashboards are managed via the wrapper's dashboards: block and synced with `make sync-dashboards`.
   dashboards:
-    enabled: false
+    enabled: true
+    # GS uses ConfigMap label 'app.giantswarm.io/kind: dashboard' for dashboard discovery.
+    label: "app.giantswarm.io/kind"
+    labelValue: "dashboard"
+    annotations:
+      # Set to your Grafana organization slug.
+      "observability.giantswarm.io/organization": "Shared Org"
+      "observability.giantswarm.io/folder": Kafka

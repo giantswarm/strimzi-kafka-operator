@@ -80,6 +80,17 @@
           "type": "object",
           "description": "Labels added to the PodMonitor resource. Use 'observability.giantswarm.io/tenant' to route metrics to a Grafana Organization.",
           "additionalProperties": { "type": "string" }
+        },
+        "workloads": {
+          "type": "object",
+          "description": "PodMonitors for Kafka workloads managed by the operator (cross-namespace).",
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "description": "Create PodMonitors for Kafka, KafkaBridge, and Entity Operator pods across all namespaces."
+            }
+          },
+          "additionalProperties": false
         }
       },
       "additionalProperties": false
