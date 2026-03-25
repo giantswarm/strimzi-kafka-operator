@@ -1,0 +1,77 @@
+{{- if .Values.prometheusRule.enabled }}
+{{- $extraLabels := .Values.prometheusRule.extraAlertLabels | default dict }}
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: {{ include "strimzi-kafka-operator.fullname" . }}
+  namespace: {{ .Release.Namespace | quote }}
+  labels:
+    {{- include "strimzi-kafka-operator.labels" . | nindent 4 }}
+    {{- with .Values.prometheusRule.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  groups:
+    - name: strimzi-cluster-operator
+      rules:
+        - alert: StrimziClusterOperatorDown
+          expr: |
+            kube_deployment_status_replicas_available{deployment="strimzi-cluster-operator"} == 0
+          for: 2m
+          labels:
+            {{- merge $extraLabels (dict "area" "platform" "severity" "page" "team" "atlas" "topic" "kafka") | toYaml | nindent 12 }}
+          annotations:
+            description: >-
+              The Strimzi Cluster Operator Deployment has no available replicas
+              in namespace {{ "{{" }} $labels.namespace {{ "}}" }}.
+              No Kafka resources will be reconciled until the operator is restored.
+
+        - alert: StrimziClusterOperatorReconciliationErrors
+          expr: |
+            rate(strimzi_reconciliations_failed_total[5m]) > 0
+          for: 5m
+          labels:
+            {{- merge $extraLabels (dict "area" "platform" "severity" "notify" "team" "atlas" "topic" "kafka") | toYaml | nindent 12 }}
+          annotations:
+            description: >-
+              The Strimzi Cluster Operator is failing to reconcile
+              {{ "{{" }} $labels.kind {{ "}}" }} resources at a rate of
+              {{ "{{" }} printf "%.2f" $value {{ "}}" }} failures/s in
+              namespace {{ "{{" }} $labels.namespace {{ "}}" }}.
+
+        - alert: StrimziCertificateExpiringSoon
+          expr: |
+            (strimzi_certificate_expiration_timestamp_ms / 1000) - time() < 14 * 24 * 60 * 60
+          for: 5m
+          labels:
+            {{- merge $extraLabels (dict "area" "platform" "severity" "notify" "team" "atlas" "topic" "kafka") | toYaml | nindent 12 }}
+          annotations:
+            description: >-
+              The {{ "{{" }} $labels.type {{ "}}" }} certificate for Kafka cluster
+              {{ "{{" }} $labels.cluster {{ "}}" }} in namespace
+              {{ "{{" }} $labels.resource_namespace {{ "}}" }} will expire in less than 14 days.
+
+        - alert: StrimziCertificateExpiringCritical
+          expr: |
+            (strimzi_certificate_expiration_timestamp_ms / 1000) - time() < 7 * 24 * 60 * 60
+          for: 5m
+          labels:
+            {{- merge $extraLabels (dict "area" "platform" "severity" "page" "team" "atlas" "topic" "kafka") | toYaml | nindent 12 }}
+          annotations:
+            description: >-
+              The {{ "{{" }} $labels.type {{ "}}" }} certificate for Kafka cluster
+              {{ "{{" }} $labels.cluster {{ "}}" }} in namespace
+              {{ "{{" }} $labels.resource_namespace {{ "}}" }} will expire in less than 7 days.
+
+        - alert: StrimziResourcesPaused
+          expr: |
+            strimzi_resources_paused > 0
+          for: 1h
+          labels:
+            {{- merge $extraLabels (dict "area" "platform" "severity" "notify" "team" "atlas" "topic" "kafka") | toYaml | nindent 12 }}
+          annotations:
+            description: >-
+              {{ "{{" }} $value {{ "}}" }} {{ "{{" }} $labels.kind {{ "}}" }} resource(s)
+              in namespace {{ "{{" }} $labels.namespace {{ "}}" }} have had reconciliation
+              paused for more than 1 hour. Ensure this is intentional.
+{{- end }}

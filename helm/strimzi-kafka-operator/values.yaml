@@ -43,6 +43,17 @@ networkPolicy:
   flavor: cilium
 
 
+# -- PrometheusRule with alerts for the Strimzi Cluster Operator.
+# Requires the PrometheusRule CRD (monitoring.coreos.com/v1) to be installed.
+# Alerts follow GS conventions: area=platform, team=atlas, topic=kafka.
+prometheusRule:
+  enabled: false
+  # labels are added to the PrometheusRule resource itself.
+  labels: {}
+  # extraAlertLabels are merged into every alert rule's labels block.
+  # Use this to add or override per-alert labels (e.g. team, topic, cancel_if_*).
+  extraAlertLabels: {}
+
 # -- PodMonitor for scraping operator metrics (port 8080 / Prometheus format).
 # Docs: https://docs.giantswarm.io/overview/observability/data-management/data-ingestion/
 podMonitor:
@@ -199,3 +210,10 @@ strimzi-kafka-operator:
   # Dashboards are managed via the wrapper's dashboards: block and synced with `make sync-dashboards`.
   dashboards:
     enabled: false
+    # GS uses ConfigMap label 'app.giantswarm.io/kind: dashboard' for dashboard discovery.
+    label: "app.giantswarm.io/kind"
+    labelValue: "dashboard"
+    annotations:
+      # Set to your Grafana organization slug.
+      "observability.giantswarm.io/organization": "Shared Org"
+      "observability.giantswarm.io/folder": Kafka

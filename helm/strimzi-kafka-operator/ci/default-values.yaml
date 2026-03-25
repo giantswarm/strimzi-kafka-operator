@@ -18,6 +18,10 @@ podMonitor:
   # Disable: no Prometheus CRDs in CI kind clusters.
   enabled: false
 
+prometheusRule:
+  # Disable: no Prometheus CRDs in CI kind clusters.
+  enabled: false
+
 strimzi-kafka-operator:
   replicas: 1
 
