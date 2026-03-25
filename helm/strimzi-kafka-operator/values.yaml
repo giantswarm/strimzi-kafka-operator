@@ -37,6 +37,17 @@ kyvernoPolicyExceptions:
   enabled: true
   namespace: giantswarm
 
+# -- PrometheusRule with alerts for the Strimzi Cluster Operator.
+# Requires the PrometheusRule CRD (monitoring.coreos.com/v1) to be installed.
+# Alerts follow GS conventions: area=platform, team=atlas, topic=kafka.
+prometheusRule:
+  enabled: false
+  # labels are added to the PrometheusRule resource itself.
+  labels: {}
+  # extraAlertLabels are merged into every alert rule's labels block.
+  # Use this to add or override per-alert labels (e.g. team, topic, cancel_if_*).
+  extraAlertLabels: {}
+
 # -- PodMonitor for scraping operator metrics (port 8080 / Prometheus format).
 # Docs: https://docs.giantswarm.io/overview/observability/data-management/data-ingestion/
 podMonitor:
