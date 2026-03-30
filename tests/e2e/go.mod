@@ -1,4 +1,4 @@
-module github.com/giantswarm/strimzi-kafka-operator-app/tests/e2e
+module github.com/giantswarm/strimzi-kafka-operator/tests/e2e
 
 go 1.25.7
 

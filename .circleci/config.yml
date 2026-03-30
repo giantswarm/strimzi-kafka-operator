@@ -8,15 +8,12 @@ workflows:
       - architect/push-to-app-catalog:
           context: architect
           executor: app-build-suite
-          name: package-and-push-chart
+          name: push-to-giantswarm-catalog
           app_catalog: giantswarm-catalog
           app_catalog_test: giantswarm-test-catalog
           chart: strimzi-kafka-operator
-          push_to_oci_registry: true
           persist_chart_archive: true
+          ct_config: ".circleci/ct-config.yaml"
           filters:
             tags:
               only: /^v.*/
-            branches:
-              ignore:
-                - main

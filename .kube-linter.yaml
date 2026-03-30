@@ -1,0 +1,23 @@
+checks:
+  addAllBuiltIn: true
+  exclude:
+    # The upstream strimzi-kafka-operator subchart does not expose
+    # unhealthyPodEvictionPolicy in its PDB template and cannot be patched
+    # without forking the chart. Ignored until upstream adds support.
+    - "pdb-unhealthy-pod-eviction-policy"
+    # CRDs are generated from the upstream chart and contain unsorted keys in
+    # their OpenAPI v3 schemas (e.g. [type, items] vs [items, type]). Key order
+    # is controlled upstream; we cannot sort them without forking.
+    - "sorted-keys"
+    - "access-to-secrets"
+    - "use-namespace"
+    - "access-to-create-pods"
+    # --- upstream Deployment (060-Deployment-strimzi-cluster-operator.yaml) ---
+    # These checks fail on the vendored subchart template which cannot be modified.
+    - "dnsconfig-options"           # GS-specific; upstream charts don't set DNSConfig
+    - "minimum-three-replicas"      # Intentional: 2 replicas with leader election
+    - "no-node-affinity"            # podAntiAffinity + TopologySpreadConstraints cover scheduling
+    - "no-rolling-update-strategy"  # Upstream relies on k8s default RollingUpdate
+    - "non-isolated-pod"            # operatorNetworkPolicy in upstream chart isolates the pod
+    - "required-annotation-email"   # GS-internal check; upstream charts don't carry this
+    - "required-label-owner"        # GS-internal check; upstream charts don't carry this
