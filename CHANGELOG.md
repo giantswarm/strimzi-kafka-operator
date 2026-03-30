@@ -43,4 +43,4 @@ All images retagged from `quay.io/strimzi/*` → `gsoci.azurecr.io/giantswarm/st
 | `quay.io/strimzi/buildah` | `0.51.0` | Connector build support |
 | `quay.io/strimzi/maven-builder` | `0.51.0` | Connector build support |
 
-[Unreleased]: https://github.com/giantswarm/strimzi-kafka-operatortree/main
+[Unreleased]: https://github.com/giantswarm/strimzi-kafka-operator/tree/main
