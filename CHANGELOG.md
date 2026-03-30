@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.1] - 2026-03-30
+
 ### Added
 
 - Initial release wrapping upstream `strimzi-kafka-operator` chart v0.51.0.
@@ -43,4 +45,5 @@ All images retagged from `quay.io/strimzi/*` → `gsoci.azurecr.io/giantswarm/st
 | `quay.io/strimzi/buildah` | `0.51.0` | Connector build support |
 | `quay.io/strimzi/maven-builder` | `0.51.0` | Connector build support |
 
-[Unreleased]: https://github.com/giantswarm/strimzi-kafka-operator/tree/main
+[Unreleased]: https://github.com/giantswarm/strimzi-kafka-operator/compare/v0.0.1...HEAD
+[0.0.1]: https://github.com/giantswarm/strimzi-kafka-operator/releases/tag/v0.0.1
