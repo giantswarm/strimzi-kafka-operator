@@ -49,5 +49,5 @@ NetworkPolicy:  {{ if .Values.networkPolicy.enabled }}enabled ({{ .Values.networ
 
 
 For full documentation see:
-  https://github.com/giantswarm/strimzi-kafka-operator-app
+  https://github.com/giantswarm/strimzi-kafka-operator
   https://strimzi.io/documentation/

@@ -12,21 +12,6 @@
       },
       "additionalProperties": false
     },
-    "networkPolicy": {
-      "type": "object",
-      "properties": {
-        "enabled": {
-          "type": "boolean",
-          "description": "Enable NetworkPolicy for the strimzi operator pod."
-        },
-        "flavor": {
-          "type": "string",
-          "enum": ["cilium", "kubernetes"],
-          "description": "NetworkPolicy flavor: 'cilium' for CiliumNetworkPolicy, 'kubernetes' for standard NetworkPolicy."
-        }
-      },
-      "additionalProperties": false
-    },
     "dashboards": {
       "type": "object",
       "properties": {
