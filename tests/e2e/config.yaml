@@ -1,0 +1,6 @@
+appName: strimzi-kafka-operator
+repoName: strimzi-kafka-operator-app
+appCatalog: giantswarm
+providers:
+  - capa
+  - capz

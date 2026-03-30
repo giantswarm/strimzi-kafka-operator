@@ -1,0 +1,10 @@
+# Helm values applied during the e2e test install.
+# Mirrors tests/test-values.yaml but scoped to the suite.
+verticalPodAutoscaler:
+  enabled: false
+
+strimzi-kafka-operator:
+  replicas: 1
+  podDisruptionBudget:
+    enabled: false
+  topologySpreadConstraints: []
