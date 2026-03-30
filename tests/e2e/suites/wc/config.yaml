@@ -1,7 +1,0 @@
-appName: strimzi-kafka-operator
-repoName: strimzi-kafka-operator
-appCatalog: giantswarm
-providers:
-  - capa
-  - capz
-isMCTest: false
