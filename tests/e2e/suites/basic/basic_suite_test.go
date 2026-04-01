@@ -1,4 +1,4 @@
-package wc_test
+package basic_test
 
 import (
 	"context"
@@ -26,33 +26,19 @@ import (
 )
 
 const (
-	// installNamespace is where the strimzi-kafka-operator chart is installed.
-	installNamespace = "strimzi-system"
-
-	// kafkaNamespace is the test namespace created to hold the Kafka CR.
-	kafkaNamespace = "kafka-test"
-
-	// kafkaClusterName is used for both the Kafka CR and KafkaNodePool CR.
-	kafkaClusterName = "test-cluster"
-
-	// kafkaPoolName is the KafkaNodePool name; the broker pod will be <cluster>-<pool>-0.
-	kafkaPoolName = "dual-role"
-
-	// operatorDeploymentName matches the upstream strimzi chart default.
+	installNamespace       = "strimzi-system"
+	kafkaNamespace         = "kafka-test"
+	kafkaClusterName       = "test-cluster"
+	kafkaPoolName          = "dual-role"
 	operatorDeploymentName = "strimzi-cluster-operator"
-
-	// mimirEndpoint is the Prometheus-compatible query API on the MC Mimir instance.
-	// Queried via a pod running on the MC (not from the test process, which runs remotely).
-	mimirEndpoint = "http://mimir-gateway.mimir.svc/prometheus/api/v1/query"
+	mimirEndpoint          = "http://mimir-gateway.mimir.svc/prometheus/api/v1/query"
 )
 
-var isUpgrade = false
-
-func TestWC(t *testing.T) {
+func TestBasic(t *testing.T) {
 	suite.New().
 		WithHelmRelease(true).
 		WithHelmTargetNamespace(installNamespace).
-		WithIsUpgrade(isUpgrade).
+		WithIsUpgrade(false).
 		WithValuesFile("./values.yaml").
 		AfterClusterReady(func() {
 			It("should have WC API connectivity", func() {
@@ -70,9 +56,6 @@ func TestWC(t *testing.T) {
 					Expect(err).NotTo(HaveOccurred())
 				})
 
-				// ------------------------------------------------------------
-				// 1. Operator readiness
-				// ------------------------------------------------------------
 				It("operator Deployment should become ready", func() {
 					ctx := state.GetContext()
 					Eventually(func() (bool, error) {
@@ -81,7 +64,7 @@ func TestWC(t *testing.T) {
 							Namespace: installNamespace,
 							Name:      operatorDeploymentName,
 						}, &dep); err != nil {
-							return false, nil //nolint:nilerr // not ready yet, keep polling
+							return false, nil //nolint:nilerr
 						}
 						if dep.Spec.Replicas == nil {
 							return false, nil
@@ -92,11 +75,7 @@ func TestWC(t *testing.T) {
 						"operator Deployment %s/%s never became ready", installNamespace, operatorDeploymentName)
 				})
 
-				// ------------------------------------------------------------
-				// 2. Kafka integration
-				// ------------------------------------------------------------
 				Describe("kafka integration", Ordered, func() {
-					// Stubs used by DoesResourceExist / IsResourceDeleted.
 					var (
 						kafkaNodePoolRef *unstructured.Unstructured
 						kafkaRef         *unstructured.Unstructured
@@ -106,7 +85,6 @@ func TestWC(t *testing.T) {
 					BeforeAll(func() {
 						ctx := state.GetContext()
 
-						By("creating test namespace " + kafkaNamespace)
 						namespaceRef = &corev1.Namespace{
 							ObjectMeta: metav1.ObjectMeta{Name: kafkaNamespace},
 						}
@@ -115,21 +93,18 @@ func TestWC(t *testing.T) {
 							Expect(err).NotTo(HaveOccurred())
 						}
 
-						By("deploying KafkaNodePool CR")
 						kafkaNodePoolRef = kafkaNodePoolManifest()
 						err = wcClient.Create(ctx, kafkaNodePoolRef)
 						if err != nil && !apierrors.IsAlreadyExists(err) {
 							Expect(err).NotTo(HaveOccurred())
 						}
 
-						By("deploying Kafka CR")
 						kafkaRef = kafkaManifest()
 						err = wcClient.Create(ctx, kafkaRef)
 						if err != nil && !apierrors.IsAlreadyExists(err) {
 							Expect(err).NotTo(HaveOccurred())
 						}
 
-						By("waiting for Kafka CRs to be accepted by the operator")
 						Eventually(wait.DoesResourceExist(ctx, wcClient, kafkaNodePoolRef)).
 							WithPolling(5 * time.Second).WithTimeout(2 * time.Minute).Should(BeTrue())
 						Eventually(wait.DoesResourceExist(ctx, wcClient, kafkaRef)).
@@ -138,7 +113,6 @@ func TestWC(t *testing.T) {
 
 					AfterAll(func() {
 						ctx := state.GetContext()
-						By("deleting test namespace " + kafkaNamespace)
 						_ = wcClient.Delete(ctx, namespaceRef)
 						Eventually(wait.IsResourceDeleted(ctx, wcClient, namespaceRef)).
 							WithPolling(10 * time.Second).WithTimeout(5 * time.Minute).Should(BeTrue())
@@ -189,8 +163,6 @@ func TestWC(t *testing.T) {
 						ctx := state.GetContext()
 						mcClient := state.GetFramework().MC()
 
-						// Spin up an alpine pod on the MC so we can reach mimir-gateway.mimir.svc
-						// from within the MC cluster (the test process runs remotely).
 						podName := fmt.Sprintf("%s-metrics-test", state.GetCluster().Name)
 						t := true
 						f := false
@@ -232,7 +204,6 @@ func TestWC(t *testing.T) {
 							_ = mcClient.Delete(context.Background(), pod)
 						})
 
-						By("waiting for metrics test pod to be running on MC")
 						Eventually(func() (bool, error) {
 							var p corev1.Pod
 							if err := mcClient.Get(ctx, types.NamespacedName{Namespace: "default", Name: podName}, &p); err != nil {
@@ -241,8 +212,6 @@ func TestWC(t *testing.T) {
 							return p.Status.Phase == corev1.PodRunning, nil
 						}).WithPolling(5*time.Second).WithTimeout(2*time.Minute).Should(BeTrue())
 
-						// The PodMonitor scrapes every 60 s; allow several scrape cycles for
-						// metrics to propagate through Alloy → remote-write → Mimir.
 						promQL := fmt.Sprintf(`kafka_server_replicamanager_leadercount{cluster_id=%q,namespace=%q}`,
 							state.GetCluster().Name, kafkaNamespace)
 						Eventually(queryMimirViaPod(ctx, mcClient, podName, promQL)).
@@ -252,11 +221,9 @@ func TestWC(t *testing.T) {
 				})
 			})
 		}).
-		Run(t, "strimzi-kafka-operator WC test")
+		Run(t, "strimzi-kafka-operator basic")
 }
 
-// kafkaNodePoolManifest returns the KafkaNodePool CR for a single-node KRaft cluster.
-// Uses apiVersion v1 (served; matches examples in this repo).
 func kafkaNodePoolManifest() *unstructured.Unstructured {
 	u := &unstructured.Unstructured{}
 	u.SetGroupVersionKind(schema.GroupVersionKind{
@@ -266,9 +233,7 @@ func kafkaNodePoolManifest() *unstructured.Unstructured {
 	})
 	u.SetName(kafkaPoolName)
 	u.SetNamespace(kafkaNamespace)
-	u.SetLabels(map[string]string{
-		"strimzi.io/cluster": kafkaClusterName,
-	})
+	u.SetLabels(map[string]string{"strimzi.io/cluster": kafkaClusterName})
 	_ = unstructured.SetNestedField(u.Object, map[string]interface{}{
 		"replicas": int64(1),
 		"roles":    []interface{}{"controller", "broker"},
@@ -286,8 +251,6 @@ func kafkaNodePoolManifest() *unstructured.Unstructured {
 	return u
 }
 
-// kafkaManifest returns the Kafka CR for a single-node KRaft cluster with built-in
-// metrics reporter (strimziMetricsReporter) on port 9404.
 func kafkaManifest() *unstructured.Unstructured {
 	u := &unstructured.Unstructured{}
 	u.SetGroupVersionKind(schema.GroupVersionKind{
@@ -333,7 +296,6 @@ func kafkaManifest() *unstructured.Unstructured {
 	return u
 }
 
-// mimirResponse is the subset of the Prometheus HTTP API response we care about.
 type mimirResponse struct {
 	Status string `json:"status"`
 	Data   struct {
@@ -341,8 +303,6 @@ type mimirResponse struct {
 	} `json:"data"`
 }
 
-// queryMimirViaPod returns a WaitCondition that execs wget inside podName (running on the MC)
-// to query Mimir, and resolves to true when at least one result is returned.
 func queryMimirViaPod(ctx context.Context, mcClient *crclient.Client, podName, promQL string) func() (bool, error) {
 	return func() (bool, error) {
 		cmd := []string{
@@ -354,12 +314,10 @@ func queryMimirViaPod(ctx context.Context, mcClient *crclient.Client, podName, p
 		if err != nil {
 			return false, nil //nolint:nilerr
 		}
-
 		var result mimirResponse
 		if err := json.Unmarshal([]byte(stdout), &result); err != nil {
 			return false, nil //nolint:nilerr
 		}
-
 		return result.Status == "success" && len(result.Data.Result) > 0, nil
 	}
 }
