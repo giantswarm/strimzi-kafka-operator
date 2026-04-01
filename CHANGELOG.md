@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.2] - 2026-04-01
+
 ### Added
 
 - E2E tests for workload cluster deployments: operator readiness, Kafka/KafkaNodePool CR lifecycle, broker pod readiness, entity-operator readiness, and metrics availability in Mimir.
@@ -49,5 +51,6 @@ All images retagged from `quay.io/strimzi/*` → `gsoci.azurecr.io/giantswarm/st
 | `quay.io/strimzi/buildah` | `0.51.0` | Connector build support |
 | `quay.io/strimzi/maven-builder` | `0.51.0` | Connector build support |
 
-[Unreleased]: https://github.com/giantswarm/strimzi-kafka-operator/compare/v0.0.1...HEAD
+[Unreleased]: https://github.com/giantswarm/strimzi-kafka-operator/compare/v0.0.2...HEAD
+[0.0.2]: https://github.com/giantswarm/strimzi-kafka-operator/compare/v0.0.1...v0.0.2
 [0.0.1]: https://github.com/giantswarm/strimzi-kafka-operator/releases/tag/v0.0.1
