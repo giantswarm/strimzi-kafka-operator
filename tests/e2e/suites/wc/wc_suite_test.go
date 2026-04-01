@@ -347,7 +347,7 @@ func queryMimirViaPod(ctx context.Context, mcClient *crclient.Client, podName, p
 	return func() (bool, error) {
 		cmd := []string{
 			"wget", "-O-", "-Y", "off",
-			"--header", "X-Scope-OrgID: anonymous|giantswarm",
+			"--header", "X-Scope-OrgID: giantswarm",
 			fmt.Sprintf("%s?query=%s", mimirEndpoint, url.QueryEscape(promQL)),
 		}
 		stdout, _, err := mcClient.ExecInPod(ctx, podName, "default", "test", cmd)
