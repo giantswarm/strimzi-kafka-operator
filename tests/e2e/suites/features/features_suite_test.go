@@ -203,7 +203,7 @@ func TestFeatures(t *testing.T) {
 						testMessage := "e2e-persistence-test"
 
 						By("producing a message")
-						_, _, err := wcClient.ExecInPod(ctx, brokerPodName, kafkaNamespace, kafkaClusterName,
+						_, _, err := wcClient.ExecInPod(ctx, brokerPodName, kafkaNamespace, "kafka",
 							[]string{"sh", "-c", fmt.Sprintf(
 								"echo %q | /opt/kafka/bin/kafka-console-producer.sh --bootstrap-server %s --topic %s",
 								testMessage, bootstrapAddress, topicName,
@@ -237,7 +237,7 @@ func TestFeatures(t *testing.T) {
 
 						By("consuming the message and verifying it survived")
 						Eventually(func() (bool, error) {
-							stdout, _, err := wcClient.ExecInPod(ctx, brokerPodName, kafkaNamespace, kafkaClusterName,
+							stdout, _, err := wcClient.ExecInPod(ctx, brokerPodName, kafkaNamespace, "kafka",
 								[]string{
 									"/opt/kafka/bin/kafka-console-consumer.sh",
 									"--bootstrap-server", bootstrapAddress,
@@ -471,7 +471,7 @@ func kafkaTopicManifestWithRF(name string, replicationFactor int64) *unstructure
 	u := &unstructured.Unstructured{}
 	u.SetGroupVersionKind(schema.GroupVersionKind{
 		Group:   "kafka.strimzi.io",
-		Version: "v1beta2",
+		Version: "v1",
 		Kind:    "KafkaTopic",
 	})
 	u.SetName(name)
@@ -489,7 +489,7 @@ func kafkaUserManifest(name string) *unstructured.Unstructured {
 	u := &unstructured.Unstructured{}
 	u.SetGroupVersionKind(schema.GroupVersionKind{
 		Group:   "kafka.strimzi.io",
-		Version: "v1beta2",
+		Version: "v1",
 		Kind:    "KafkaUser",
 	})
 	u.SetName(name)
