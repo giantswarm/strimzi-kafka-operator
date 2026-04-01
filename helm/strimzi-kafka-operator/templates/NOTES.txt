@@ -45,8 +45,6 @@ CRDs installed: {{ .Values.crds.install }}
     ArgoCD:  skipCrds: true           (Application .spec.source.helm)
     Helm:    --skip-crds
 {{- end }}
-NetworkPolicy:  {{ if .Values.networkPolicy.enabled }}enabled ({{ .Values.networkPolicy.flavor }}){{ else }}disabled{{ end }}
-
 
 For full documentation see:
   https://github.com/giantswarm/strimzi-kafka-operator
