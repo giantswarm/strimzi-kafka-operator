@@ -5,7 +5,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"net"
 	"net/http"
+	"net/url"
 	"testing"
 	"time"
 
@@ -15,7 +17,6 @@ import (
 	"github.com/giantswarm/apptest-framework/v4/pkg/state"
 	"github.com/giantswarm/apptest-framework/v4/pkg/suite"
 	crclient "github.com/giantswarm/clustertest/v4/pkg/client"
-	clusternetwork "github.com/giantswarm/clustertest/v4/pkg/net"
 	"github.com/giantswarm/clustertest/v4/pkg/wait"
 
 	appsv1 "k8s.io/api/apps/v1"
@@ -294,7 +295,14 @@ type mimirResponse struct {
 // queryMimir returns a WaitCondition that polls Mimir with the given PromQL expression
 // and resolves to true when at least one result is returned.
 func queryMimir(ctx context.Context, promQL string) func() (bool, error) {
-	httpClient := clusternetwork.NewHTTPClient()
+	// Use a no-proxy transport: mimir-gateway.mimir.svc is in-cluster and must
+	// not be routed through HTTP_PROXY (which is set for external/VPN traffic).
+	httpClient := &http.Client{
+		Transport: &http.Transport{
+			Proxy: func(*http.Request) (*url.URL, error) { return nil, nil },
+			DialContext: (&net.Dialer{}).DialContext,
+		},
+	}
 	return func() (bool, error) {
 		req, err := http.NewRequestWithContext(ctx, http.MethodGet, mimirURL, nil)
 		if err != nil {
