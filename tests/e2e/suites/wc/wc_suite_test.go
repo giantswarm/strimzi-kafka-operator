@@ -4,9 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io"
-	"net"
-	"net/http"
 	"net/url"
 	"testing"
 	"time"
@@ -44,13 +41,9 @@ const (
 	// operatorDeploymentName matches the upstream strimzi chart default.
 	operatorDeploymentName = "strimzi-cluster-operator"
 
-	// mimirURL is the Prometheus-compatible query API for the MC-hosted Mimir instance.
-	// The test runner executes inside the MC so the in-cluster service is reachable directly.
-	mimirURL = "http://mimir-gateway.mimir.svc/prometheus/api/v1/query"
-
-	// mimirTenant routes the query to the GS observability tenant, matching the
-	// observability.giantswarm.io/tenant label on the PodMonitor resources.
-	mimirTenant = "giantswarm"
+	// mimirEndpoint is the Prometheus-compatible query API on the MC Mimir instance.
+	// Queried via a pod running on the MC (not from the test process, which runs remotely).
+	mimirEndpoint = "http://mimir-gateway.mimir.svc/prometheus/api/v1/query"
 )
 
 var isUpgrade = false
@@ -193,10 +186,66 @@ func TestWC(t *testing.T) {
 					})
 
 					It("Kafka broker metrics should appear in Mimir", func() {
+						ctx := state.GetContext()
+						mcClient := state.GetFramework().MC()
+
+						// Spin up an alpine pod on the MC so we can reach mimir-gateway.mimir.svc
+						// from within the MC cluster (the test process runs remotely).
+						podName := fmt.Sprintf("%s-metrics-test", state.GetCluster().Name)
+						t := true
+						f := false
+						uid := int64(35)
+						pod := &corev1.Pod{
+							ObjectMeta: metav1.ObjectMeta{
+								Name:      podName,
+								Namespace: "default",
+							},
+							Spec: corev1.PodSpec{
+								SecurityContext: &corev1.PodSecurityContext{
+									RunAsUser:    &uid,
+									RunAsGroup:   &uid,
+									RunAsNonRoot: &t,
+									SeccompProfile: &corev1.SeccompProfile{
+										Type: corev1.SeccompProfileTypeRuntimeDefault,
+									},
+								},
+								Containers: []corev1.Container{
+									{
+										Name:  "test",
+										Image: "gsoci.azurecr.io/giantswarm/alpine:latest",
+										Args:  []string{"sleep", "99999999"},
+										SecurityContext: &corev1.SecurityContext{
+											AllowPrivilegeEscalation: &f,
+											Capabilities: &corev1.Capabilities{
+												Drop: []corev1.Capability{"ALL"},
+											},
+										},
+									},
+								},
+							},
+						}
+						err := mcClient.Create(ctx, pod)
+						if err != nil && !apierrors.IsAlreadyExists(err) {
+							Expect(err).NotTo(HaveOccurred())
+						}
+						DeferCleanup(func() {
+							_ = mcClient.Delete(context.Background(), pod)
+						})
+
+						By("waiting for metrics test pod to be running on MC")
+						Eventually(func() (bool, error) {
+							var p corev1.Pod
+							if err := mcClient.Get(ctx, types.NamespacedName{Namespace: "default", Name: podName}, &p); err != nil {
+								return false, nil //nolint:nilerr
+							}
+							return p.Status.Phase == corev1.PodRunning, nil
+						}).WithPolling(5*time.Second).WithTimeout(2*time.Minute).Should(BeTrue())
+
 						// The PodMonitor scrapes every 60 s; allow several scrape cycles for
 						// metrics to propagate through Alloy → remote-write → Mimir.
-						promQL := fmt.Sprintf(`kafka_server_replicamanager_leadercount{namespace=%q}`, kafkaNamespace)
-						Eventually(queryMimir(state.GetContext(), promQL)).
+						promQL := fmt.Sprintf(`kafka_server_replicamanager_leadercount{cluster_id=%q,namespace=%q}`,
+							state.GetCluster().Name, kafkaNamespace)
+						Eventually(queryMimirViaPod(ctx, mcClient, podName, promQL)).
 							WithPolling(30*time.Second).WithTimeout(5*time.Minute).Should(BeTrue(),
 							"PromQL %q returned no results in Mimir after 5 minutes", promQL)
 					})
@@ -292,45 +341,22 @@ type mimirResponse struct {
 	} `json:"data"`
 }
 
-// queryMimir returns a WaitCondition that polls Mimir with the given PromQL expression
-// and resolves to true when at least one result is returned.
-func queryMimir(ctx context.Context, promQL string) func() (bool, error) {
-	// Use a no-proxy transport: mimir-gateway.mimir.svc is in-cluster and must
-	// not be routed through HTTP_PROXY (which is set for external/VPN traffic).
-	httpClient := &http.Client{
-		Transport: &http.Transport{
-			Proxy: func(*http.Request) (*url.URL, error) { return nil, nil },
-			DialContext: (&net.Dialer{}).DialContext,
-		},
-	}
+// queryMimirViaPod returns a WaitCondition that execs wget inside podName (running on the MC)
+// to query Mimir, and resolves to true when at least one result is returned.
+func queryMimirViaPod(ctx context.Context, mcClient *crclient.Client, podName, promQL string) func() (bool, error) {
 	return func() (bool, error) {
-		req, err := http.NewRequestWithContext(ctx, http.MethodGet, mimirURL, nil)
-		if err != nil {
-			return false, fmt.Errorf("building Mimir request: %w", err)
+		cmd := []string{
+			"wget", "-O-", "-Y", "off",
+			"--header", "X-Scope-OrgID: anonymous|giantswarm",
+			fmt.Sprintf("%s?query=%s", mimirEndpoint, url.QueryEscape(promQL)),
 		}
-		q := req.URL.Query()
-		q.Set("query", promQL)
-		req.URL.RawQuery = q.Encode()
-		req.Header.Set("X-Scope-OrgID", mimirTenant)
-
-		resp, err := httpClient.Do(req)
-		if err != nil {
-			// Network error — not fatal, keep polling.
-			return false, nil //nolint:nilerr
-		}
-		defer resp.Body.Close()
-
-		if resp.StatusCode != http.StatusOK {
-			return false, nil
-		}
-
-		body, err := io.ReadAll(resp.Body)
+		stdout, _, err := mcClient.ExecInPod(ctx, podName, "default", "test", cmd)
 		if err != nil {
 			return false, nil //nolint:nilerr
 		}
 
 		var result mimirResponse
-		if err := json.Unmarshal(body, &result); err != nil {
+		if err := json.Unmarshal([]byte(stdout), &result); err != nil {
 			return false, nil //nolint:nilerr
 		}
 
