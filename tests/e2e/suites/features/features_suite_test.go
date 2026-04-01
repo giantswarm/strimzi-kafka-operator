@@ -197,7 +197,7 @@ func TestFeatures(t *testing.T) {
 							"KafkaTopic %s/%s never became Ready", kafkaNamespace, topicName)
 					})
 
-					It("should persist messages across operator restart", func() {
+					It("should persist messages across broker pod restart", func() {
 						ctx := state.GetContext()
 						brokerPodName := fmt.Sprintf("%s-%s-0", kafkaClusterName, kafkaPoolName)
 						testMessage := "e2e-persistence-test"
@@ -211,31 +211,33 @@ func TestFeatures(t *testing.T) {
 						)
 						Expect(err).NotTo(HaveOccurred(), "failed to produce message to topic %s", topicName)
 
-						By("restarting the operator")
-						var podList corev1.PodList
-						Expect(wcClient.List(ctx, &podList,
-							cr.InNamespace(installNamespace),
-							cr.MatchingLabels{"name": operatorDeploymentName},
-						)).To(Succeed())
-						if len(podList.Items) > 0 {
-							_ = wcClient.Delete(ctx, &podList.Items[0])
-						}
+						By("deleting the broker pod to trigger a restart")
+						brokerPod := &corev1.Pod{}
+						Expect(wcClient.Get(ctx, types.NamespacedName{
+							Namespace: kafkaNamespace,
+							Name:      brokerPodName,
+						}, brokerPod)).To(Succeed())
+						Expect(wcClient.Delete(ctx, brokerPod)).To(Succeed())
+
+						By("waiting for the broker pod to be ready again")
 						Eventually(func() (bool, error) {
-							var dep appsv1.Deployment
+							var pod corev1.Pod
 							if err := wcClient.Get(ctx, types.NamespacedName{
-								Namespace: installNamespace,
-								Name:      operatorDeploymentName,
-							}, &dep); err != nil {
+								Namespace: kafkaNamespace,
+								Name:      brokerPodName,
+							}, &pod); err != nil {
 								return false, nil //nolint:nilerr
 							}
-							if dep.Spec.Replicas == nil {
-								return false, nil
+							for _, c := range pod.Status.Conditions {
+								if c.Type == corev1.PodReady {
+									return c.Status == corev1.ConditionTrue, nil
+								}
 							}
-							return dep.Status.ReadyReplicas > 0 &&
-								dep.Status.ReadyReplicas == *dep.Spec.Replicas, nil
-						}).WithPolling(10*time.Second).WithTimeout(3*time.Minute).Should(BeTrue())
+							return false, nil
+						}).WithPolling(10*time.Second).WithTimeout(5*time.Minute).Should(BeTrue(),
+							"broker pod did not recover after restart")
 
-						By("consuming the message and verifying it survived")
+						By("consuming the message and verifying it survived the restart")
 						Eventually(func() (bool, error) {
 							stdout, _, err := wcClient.ExecInPod(ctx, brokerPodName, kafkaNamespace, "kafka",
 								[]string{
@@ -252,7 +254,7 @@ func TestFeatures(t *testing.T) {
 							}
 							return strings.Contains(stdout, testMessage), nil
 						}).WithPolling(15*time.Second).WithTimeout(2*time.Minute).Should(BeTrue(),
-							"message %q not found in topic %s after operator restart", testMessage, topicName)
+							"message %q not found in topic %s after broker restart", testMessage, topicName)
 					})
 				})
 
@@ -409,8 +411,10 @@ func kafkaNodePoolManifest() *unstructured.Unstructured {
 			"volumes": []interface{}{
 				map[string]interface{}{
 					"id":            int64(0),
-					"type":          "ephemeral",
+					"type":          "persistent-claim",
+					"size":          "5Gi",
 					"kraftMetadata": "shared",
+					"deleteClaim":   true,
 				},
 			},
 		},

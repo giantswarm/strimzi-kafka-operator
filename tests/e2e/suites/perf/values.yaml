@@ -1,0 +1,8 @@
+verticalPodAutoscaler:
+  enabled: false
+
+strimzi-kafka-operator:
+  replicas: 1
+  podDisruptionBudget:
+    enabled: false
+  topologySpreadConstraints: []
