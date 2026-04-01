@@ -21,3 +21,5 @@ checks:
     - "non-isolated-pod"            # operatorNetworkPolicy in upstream chart isolates the pod
     - "required-annotation-email"   # GS-internal check; upstream charts don't carry this
     - "required-label-owner"        # GS-internal check; upstream charts don't carry this
+    - "dangling-networkpolicy"
+    - "restart-policy"

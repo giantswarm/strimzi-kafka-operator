@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- E2E tests for workload cluster deployments: operator readiness, Kafka/KafkaNodePool CR lifecycle, broker pod readiness, entity-operator readiness, and metrics availability in Mimir.
+
 ## [0.0.1] - 2026-03-30
 
 ### Added

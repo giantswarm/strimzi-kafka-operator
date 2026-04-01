@@ -139,8 +139,12 @@ strimzi-kafka-operator:
       value: io.strimzi.plugin.security.profiles.impl.RestrictedPodSecurityProvider
 
   # -- NetworkPolicy for the operator pod, managed by the upstream chart.
+  # egress must be [{} ] (single empty rule) to allow all egress — the upstream
+  # template uses `with` so an empty map `{}` renders as blocked.
   operatorNetworkPolicy:
     enabled: true
+    egress:
+      - {}
 
   # -- Keep Strimzi-generated NetworkPolicies for Kafka component pods.
   generateNetworkPolicy: true
@@ -202,7 +206,7 @@ strimzi-kafka-operator:
   #    dashboards (+ strimzi-kafka-exporter) which require metricsConfig.type: strimziMetricsReporter.
   # Dashboards are managed via the wrapper's dashboards: block and synced with `make sync-dashboards`.
   dashboards:
-    enabled: true
+    enabled: false
     # GS uses ConfigMap label 'app.giantswarm.io/kind: dashboard' for dashboard discovery.
     label: "app.giantswarm.io/kind"
     labelValue: "dashboard"
