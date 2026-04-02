@@ -2,7 +2,6 @@ apiVersion: v2
 name: strimzi-kafka-operator
 description: >
   Giant Swarm app wrapping the Strimzi Kafka Operator, which manages Apache Kafka clusters natively on Kubernetes via custom resources.
-
 type: application
 # version is replaced by app-build-suite with the git tag
 version: 0.0.2
