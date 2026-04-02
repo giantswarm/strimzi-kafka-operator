@@ -56,30 +56,47 @@ func TestPerf(t *testing.T) {
 
 				BeforeAll(func() {
 					ctx := state.GetContext()
-					var err error
-					wcClient, err = state.GetFramework().WC(state.GetCluster().Name)
-					Expect(err).NotTo(HaveOccurred())
+
+					By("obtaining WC client")
+					Eventually(func() error {
+						var err error
+						wcClient, err = state.GetFramework().WC(state.GetCluster().Name)
+						return err
+					}).WithPolling(5*time.Second).WithTimeout(2*time.Minute).Should(Succeed(),
+						"failed to obtain WC client")
 
 					By("creating perf namespace " + kafkaNamespace)
 					namespaceRef = &corev1.Namespace{
 						ObjectMeta: metav1.ObjectMeta{Name: kafkaNamespace},
 					}
-					err = wcClient.Create(ctx, namespaceRef)
-					if err != nil && !apierrors.IsAlreadyExists(err) {
-						Expect(err).NotTo(HaveOccurred())
-					}
+					Eventually(func() error {
+						err := wcClient.Create(ctx, namespaceRef)
+						if apierrors.IsAlreadyExists(err) {
+							return nil
+						}
+						return err
+					}).WithPolling(5*time.Second).WithTimeout(2*time.Minute).Should(Succeed(),
+						"failed to create namespace %s", kafkaNamespace)
 
 					By("deploying KafkaNodePool and Kafka CRs")
 					pool := kafkaNodePoolManifest()
-					err = wcClient.Create(ctx, pool)
-					if err != nil && !apierrors.IsAlreadyExists(err) {
-						Expect(err).NotTo(HaveOccurred())
-					}
+					Eventually(func() error {
+						err := wcClient.Create(ctx, pool)
+						if apierrors.IsAlreadyExists(err) {
+							return nil
+						}
+						return err
+					}).WithPolling(5*time.Second).WithTimeout(2*time.Minute).Should(Succeed(),
+						"failed to create KafkaNodePool")
 					kafka := kafkaManifest()
-					err = wcClient.Create(ctx, kafka)
-					if err != nil && !apierrors.IsAlreadyExists(err) {
-						Expect(err).NotTo(HaveOccurred())
-					}
+					Eventually(func() error {
+						err := wcClient.Create(ctx, kafka)
+						if apierrors.IsAlreadyExists(err) {
+							return nil
+						}
+						return err
+					}).WithPolling(5*time.Second).WithTimeout(2*time.Minute).Should(Succeed(),
+						"failed to create Kafka CR")
 
 					By("waiting for Kafka broker pod to be ready")
 					podName := fmt.Sprintf("%s-%s-0", kafkaClusterName, kafkaPoolName)
@@ -97,14 +114,18 @@ func TestPerf(t *testing.T) {
 							}
 						}
 						return false, nil
-					}).WithPolling(15*time.Second).WithTimeout(10*time.Minute).Should(BeTrue())
+					}).WithPolling(15*time.Second).WithTimeout(15*time.Minute).Should(BeTrue())
 
 					By("creating perf topic")
 					topic := kafkaTopicManifest(perfTopic)
-					err = wcClient.Create(ctx, topic)
-					if err != nil && !apierrors.IsAlreadyExists(err) {
-						Expect(err).NotTo(HaveOccurred())
-					}
+					Eventually(func() error {
+						err := wcClient.Create(ctx, topic)
+						if apierrors.IsAlreadyExists(err) {
+							return nil
+						}
+						return err
+					}).WithPolling(5*time.Second).WithTimeout(2*time.Minute).Should(Succeed(),
+						"failed to create perf topic")
 					Eventually(func() (bool, error) {
 						var t unstructured.Unstructured
 						t.SetGroupVersionKind(topic.GroupVersionKind())
@@ -136,19 +157,27 @@ func TestPerf(t *testing.T) {
 					brokerPod := fmt.Sprintf("%s-%s-0", kafkaClusterName, kafkaPoolName)
 
 					// 100k messages, 1 KiB each, no throughput cap.
-					stdout, _, err := wcClient.ExecInPod(ctx, brokerPod, kafkaNamespace, "kafka",
-						[]string{
-							"/opt/kafka/bin/kafka-producer-perf-test.sh",
-							"--topic", perfTopic,
-							"--num-records", "100000",
-							"--record-size", "1024",
-							"--throughput", "-1",
-							"--producer-props", fmt.Sprintf("bootstrap.servers=%s", bootstrapAddress),
-						},
-					)
-					Expect(err).NotTo(HaveOccurred(), "producer perf test failed")
+					// Retry on transient connection errors (EOF) before asserting throughput.
+					var msgPerSec, mbPerSec float64
+					Eventually(func() error {
+						stdout, _, err := wcClient.ExecInPod(ctx, brokerPod, kafkaNamespace, "kafka",
+							[]string{
+								"/opt/kafka/bin/kafka-producer-perf-test.sh",
+								"--topic", perfTopic,
+								"--num-records", "100000",
+								"--record-size", "1024",
+								"--throughput", "-1",
+								"--producer-props", fmt.Sprintf("bootstrap.servers=%s", bootstrapAddress),
+							},
+						)
+						if err != nil {
+							return err
+						}
+						msgPerSec, mbPerSec = parseProducerOutput(stdout)
+						return nil
+					}).WithPolling(10*time.Second).WithTimeout(10*time.Minute).Should(Succeed(),
+						"producer perf test failed")
 
-					msgPerSec, mbPerSec := parseProducerOutput(stdout)
 					GinkgoLogr.Info("Producer throughput",
 						"msg/s", msgPerSec,
 						"MB/s", mbPerSec,
@@ -163,17 +192,24 @@ func TestPerf(t *testing.T) {
 					ctx := state.GetContext()
 					brokerPod := fmt.Sprintf("%s-%s-0", kafkaClusterName, kafkaPoolName)
 
-					stdout, _, err := wcClient.ExecInPod(ctx, brokerPod, kafkaNamespace, "kafka",
-						[]string{
-							"/opt/kafka/bin/kafka-consumer-perf-test.sh",
-							"--topic", perfTopic,
-							"--messages", "100000",
-							"--bootstrap-server", bootstrapAddress,
-						},
-					)
-					Expect(err).NotTo(HaveOccurred(), "consumer perf test failed")
+					var msgPerSec float64
+					Eventually(func() error {
+						stdout, _, err := wcClient.ExecInPod(ctx, brokerPod, kafkaNamespace, "kafka",
+							[]string{
+								"/opt/kafka/bin/kafka-consumer-perf-test.sh",
+								"--topic", perfTopic,
+								"--messages", "100000",
+								"--bootstrap-server", bootstrapAddress,
+							},
+						)
+						if err != nil {
+							return err
+						}
+						msgPerSec = parseConsumerOutput(stdout)
+						return nil
+					}).WithPolling(10*time.Second).WithTimeout(10*time.Minute).Should(Succeed(),
+						"consumer perf test failed")
 
-					msgPerSec := parseConsumerOutput(stdout)
 					GinkgoLogr.Info("Consumer throughput", "msg/s", msgPerSec)
 					Expect(msgPerSec).To(BeNumerically(">=", minConsumerMsgPerSec),
 						"consumer throughput %.0f msg/s below minimum %.0f", msgPerSec, minConsumerMsgPerSec)

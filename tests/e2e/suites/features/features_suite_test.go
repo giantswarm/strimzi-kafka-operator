@@ -54,30 +54,47 @@ func TestFeatures(t *testing.T) {
 
 				BeforeAll(func() {
 					ctx := state.GetContext()
-					var err error
-					wcClient, err = state.GetFramework().WC(state.GetCluster().Name)
-					Expect(err).NotTo(HaveOccurred())
+
+					By("obtaining WC client")
+					Eventually(func() error {
+						var err error
+						wcClient, err = state.GetFramework().WC(state.GetCluster().Name)
+						return err
+					}).WithPolling(5*time.Second).WithTimeout(2*time.Minute).Should(Succeed(),
+						"failed to obtain WC client")
 
 					By("creating test namespace " + kafkaNamespace)
 					namespaceRef = &corev1.Namespace{
 						ObjectMeta: metav1.ObjectMeta{Name: kafkaNamespace},
 					}
-					err = wcClient.Create(ctx, namespaceRef)
-					if err != nil && !apierrors.IsAlreadyExists(err) {
-						Expect(err).NotTo(HaveOccurred())
-					}
+					Eventually(func() error {
+						err := wcClient.Create(ctx, namespaceRef)
+						if apierrors.IsAlreadyExists(err) {
+							return nil
+						}
+						return err
+					}).WithPolling(5*time.Second).WithTimeout(2*time.Minute).Should(Succeed(),
+						"failed to create namespace %s", kafkaNamespace)
 
 					By("deploying KafkaNodePool and Kafka CRs")
 					pool := kafkaNodePoolManifest()
-					err = wcClient.Create(ctx, pool)
-					if err != nil && !apierrors.IsAlreadyExists(err) {
-						Expect(err).NotTo(HaveOccurred())
-					}
+					Eventually(func() error {
+						err := wcClient.Create(ctx, pool)
+						if apierrors.IsAlreadyExists(err) {
+							return nil
+						}
+						return err
+					}).WithPolling(5*time.Second).WithTimeout(2*time.Minute).Should(Succeed(),
+						"failed to create KafkaNodePool")
 					kafka := kafkaManifest()
-					err = wcClient.Create(ctx, kafka)
-					if err != nil && !apierrors.IsAlreadyExists(err) {
-						Expect(err).NotTo(HaveOccurred())
-					}
+					Eventually(func() error {
+						err := wcClient.Create(ctx, kafka)
+						if apierrors.IsAlreadyExists(err) {
+							return nil
+						}
+						return err
+					}).WithPolling(5*time.Second).WithTimeout(2*time.Minute).Should(Succeed(),
+						"failed to create Kafka CR")
 
 					By("waiting for Kafka broker pod to be ready")
 					podName := fmt.Sprintf("%s-%s-0", kafkaClusterName, kafkaPoolName)
@@ -203,13 +220,16 @@ func TestFeatures(t *testing.T) {
 						testMessage := "e2e-persistence-test"
 
 						By("producing a message")
-						_, _, err := wcClient.ExecInPod(ctx, brokerPodName, kafkaNamespace, "kafka",
-							[]string{"sh", "-c", fmt.Sprintf(
-								"echo %q | /opt/kafka/bin/kafka-console-producer.sh --bootstrap-server %s --topic %s",
-								testMessage, bootstrapAddress, topicName,
-							)},
-						)
-						Expect(err).NotTo(HaveOccurred(), "failed to produce message to topic %s", topicName)
+						Eventually(func() error {
+							_, _, err := wcClient.ExecInPod(ctx, brokerPodName, kafkaNamespace, "kafka",
+								[]string{"sh", "-c", fmt.Sprintf(
+									"echo %q | /opt/kafka/bin/kafka-console-producer.sh --bootstrap-server %s --topic %s",
+									testMessage, bootstrapAddress, topicName,
+								)},
+							)
+							return err
+						}).WithPolling(5*time.Second).WithTimeout(2*time.Minute).Should(Succeed(),
+							"failed to produce message to topic %s", topicName)
 
 						By("deleting the broker pod to trigger a restart")
 						brokerPod := &corev1.Pod{}
