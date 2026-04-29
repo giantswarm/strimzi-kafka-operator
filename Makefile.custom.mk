@@ -13,9 +13,14 @@ sync-crds: ## Re-extract CRDs from upstream chart tgz after a version bump.
 	  -C $(CHART_DIR)/templates/crds/ \
 	  strimzi-kafka-operator/crds/
 	@# Patch in the helm.sh/resource-policy: keep annotation so CRDs survive helm uninstall.
-	@# The sed pattern inserts after the 'annotations:' key at the metadata level.
-	find $(CHART_DIR)/templates/crds/ -name '*.yaml' -exec \
-	  sed -i '/^  annotations:$$/a\    "helm.sh/resource-policy": keep' {} \;
+	@# The sed patterns do:
+	@# - inserts after the 'annotations:' key at the metadata level.
+	@# - add Helm conditionals to wrap all CRDs so they can be optionally installed (Values.crds.install).
+	sed \
+		-e '/^  annotations:$$/a\    "helm.sh/resource-policy": keep' \
+		-e '1s/^/{{- if .Values.crds.install }}\n/' \
+		-e '$$a {{- end }}' \
+		-i $(CHART_DIR)/templates/crds/*.yaml
 	@echo "CRDs synced to $(CHART_DIR)/templates/crds/. Review the diff and commit."
 
 .PHONY: sync-dashboards
