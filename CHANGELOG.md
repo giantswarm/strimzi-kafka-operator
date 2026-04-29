@@ -7,11 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-<<<<<<< add-tests-v2
-=======
+### Changed
+
+- Upgrade to Strimzi Kafka Operator v0.51.0, which includes support for Kafka 4.x and various bug fixes and improvements.
+
 ## [0.0.2] - 2026-04-01
 
->>>>>>> main
 ### Added
 
 - E2E tests for workload cluster deployments: operator readiness, Kafka/KafkaNodePool CR lifecycle, broker pod readiness, entity-operator readiness, and metrics availability in Mimir.
