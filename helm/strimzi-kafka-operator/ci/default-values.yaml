@@ -24,7 +24,7 @@ strimzi-kafka-operator:
   # Use gsoci images (same as production defaults).
   defaultImageRegistry: gsoci.azurecr.io
   defaultImageRepository: giantswarm/strimzi
-  defaultImageTag: "0.51.0"
+  defaultImageTag: 1.0.0
 
   resources:
     requests:
