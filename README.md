@@ -60,12 +60,12 @@ All images are sourced from `gsoci.azurecr.io` (retagged from upstream `quay.io/
 
 | Image | Tag |
 |---|---|
-| `gsoci.azurecr.io/giantswarm/strimzi/operator` | `0.51.0` |
-| `gsoci.azurecr.io/giantswarm/strimzi/kafka` | `0.51.0-kafka-<ver>` |
-| `gsoci.azurecr.io/giantswarm/strimzi/kafka-bridge` | `0.33.1` |
-| `gsoci.azurecr.io/giantswarm/strimzi/kaniko-executor` | `0.51.0` |
-| `gsoci.azurecr.io/giantswarm/strimzi/buildah` | `0.51.0` |
-| `gsoci.azurecr.io/giantswarm/strimzi/maven-builder` | `0.51.0` |
+| `gsoci.azurecr.io/giantswarm/strimzi/operator` | `1.0.0` |
+| `gsoci.azurecr.io/giantswarm/strimzi/kafka` | `1.0.0-kafka-<ver>` |
+| `gsoci.azurecr.io/giantswarm/strimzi/kafka-bridge` | `1.0.0` |
+| `gsoci.azurecr.io/giantswarm/strimzi/kaniko-executor` | `1.0.0` |
+| `gsoci.azurecr.io/giantswarm/strimzi/buildah` | `1.0.0` |
+| `gsoci.azurecr.io/giantswarm/strimzi/maven-builder` | `1.0.0` |
 
 ## CRD management
 
@@ -89,7 +89,7 @@ git commit -m "Sync CRDs for strimzi-kafka-operator v<new-version>"
 
 | App version | Upstream chart | Kubernetes |
 |---|---|---|
-| 0.1.x | strimzi-kafka-operator 0.51.0 | 1.27+ |
+| 0.1.x | strimzi-kafka-operator 1.0.0 | 1.30+ |
 
 ## Development
 

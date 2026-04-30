@@ -2356,7 +2356,7 @@
   },
   "timezone": "",
   "title": "Strimzi Kafka Mirror Maker 2",
+  "uid": "strimzi-kafka-mirror-maker-2",
   "version": 10,
-  "weekStart": "",
-  "uid": "strimzi-kafka-mirror-maker-2"
+  "weekStart": ""
 }
