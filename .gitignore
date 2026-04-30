@@ -1,3 +1,2 @@
 vendor
 .vendir*
-helm/strimzi-kafka-operator/charts/
