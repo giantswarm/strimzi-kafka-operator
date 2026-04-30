@@ -2115,7 +2115,7 @@
   },
   "timezone": "",
   "title": "Strimzi KRaft",
+  "uid": "strimzi-kraft",
   "version": 6,
-  "weekStart": "",
-  "uid": "strimzi-kraft"
+  "weekStart": ""
 }
