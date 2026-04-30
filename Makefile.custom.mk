@@ -76,7 +76,12 @@ install-helm-unittest:
 	fi
 
 .PHONY: test-chart
-test-chart: install-helm-unittest ## Run helm-unittest test suites against the chart.
+test-chart: ## Run helm-unittest suites and verify the vendored subchart contains no crds/ dir.
+	@echo "====> Verifying subchart tgz has no crds/ dir (would otherwise be auto-installed by helm install)"
+	@if tar -tzf $(CHART_DIR)/charts/strimzi-kafka-operator-*.tgz | grep -q '^strimzi-kafka-operator/crds/'; then \
+	  echo "ERROR: vendored subchart contains crds/ — re-run 'make sync-crds'"; exit 1; \
+	fi
+	@echo "OK: subchart crds/ stripped."
 	helm unittest $(CHART_DIR)
 
 .PHONY: show-images

@@ -1,0 +1,71 @@
+suite: CRD lifecycle
+templates:
+  - templates/crds/*.yaml
+tests:
+  - it: renders all 10 CRDs by default
+    asserts:
+      - hasDocuments:
+          count: 1
+        template: templates/crds/040-Crd-kafka.yaml
+      - hasDocuments:
+          count: 1
+        template: templates/crds/041-Crd-kafkaconnect.yaml
+      - hasDocuments:
+          count: 1
+        template: templates/crds/042-Crd-strimzipodset.yaml
+      - hasDocuments:
+          count: 1
+        template: templates/crds/043-Crd-kafkatopic.yaml
+      - hasDocuments:
+          count: 1
+        template: templates/crds/044-Crd-kafkauser.yaml
+      - hasDocuments:
+          count: 1
+        template: templates/crds/045-Crd-kafkanodepool.yaml
+      - hasDocuments:
+          count: 1
+        template: templates/crds/046-Crd-kafkabridge.yaml
+      - hasDocuments:
+          count: 1
+        template: templates/crds/047-Crd-kafkaconnector.yaml
+      - hasDocuments:
+          count: 1
+        template: templates/crds/048-Crd-kafkamirrormaker2.yaml
+      - hasDocuments:
+          count: 1
+        template: templates/crds/049-Crd-kafkarebalance.yaml
+
+  - it: renders no CRDs when crds.install is false
+    set:
+      crds.install: false
+    asserts:
+      - hasDocuments:
+          count: 0
+        template: templates/crds/040-Crd-kafka.yaml
+      - hasDocuments:
+          count: 0
+        template: templates/crds/041-Crd-kafkaconnect.yaml
+      - hasDocuments:
+          count: 0
+        template: templates/crds/042-Crd-strimzipodset.yaml
+      - hasDocuments:
+          count: 0
+        template: templates/crds/043-Crd-kafkatopic.yaml
+      - hasDocuments:
+          count: 0
+        template: templates/crds/044-Crd-kafkauser.yaml
+      - hasDocuments:
+          count: 0
+        template: templates/crds/045-Crd-kafkanodepool.yaml
+      - hasDocuments:
+          count: 0
+        template: templates/crds/046-Crd-kafkabridge.yaml
+      - hasDocuments:
+          count: 0
+        template: templates/crds/047-Crd-kafkaconnector.yaml
+      - hasDocuments:
+          count: 0
+        template: templates/crds/048-Crd-kafkamirrormaker2.yaml
+      - hasDocuments:
+          count: 0
+        template: templates/crds/049-Crd-kafkarebalance.yaml
