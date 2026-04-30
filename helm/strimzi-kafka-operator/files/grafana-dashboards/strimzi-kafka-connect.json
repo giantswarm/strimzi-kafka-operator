@@ -1803,7 +1803,7 @@
   },
   "timezone": "",
   "title": "Strimzi Kafka Connect",
+  "uid": "strimzi-kafka-connect",
   "version": 6,
-  "weekStart": "",
-  "uid": "strimzi-kafka-connect"
+  "weekStart": ""
 }
