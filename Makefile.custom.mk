@@ -13,9 +13,14 @@ sync-crds: ## Re-extract CRDs from upstream chart tgz after a version bump.
 	  -C $(CHART_DIR)/templates/crds/ \
 	  strimzi-kafka-operator/crds/
 	@# Patch in the helm.sh/resource-policy: keep annotation so CRDs survive helm uninstall.
-	@# The sed pattern inserts after the 'annotations:' key at the metadata level.
-	find $(CHART_DIR)/templates/crds/ -name '*.yaml' -exec \
-	  sed -i '/^  annotations:$$/a\    "helm.sh/resource-policy": keep' {} \;
+	@# The sed patterns do:
+	@# - inserts after the 'annotations:' key at the metadata level.
+	@# - add Helm conditionals to wrap all CRDs so they can be optionally installed (Values.crds.install).
+	sed \
+		-e '/^  annotations:$$/a\    "helm.sh/resource-policy": keep' \
+		-e '1s/^/{{- if .Values.crds.install }}\n/' \
+		-e '$$a {{- end }}' \
+		-i $(CHART_DIR)/templates/crds/*.yaml
 	@echo "CRDs synced to $(CHART_DIR)/templates/crds/. Review the diff and commit."
 
 .PHONY: sync-dashboards
@@ -28,7 +33,7 @@ sync-dashboards: ## Download and patch Grafana dashboard JSONs from upstream Git
 	@# (dashboardconfigmap.observability.giantswarm.io) requires them.
 	@# TODO: remove uid injection once Strimzi adds stable uid fields upstream.
 	@# Track at: https://github.com/strimzi/strimzi-kafka-operator (open an issue)
-	$(eval VERSION := $(shell grep appVersion $(CHART_DIR)/Chart.yaml | awk '{print $$2}' | tr -d '"'))
+	$(eval VERSION := $(shell awk '$$1 == "appVersion:" {gsub(/"/, "", $$2); printf $$2}' $(CHART_DIR)/Chart.yaml))
 	@echo "====> Syncing Grafana dashboards for strimzi-kafka-operator $(VERSION)"
 	rm -rf $(CHART_DIR)/files/grafana-dashboards/
 	mkdir -p $(CHART_DIR)/files/grafana-dashboards/
