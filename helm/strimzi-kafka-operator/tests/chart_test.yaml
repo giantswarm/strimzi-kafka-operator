@@ -1,0 +1,7 @@
+suite: chart renders
+templates:
+  - templates/podmonitor.yaml
+tests:
+  - it: renders without error
+    asserts:
+      - notFailedTemplate: {}

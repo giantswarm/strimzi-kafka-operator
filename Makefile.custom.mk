@@ -55,6 +55,10 @@ sync-dashboards: ## Download and patch Grafana dashboard JSONs from upstream Git
 	done
 	@echo "Dashboards synced to $(CHART_DIR)/files/grafana-dashboards/. Review the diff and commit."
 
+.PHONY: test-chart
+test-chart: ## Run helm-unittest test suites against the chart.
+	helm unittest $(CHART_DIR)
+
 .PHONY: show-images
 show-images: ## List all container images used by this chart (requires helm dep update first).
 	@echo "====> Images referenced by strimzi-kafka-operator v$$(grep appVersion $(CHART_DIR)/Chart.yaml | awk '{print $$2}')"
