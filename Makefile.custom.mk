@@ -3,7 +3,7 @@
 CHART_DIR := helm/strimzi-kafka-operator
 
 .PHONY: sync-crds
-sync-crds: ## Re-extract CRDs from upstream chart tgz after a version bump.
+sync-crds: ## Re-extract CRDs from upstream chart tgz after a version bump. Always use this instead of `helm dep update` directly.
 	@echo "====> Syncing CRDs from upstream strimzi-kafka-operator chart"
 	helm dep update $(CHART_DIR)
 	rm -rf $(CHART_DIR)/templates/crds/
@@ -21,6 +21,17 @@ sync-crds: ## Re-extract CRDs from upstream chart tgz after a version bump.
 		-e '1s/^/{{- if .Values.crds.install }}\n/' \
 		-e '$$a {{- end }}' \
 		-i $(CHART_DIR)/templates/crds/*.yaml
+	@# Strip crds/ from the vendored subchart tgz so Helm doesn't auto-install them on
+	@# `helm install` (Helm always installs files under a chart's crds/ directory and offers
+	@# no values toggle, only --skip-crds). The parent chart owns CRDs via templates/crds/
+	@# above, gated on .Values.crds.install. Done last so `helm dep update/build` is never
+	@# re-run after this point — those would re-fetch upstream and undo the strip.
+	@TMP=$$(mktemp -d) && \
+	  TGZ=$$(ls $(CHART_DIR)/charts/strimzi-kafka-operator-*.tgz) && \
+	  tar -xzf $$TGZ -C $$TMP && \
+	  rm -rf $$TMP/strimzi-kafka-operator/crds && \
+	  tar -czf $$TGZ -C $$TMP strimzi-kafka-operator && \
+	  rm -rf $$TMP
 	@echo "CRDs synced to $(CHART_DIR)/templates/crds/. Review the diff and commit."
 
 .PHONY: sync-dashboards
