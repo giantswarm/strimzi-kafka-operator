@@ -1,6 +1,6 @@
 suite: chart renders
 templates:
-  - templates/podmonitor.yaml
+  - templates/**/*.yaml
 tests:
   - it: renders without error
     asserts:
