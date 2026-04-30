@@ -33,7 +33,7 @@ sync-dashboards: ## Download and patch Grafana dashboard JSONs from upstream Git
 	@# (dashboardconfigmap.observability.giantswarm.io) requires them.
 	@# TODO: remove uid injection once Strimzi adds stable uid fields upstream.
 	@# Track at: https://github.com/strimzi/strimzi-kafka-operator (open an issue)
-	$(eval VERSION := $(shell grep appVersion $(CHART_DIR)/Chart.yaml | awk '{print $$2}' | tr -d '"'))
+	$(eval VERSION := $(shell awk '$$1 == "appVersion:" {gsub(/"/, "", $$2); printf $$2}' $(CHART_DIR)/Chart.yaml))
 	@echo "====> Syncing Grafana dashboards for strimzi-kafka-operator $(VERSION)"
 	rm -rf $(CHART_DIR)/files/grafana-dashboards/
 	mkdir -p $(CHART_DIR)/files/grafana-dashboards/
