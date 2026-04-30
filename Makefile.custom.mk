@@ -55,8 +55,13 @@ sync-dashboards: ## Download and patch Grafana dashboard JSONs from upstream Git
 	done
 	@echo "Dashboards synced to $(CHART_DIR)/files/grafana-dashboards/. Review the diff and commit."
 
+.PHONY: install-helm-unittest
+install-helm-unittest:
+	@helm plugin list | awk '{print $$1}' | grep -qx unittest || \
+	  helm plugin install https://github.com/helm-unittest/helm-unittest
+
 .PHONY: test-chart
-test-chart: ## Run helm-unittest test suites against the chart.
+test-chart: install-helm-unittest ## Run helm-unittest test suites against the chart.
 	helm unittest $(CHART_DIR)
 
 .PHONY: show-images
