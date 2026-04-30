@@ -6,13 +6,6 @@
 Giant Swarm app wrapping the [Strimzi Kafka Operator](https://strimzi.io/), which manages
 Apache Kafka clusters natively on Kubernetes via custom resources (CRDs).
 
-**What is this app?**
-Strimzi simplifies running Kafka on Kubernetes by providing a Kubernetes-native way to
-deploy and manage Kafka clusters, topics, users, and connectors through CRDs.
-
-**Who can use it?**
-Teams that need to run Apache Kafka on Giant Swarm workload clusters.
-
 ## Installing
 
 Deploy via the Giant Swarm App Platform:
@@ -76,11 +69,11 @@ All images are sourced from `gsoci.azurecr.io` (retagged from upstream `quay.io/
 
 ## CRD management
 
-CRDs are placed in `helm/strimzi-kafka-operator/templates/crds/` (not Helm's `crds/` directory).
-This means CRDs are **updated on `helm upgrade`** (Helm's `crds/` dir only installs, never upgrades).
-
-The annotation `helm.sh/resource-policy: keep` prevents CRD deletion on `helm uninstall`,
-protecting any existing Kafka CR data.
+CRDs are managed by this chart's `templates/crds/` (updated on `helm upgrade`, kept on
+`helm uninstall`). **Flux and Argo CD users:** the bundled subchart also ships CRDs and
+needs `--skip-crds` equivalents — see the `crds:` block in
+[helm/strimzi-kafka-operator/values.yaml](helm/strimzi-kafka-operator/values.yaml) for the
+full lifecycle, rationale, and per-tool flags.
 
 ### After a version bump (Renovate PR)
 
@@ -117,24 +110,25 @@ helm template strimzi-kafka-operator helm/strimzi-kafka-operator \
 
 ## Creating a Kafka cluster
 
-Here are some useful links about how to start with strimzi:
-* The [Strimzi Quickstart](https://strimzi.io/quickstarts/) - section "Create an Apache Kafka cluster"
-* [Strimzi overview](https://strimzi.io/docs/operators/latest/overview)
-* [Example kafka cluster resources](https://github.com/strimzi/strimzi-kafka-operator/tree/1.0.0/examples/kafka)
-You can see some example kafka cluster resources here: https://github.com/strimzi/strimzi-kafka-operator/tree/1.0.0/examples/kafka
+Start with the upstream docs:
 
-### Send and receive messages
+- [Strimzi Quickstart](https://strimzi.io/quickstarts/) — create a cluster, send and receive messages
+- [Strimzi overview](https://strimzi.io/docs/operators/latest/overview)
+- [Example Kafka resources](https://github.com/strimzi/strimzi-kafka-operator/tree/0.51.0/examples/kafka)
 
-Here are some tutorials:
-* The [Strimzi Quickstart](https://strimzi.io/quickstarts/) - section "Send and receive messages"
-  * GiantSwarm's security hardening will prevent you from running those "kubectl run" commands
-  * but you can `kubectl exec -ti my-cluster-broker-0 -- /bin/sh` and run the test command like `bin/kafka-console-producer.sh` from here
-* The [official kafka quickstart](https://kafka.apache.org/quickstart/#step-3-create-a-topic-to-store-your-events) - starting from step 3 as you have already setup a kafka cluster
-  * Like for the Strimzi Quickstart, run a terminal in a broker with `kubectl exec -ti my-cluster-broker-0 -- /bin/sh`
-  * It will provide you the quickstart tools `bin/kafka-topics.sh` and the likes.
+> **Giant Swarm note:** the hardened pod security policies on GS clusters block the
+> `kubectl run` commands in the upstream quickstart. Instead, exec into a broker pod
+> and run the producer/consumer scripts from there:
+>
+> ```bash
+> kubectl exec -ti my-cluster-broker-0 -- /bin/sh
+> # then: bin/kafka-console-producer.sh, bin/kafka-topics.sh, ...
+> ```
 
-## Credit
+## References
 
-- Upstream: [strimzi/strimzi-kafka-operator](https://github.com/strimzi/strimzi-kafka-operator)
-- Helm chart: [Strimzi Helm charts](https://github.com/strimzi/strimzi-kafka-operator/tree/main/helm-charts/helm3/strimzi-kafka-operator)
-- ArtifactHub: [strimzi-kafka-operator](https://artifacthub.io/packages/helm/strimzi/strimzi-kafka-operator)
+- Changelog: [CHANGELOG.md](CHANGELOG.md)
+- Security policy: [SECURITY.md](SECURITY.md)
+- Upstream values reference: [strimzi-kafka-operator on ArtifactHub](https://artifacthub.io/packages/helm/strimzi/strimzi-kafka-operator)
+- Upstream source: [strimzi/strimzi-kafka-operator](https://github.com/strimzi/strimzi-kafka-operator)
+- Upstream Helm chart: [strimzi-kafka-operator chart](https://github.com/strimzi/strimzi-kafka-operator/tree/main/helm-charts/helm3/strimzi-kafka-operator)
