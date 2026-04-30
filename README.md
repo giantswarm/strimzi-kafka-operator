@@ -6,13 +6,6 @@
 Giant Swarm app wrapping the [Strimzi Kafka Operator](https://strimzi.io/), which manages
 Apache Kafka clusters natively on Kubernetes via custom resources (CRDs).
 
-**What is this app?**
-Strimzi simplifies running Kafka on Kubernetes by providing a Kubernetes-native way to
-deploy and manage Kafka clusters, topics, users, and connectors through CRDs.
-
-**Who can use it?**
-Teams that need to run Apache Kafka on Giant Swarm workload clusters.
-
 ## Installing
 
 Deploy via the Giant Swarm App Platform:
@@ -61,38 +54,6 @@ strimzi-kafka-operator:
 
 See [helm/strimzi-kafka-operator/values.yaml](helm/strimzi-kafka-operator/values.yaml) for all options.
 
-### Sample App CR
-
-```yaml
-apiVersion: application.giantswarm.io/v1alpha1
-kind: App
-metadata:
-  name: strimzi-kafka-operator
-  namespace: <cluster-id>
-spec:
-  name: strimzi-kafka-operator
-  namespace: strimzi-system
-  version: 0.1.0
-  catalog: giantswarm
-  userConfig:
-    configMap:
-      name: strimzi-kafka-operator-user-values
-      namespace: <cluster-id>
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: strimzi-kafka-operator-user-values
-  namespace: <cluster-id>
-data:
-  values: |
-    networkPolicy:
-      enabled: true
-      flavor: cilium
-    strimzi-kafka-operator:
-      watchAnyNamespace: true
-```
-
 ## Images
 
 All images are sourced from `gsoci.azurecr.io` (retagged from upstream `quay.io/strimzi`).
@@ -108,11 +69,11 @@ All images are sourced from `gsoci.azurecr.io` (retagged from upstream `quay.io/
 
 ## CRD management
 
-CRDs are placed in `helm/strimzi-kafka-operator/templates/crds/` (not Helm's `crds/` directory).
-This means CRDs are **updated on `helm upgrade`** (Helm's `crds/` dir only installs, never upgrades).
-
-The annotation `helm.sh/resource-policy: keep` prevents CRD deletion on `helm uninstall`,
-protecting any existing Kafka CR data.
+CRDs are managed by this chart's `templates/crds/` (updated on `helm upgrade`, kept on
+`helm uninstall`). **Flux and Argo CD users:** the bundled subchart also ships CRDs and
+needs `--skip-crds` equivalents — see the `crds:` block in
+[helm/strimzi-kafka-operator/values.yaml](helm/strimzi-kafka-operator/values.yaml) for the
+full lifecycle, rationale, and per-tool flags.
 
 ### After a version bump (Renovate PR)
 
@@ -147,8 +108,27 @@ helm template strimzi-kafka-operator helm/strimzi-kafka-operator \
   --values helm/strimzi-kafka-operator/ci/default-values.yaml --debug
 ```
 
-## Credit
+## Creating and testing a Kafka cluster
 
-- Upstream: [strimzi/strimzi-kafka-operator](https://github.com/strimzi/strimzi-kafka-operator)
-- Helm chart: [Strimzi Helm charts](https://github.com/strimzi/strimzi-kafka-operator/tree/main/helm-charts/helm3/strimzi-kafka-operator)
-- ArtifactHub: [strimzi-kafka-operator](https://artifacthub.io/packages/helm/strimzi/strimzi-kafka-operator)
+Start with the upstream docs:
+
+- [Strimzi Quickstart](https://strimzi.io/quickstarts/) — create a cluster, send and receive messages
+- [Strimzi overview](https://strimzi.io/docs/operators/latest/overview)
+- [Example Kafka resources](https://github.com/strimzi/strimzi-kafka-operator/tree/0.51.0/examples/kafka)
+
+> **Giant Swarm note:** the hardened pod security policies on GS clusters block the
+> `kubectl run` commands in the upstream quickstart. Instead, exec into a broker pod
+> and run the producer/consumer scripts from there:
+>
+> ```bash
+> kubectl exec -ti my-cluster-broker-0 -- /bin/sh
+> # then: bin/kafka-console-producer.sh, bin/kafka-topics.sh, ...
+> ```
+
+## References
+
+- Changelog: [CHANGELOG.md](CHANGELOG.md)
+- Security policy: [SECURITY.md](SECURITY.md)
+- Upstream values reference: [strimzi-kafka-operator on ArtifactHub](https://artifacthub.io/packages/helm/strimzi/strimzi-kafka-operator)
+- Upstream source: [strimzi/strimzi-kafka-operator](https://github.com/strimzi/strimzi-kafka-operator)
+- Upstream Helm chart: [strimzi-kafka-operator chart](https://github.com/strimzi/strimzi-kafka-operator/tree/main/helm-charts/helm3/strimzi-kafka-operator)
