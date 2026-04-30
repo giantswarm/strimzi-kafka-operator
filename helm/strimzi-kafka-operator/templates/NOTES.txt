@@ -1,50 +1,10 @@
-strimzi-kafka-operator {{ .Chart.AppVersion }} has been deployed.
-
-The Strimzi Cluster Operator is now running in namespace {{ .Release.Namespace }}.
+Strimzi Kafka Operator {{ .Chart.AppVersion }} is now running in {{ .Release.Namespace }} namespace.
 {{- $upstreamValues := index .Values "strimzi-kafka-operator" }}
 It watches for Kafka custom resources in: {{ if $upstreamValues.watchAnyNamespace }}all namespaces{{ else if $upstreamValues.watchNamespaces }}{{ join ", " $upstreamValues.watchNamespaces }}{{ else }}{{ .Release.Namespace }}{{ end }}.
 
-To create a Kafka cluster, apply a Kafka CR in your target namespace
-(not {{ .Release.Namespace }}):
+To create a Kafka cluster refer to the following documentation.
 
-  kubectl apply -f - <<EOF
-  apiVersion: kafka.strimzi.io/v1beta2
-  kind: Kafka
-  metadata:
-    name: my-cluster
-    namespace: <your-namespace>
-    annotations:
-      strimzi.io/node-pools: enabled
-      strimzi.io/kraft: enabled
-  spec:
-    kafka:
-      version: 4.0.0
-      metadataVersion: "4.0"
-      listeners:
-        - name: plain
-          port: 9092
-          type: internal
-          tls: false
-      storage:
-        type: ephemeral
-    entityOperator:
-      topicOperator: {}
-      userOperator: {}
-  EOF
-
-  Note: KRaft mode (above) requires a KafkaNodePool CR — see
-  https://strimzi.io/docs/operators/latest/deploying#deploying-kafka-cluster-kraft-str
-
-CRDs installed: {{ .Values.crds.install }}
-{{- if .Values.crds.install }}
-  NOTE: the bundled subchart also ships CRDs in its crds/ dir. Skip it so this
-  chart's templates manage CRD installs and upgrades instead:
-    Flux:    spec.install.crds: Skip  (HelmRelease)
-             Alternatively: spec.install.crds: CreateReplace + spec.upgrade.crds: CreateReplace
-             lets Flux manage CRDs directly — set crds.install: false in that case.
-    ArgoCD:  skipCrds: true           (Application .spec.source.helm)
-    Helm:    --skip-crds
-{{- end }}
+https://strimzi.io/docs/operators/latest/deploying#deploying-kafka-cluster-kraft-str
 
 For full documentation see:
   https://github.com/giantswarm/strimzi-kafka-operator
