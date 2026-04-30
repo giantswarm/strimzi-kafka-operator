@@ -7,11 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-<<<<<<< add-tests-v2
-=======
 ## [0.0.2] - 2026-04-01
 
->>>>>>> main
 ### Added
 
 - E2E tests for workload cluster deployments: operator readiness, Kafka/KafkaNodePool CR lifecycle, broker pod readiness, entity-operator readiness, and metrics availability in Mimir.
@@ -38,21 +35,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - PodDisruptionBudget enabled via upstream chart's built-in support (`podDisruptionBudget.enabled: true`, `minAvailable: 1`).
 - TopologySpreadConstraints to spread operator pods across nodes (`whenUnsatisfiable: ScheduleAnyway`).
 - VerticalPodAutoscaler template (`verticalPodAutoscaler.enabled`, disabled by default; requires VPA CRDs on the cluster).
-
-### Images (strimzi-kafka-operator v0.51.0, Kafka 4.x)
-
-All images retagged from `quay.io/strimzi/*` → `gsoci.azurecr.io/giantswarm/strimzi/*`.
-
-| Source image | Tag | Notes |
-|---|---|---|
-| `quay.io/strimzi/operator` | `0.51.0` | Operator, topic-operator, user-operator, kafka-init |
-| `quay.io/strimzi/kafka` | `0.51.0-kafka-4.1.0` | Kafka broker, connect, mirror-maker-2, cruise-control, exporter |
-| `quay.io/strimzi/kafka` | `0.51.0-kafka-4.1.1` | Same components, Kafka 4.1.1 |
-| `quay.io/strimzi/kafka` | `0.51.0-kafka-4.2.0` | Same components, Kafka 4.2.0 |
-| `quay.io/strimzi/kafka-bridge` | `0.33.1` | Independent release cadence; tracked by Renovate |
-| `quay.io/strimzi/kaniko-executor` | `0.51.0` | Connector build support |
-| `quay.io/strimzi/buildah` | `0.51.0` | Connector build support |
-| `quay.io/strimzi/maven-builder` | `0.51.0` | Connector build support |
 
 [Unreleased]: https://github.com/giantswarm/strimzi-kafka-operator/compare/v0.0.2...HEAD
 [0.0.2]: https://github.com/giantswarm/strimzi-kafka-operator/compare/v0.0.1...v0.0.2
