@@ -6,7 +6,7 @@ type: application
 # version is replaced by app-build-suite with the git tag
 version: 0.0.2
 # appVersion tracks the upstream strimzi-kafka-operator version
-appVersion: "0.51.0"
+appVersion: 1.0.0
 home: https://github.com/giantswarm/strimzi-kafka-operator
 ## TODO configure the icon field with a custom app icon (see https://docs.giantswarm.io/reference/platform-api/chart-metadata/#icon)
 icon: https://s.giantswarm.io/app-icons/giantswarm/1/light.svg
@@ -22,6 +22,6 @@ maintainers:
     email: team-atlas@giantswarm.io
 dependencies:
   - name: strimzi-kafka-operator
-    version: "0.51.0"
+    version: 1.0.0
     repository: https://strimzi.io/charts/
     condition: strimzi-kafka-operator.enabled

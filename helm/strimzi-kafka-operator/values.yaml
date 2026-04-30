@@ -96,7 +96,7 @@ strimzi-kafka-operator:
       repository: ""
       name: kafka-bridge
       # renovate: datasource=docker depName=gsoci.azurecr.io/giantswarm/strimzi/kafka-bridge
-      tag: "0.33.1"
+      tag: 1.0.0
 
   # -- Number of operator replicas. Strimzi uses leader election so only one
   # replica is active at a time; additional replicas are hot standbys.

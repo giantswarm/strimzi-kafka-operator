@@ -3020,7 +3020,7 @@
   },
   "timezone": "",
   "title": "Strimzi Kafka Bridge",
+  "uid": "strimzi-kafka-bridge",
   "version": 6,
-  "weekStart": "",
-  "uid": "strimzi-kafka-bridge"
+  "weekStart": ""
 }
