@@ -57,8 +57,12 @@ sync-dashboards: ## Download and patch Grafana dashboard JSONs from upstream Git
 
 .PHONY: install-helm-unittest
 install-helm-unittest:
-	@helm plugin list | awk '{print $$1}' | grep -qx unittest || \
-	  helm plugin install https://github.com/helm-unittest/helm-unittest
+	@if helm plugin list | awk '{print $$1}' | grep -qx unittest; then \
+	  echo "====> helm-unittest plugin already installed"; \
+	else \
+	  echo "====> Installing helm-unittest plugin"; \
+	  helm plugin install https://github.com/helm-unittest/helm-unittest --verify=false --version=1.0.3; \
+	fi
 
 .PHONY: test-chart
 test-chart: install-helm-unittest ## Run helm-unittest test suites against the chart.
