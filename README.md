@@ -108,7 +108,7 @@ helm template strimzi-kafka-operator helm/strimzi-kafka-operator \
   --values helm/strimzi-kafka-operator/ci/default-values.yaml --debug
 ```
 
-## Creating a Kafka cluster
+## Creating and testing a Kafka cluster
 
 Start with the upstream docs:
 
