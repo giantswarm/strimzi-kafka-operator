@@ -61,38 +61,6 @@ strimzi-kafka-operator:
 
 See [helm/strimzi-kafka-operator/values.yaml](helm/strimzi-kafka-operator/values.yaml) for all options.
 
-### Sample App CR
-
-```yaml
-apiVersion: application.giantswarm.io/v1alpha1
-kind: App
-metadata:
-  name: strimzi-kafka-operator
-  namespace: <cluster-id>
-spec:
-  name: strimzi-kafka-operator
-  namespace: strimzi-system
-  version: 0.1.0
-  catalog: giantswarm
-  userConfig:
-    configMap:
-      name: strimzi-kafka-operator-user-values
-      namespace: <cluster-id>
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: strimzi-kafka-operator-user-values
-  namespace: <cluster-id>
-data:
-  values: |
-    networkPolicy:
-      enabled: true
-      flavor: cilium
-    strimzi-kafka-operator:
-      watchAnyNamespace: true
-```
-
 ## Images
 
 All images are sourced from `gsoci.azurecr.io` (retagged from upstream `quay.io/strimzi`).
@@ -146,6 +114,24 @@ helm lint helm/strimzi-kafka-operator --values helm/strimzi-kafka-operator/ci/de
 helm template strimzi-kafka-operator helm/strimzi-kafka-operator \
   --values helm/strimzi-kafka-operator/ci/default-values.yaml --debug
 ```
+
+## Creating a Kafka cluster
+
+Here are some useful links about how to start with strimzi:
+* The [Strimzi Quickstart](https://strimzi.io/quickstarts/) - section "Create an Apache Kafka cluster"
+* [Strimzi overview](https://strimzi.io/docs/operators/latest/overview)
+* [Example kafka cluster resources](https://github.com/strimzi/strimzi-kafka-operator/tree/1.0.0/examples/kafka)
+You can see some example kafka cluster resources here: https://github.com/strimzi/strimzi-kafka-operator/tree/1.0.0/examples/kafka
+
+### Send and receive messages
+
+Here are some tutorials:
+* The [Strimzi Quickstart](https://strimzi.io/quickstarts/) - section "Send and receive messages"
+  * GiantSwarm's security hardening will prevent you from running those "kubectl run" commands
+  * but you can `kubectl exec -ti my-cluster-broker-0 -- /bin/sh` and run the test command like `bin/kafka-console-producer.sh` from here
+* The [official kafka quickstart](https://kafka.apache.org/quickstart/#step-3-create-a-topic-to-store-your-events) - starting from step 3 as you have already setup a kafka cluster
+  * Like for the Strimzi Quickstart, run a terminal in a broker with `kubectl exec -ti my-cluster-broker-0 -- /bin/sh`
+  * It will provide you the quickstart tools `bin/kafka-topics.sh` and the likes.
 
 ## Credit
 
