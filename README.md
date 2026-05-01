@@ -77,12 +77,12 @@ full lifecycle, rationale, and per-tool flags.
 
 ### After a version bump (Renovate PR)
 
-When Renovate bumps the chart version in `Chart.yaml`, re-extract the CRDs:
+When Renovate bumps the chart version in `Chart.yaml`, re-sync the upstream chart:
 
 ```bash
-make sync-crds
-git add helm/strimzi-kafka-operator/templates/crds/
-git commit -m "Sync CRDs for strimzi-kafka-operator v<new-version>"
+make sync-chart
+git add helm/strimzi-kafka-operator/
+git commit -m "Sync upstream chart for strimzi-kafka-operator v<new-version>"
 ```
 
 ## Compatibility
@@ -94,11 +94,8 @@ git commit -m "Sync CRDs for strimzi-kafka-operator v<new-version>"
 ## Development
 
 ```bash
-# Update upstream chart dependency
-helm dep update helm/strimzi-kafka-operator
-
-# Re-extract CRDs after version bump
-make sync-crds
+# Update upstream chart dependency and CRDs
+make sync-chart
 
 # Lint
 helm lint helm/strimzi-kafka-operator --values helm/strimzi-kafka-operator/ci/default-values.yaml
