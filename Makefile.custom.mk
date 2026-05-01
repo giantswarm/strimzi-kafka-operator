@@ -1,10 +1,13 @@
 ##@ Strimzi
 
 CHART_DIR := helm/strimzi-kafka-operator
+UPSTREAM_CHART_REPO := https://strimzi.io/charts
+UPSTREAM_CHART_NAME := strimzi-kafka-operator
+UPSTREAM_CHART_VERSION := 1.0.0
 
 sync-chart:
 	rm -rf $(CHART_DIR)/charts/strimzi-kafka-operator $(CHART_DIR)/templates/crds
-	helm pull --repo https://strimzi.io/charts strimzi-kafka-operator --version 0.51.0 --destination $(CHART_DIR)/charts --untar
+	helm pull --repo $(UPSTREAM_CHART_REPO) $(UPSTREAM_CHART_NAME) --version $(UPSTREAM_CHART_VERSION) --destination $(CHART_DIR)/charts --untar
 	mv $(CHART_DIR)/charts/strimzi-kafka-operator/crds $(CHART_DIR)/templates/crds
 	@# Patch in the helm.sh/resource-policy: keep annotation so CRDs survive helm uninstall.
 	@# The sed patterns do:
