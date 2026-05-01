@@ -20,3 +20,6 @@ annotations:
 maintainers:
   - name: giantswarm/team-atlas
     email: team-atlas@giantswarm.io
+dependencies:
+  - name: strimzi-kafka-operator
+    condition: strimzi-kafka-operator.enabled
