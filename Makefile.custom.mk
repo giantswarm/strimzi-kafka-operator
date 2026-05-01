@@ -6,6 +6,7 @@ UPSTREAM_CHART_NAME := strimzi-kafka-operator
 UPSTREAM_CHART_VERSION := 1.0.0
 
 sync-chart:
+	@echo "====> Syncing subchart from upstream $(UPSTREAM_CHART_REPO)/$(UPSTREAM_CHART_REPO) $(UPSTREAM_CHART_VERSION)"
 	rm -rf $(CHART_DIR)/charts/strimzi-kafka-operator $(CHART_DIR)/templates/crds
 	helm pull --repo $(UPSTREAM_CHART_REPO) $(UPSTREAM_CHART_NAME) --version $(UPSTREAM_CHART_VERSION) --destination $(CHART_DIR)/charts --untar
 	mv $(CHART_DIR)/charts/strimzi-kafka-operator/crds $(CHART_DIR)/templates/crds
@@ -14,11 +15,11 @@ sync-chart:
 	@# - inserts after the 'annotations:' key at the metadata level.
 	@# - add Helm conditionals to wrap all CRDs so they can be optionally installed (Values.crds.install).
 	sed \
-		-e '/^  annotations:$$/a\    "helm.sh/resource-policy": keep' \
+		-e '/^metadata:$$/a\  annotations:\n    "helm.sh/resource-policy": keep' \
 		-e '1s/^/{{- if .Values.crds.install }}\n/' \
 		-e '$$a {{- end }}' \
 		-i $(CHART_DIR)/templates/crds/*.yaml
-	@echo "Chart synced to. Review the diff and commit."
+	@echo "Subchart synced to $(CHART_DIR). Review the diff and commit."
 
 .PHONY: sync-crds
 sync-crds: ## Re-extract CRDs from upstream chart tgz after a version bump.
