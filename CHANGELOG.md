@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Upgrade to Strimzi Kafka Operator v1.0.0, which moves CRDs to v1 while dropping support for beta versions, and various bug fixes and improvements.
 
+### Fixed
+
+- Fix deprecated Auto updateMode for verticalPodAutoscaler, replace it with Recreate
+
 ## [0.0.2] - 2026-04-01
 
 ### Added
