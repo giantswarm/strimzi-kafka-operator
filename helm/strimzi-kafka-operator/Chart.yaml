@@ -22,4 +22,5 @@ maintainers:
     email: team-atlas@giantswarm.io
 dependencies:
   - name: strimzi-kafka-operator
+    version: 1.0.0
     condition: strimzi-kafka-operator.enabled

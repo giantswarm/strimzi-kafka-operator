@@ -1,0 +1,6 @@
+dependencies:
+- name: strimzi-kafka-operator
+  repository: ""
+  version: 1.0.0
+digest: sha256:6ce02ba7751d1d0d24fc51167d741a80eccd45ae8e2cdb35b37146c08d8046cb
+generated: "2026-05-01T15:00:44.64608501+02:00"
