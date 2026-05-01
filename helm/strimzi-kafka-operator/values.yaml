@@ -18,8 +18,8 @@ crds:
 # Disabled by default; enable per-installation if VPA is available.
 verticalPodAutoscaler:
   enabled: true
-  # "Auto" | "Recreate" | "Initial" | "Off"
-  updateMode: "Auto"
+  # "Recreate" | "Initial" | "Off"
+  updateMode: "Recreate"
 
 # -- PodMonitor for scraping operator metrics (port 8080 / Prometheus format).
 # Docs: https://docs.giantswarm.io/overview/observability/data-management/data-ingestion/
