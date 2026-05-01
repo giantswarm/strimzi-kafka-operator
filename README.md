@@ -70,10 +70,9 @@ All images are sourced from `gsoci.azurecr.io` (retagged from upstream `quay.io/
 ## CRD management
 
 CRDs are managed by this chart's `templates/crds/` (updated on `helm upgrade`, kept on
-`helm uninstall`). **Flux and Argo CD users:** the bundled subchart also ships CRDs and
-needs `--skip-crds` equivalents — see the `crds:` block in
+`helm uninstall`). See the `crds:` block in
 [helm/strimzi-kafka-operator/values.yaml](helm/strimzi-kafka-operator/values.yaml) for the
-full lifecycle, rationale, and per-tool flags.
+full lifecycle.
 
 ### After a version bump (Renovate PR)
 

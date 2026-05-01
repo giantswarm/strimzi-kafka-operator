@@ -10,18 +10,7 @@
 # CRDs are placed in templates/crds/ (not helm's crds/ dir) so they are
 # updated on `helm upgrade`. The `helm.sh/resource-policy: keep` annotation
 # prevents deletion on `helm uninstall` to protect user data.
-#
-# The bundled subchart also ships CRDs in its crds/ dir, which Helm installs
-# without ownership metadata — conflicting with this chart's templates. Skip it:
-#   Flux:    spec.install.crds: Skip (HelmRelease) — templates/crds/ handles lifecycle.
-#            Or use CreateReplace/CreateReplace and set crds.install: false to let
-#            Flux own CRD lifecycle from the subchart's crds/ dir instead.
-#   ArgoCD:  skipCrds: true (Application .spec.source.helm) — templates/crds/ handles lifecycle.
-#   Helm:    --skip-crds
 crds:
-  # Requires pairing with --skip-crds / spec.install.crds: Skip / skipCrds: true
-  # so the subchart's crds/ dir is skipped — see comment above for details.
-  # Set to false to let Flux manage CRDs via CreateReplace instead.
   install: true
 
 # -- VerticalPodAutoscaler for the operator Deployment.
