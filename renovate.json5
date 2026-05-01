@@ -21,9 +21,6 @@
     },
   ],
   // After a Helm dependency bump, re-extract CRDs from the new upstream tgz.
-  "allowedCommands": [
-    "^make sync-crds$",
-  ],
   "packageRules": [
     {
       "matchPackageNames": ["strimzi-kafka-operator"],
