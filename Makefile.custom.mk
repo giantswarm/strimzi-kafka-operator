@@ -2,6 +2,21 @@
 
 CHART_DIR := helm/strimzi-kafka-operator
 
+sync-chart:
+	rm -rf $(CHART_DIR)/charts/strimzi-kafka-operator $(CHART_DIR)/templates/crds
+	helm pull --repo https://strimzi.io/charts strimzi-kafka-operator --version 0.51.0 --destination $(CHART_DIR)/charts --untar
+	mv $(CHART_DIR)/charts/strimzi-kafka-operator/crds $(CHART_DIR)/templates/crds
+	@# Patch in the helm.sh/resource-policy: keep annotation so CRDs survive helm uninstall.
+	@# The sed patterns do:
+	@# - inserts after the 'annotations:' key at the metadata level.
+	@# - add Helm conditionals to wrap all CRDs so they can be optionally installed (Values.crds.install).
+	sed \
+		-e '/^  annotations:$$/a\    "helm.sh/resource-policy": keep' \
+		-e '1s/^/{{- if .Values.crds.install }}\n/' \
+		-e '$$a {{- end }}' \
+		-i $(CHART_DIR)/templates/crds/*.yaml
+	@echo "Chart synced to. Review the diff and commit."
+
 .PHONY: sync-crds
 sync-crds: ## Re-extract CRDs from upstream chart tgz after a version bump.
 	@echo "====> Syncing CRDs from upstream strimzi-kafka-operator chart"
