@@ -1,0 +1,46 @@
+suite: CRD lifecycle
+templates:
+  - templates/crds/*.yaml
+tests:
+  - it: each CRD has the keep resource-policy annotation so helm uninstall doesn't drop user data
+    asserts:
+      - equal:
+          path: metadata.annotations["helm.sh/resource-policy"]
+          value: keep
+        template: templates/crds/040-Crd-kafka.yaml
+      - equal:
+          path: metadata.annotations["helm.sh/resource-policy"]
+          value: keep
+        template: templates/crds/041-Crd-kafkaconnect.yaml
+      - equal:
+          path: metadata.annotations["helm.sh/resource-policy"]
+          value: keep
+        template: templates/crds/042-Crd-strimzipodset.yaml
+      - equal:
+          path: metadata.annotations["helm.sh/resource-policy"]
+          value: keep
+        template: templates/crds/043-Crd-kafkatopic.yaml
+      - equal:
+          path: metadata.annotations["helm.sh/resource-policy"]
+          value: keep
+        template: templates/crds/044-Crd-kafkauser.yaml
+      - equal:
+          path: metadata.annotations["helm.sh/resource-policy"]
+          value: keep
+        template: templates/crds/045-Crd-kafkanodepool.yaml
+      - equal:
+          path: metadata.annotations["helm.sh/resource-policy"]
+          value: keep
+        template: templates/crds/046-Crd-kafkabridge.yaml
+      - equal:
+          path: metadata.annotations["helm.sh/resource-policy"]
+          value: keep
+        template: templates/crds/047-Crd-kafkaconnector.yaml
+      - equal:
+          path: metadata.annotations["helm.sh/resource-policy"]
+          value: keep
+        template: templates/crds/048-Crd-kafkamirrormaker2.yaml
+      - equal:
+          path: metadata.annotations["helm.sh/resource-policy"]
+          value: keep
+        template: templates/crds/049-Crd-kafkarebalance.yaml
