@@ -5,6 +5,10 @@ UPSTREAM_CHART_REPO := https://strimzi.io/charts
 UPSTREAM_CHART_NAME := strimzi-kafka-operator
 UPSTREAM_CHART_VERSION := 1.0.0
 
+# We sync and patch the whole upstream chart instead of having a classic dependency.
+# Reason: we are not happy with the way the upstream chart manages CRDs,
+#                and we can't prevent it from installing them from values.
+#                 So we move them from crds/ to templates/ so we can upgrade them along the app.
 sync-chart:
 	@echo "====> Syncing subchart from upstream $(UPSTREAM_CHART_REPO)/$(UPSTREAM_CHART_REPO) $(UPSTREAM_CHART_VERSION)"
 	rm -rf $(CHART_DIR)/charts/strimzi-kafka-operator $(CHART_DIR)/templates/crds
