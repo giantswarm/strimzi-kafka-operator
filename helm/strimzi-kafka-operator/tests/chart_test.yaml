@@ -1,0 +1,7 @@
+suite: chart renders
+templates:
+  - templates/**/*.yaml
+tests:
+  - it: renders without error
+    asserts:
+      - notFailedTemplate: {}
