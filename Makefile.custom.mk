@@ -1,28 +1,29 @@
 ##@ Strimzi
 
 CHART_DIR := helm/strimzi-kafka-operator
+UPSTREAM_CHART_REPO := https://strimzi.io/charts
+UPSTREAM_CHART_NAME := strimzi-kafka-operator
+UPSTREAM_CHART_VERSION := 1.0.0
 
-.PHONY: sync-crds
-sync-crds: ## Re-extract CRDs from upstream chart tgz after a version bump.
-	@echo "====> Syncing CRDs from upstream strimzi-kafka-operator chart"
-	helm dep update $(CHART_DIR)
-	rm -rf $(CHART_DIR)/templates/crds/
-	mkdir -p $(CHART_DIR)/templates/crds/
-	tar -xzf $(CHART_DIR)/charts/strimzi-kafka-operator-*.tgz \
-	  --strip-components=2 \
-	  -C $(CHART_DIR)/templates/crds/ \
-	  strimzi-kafka-operator/crds/
-	@# Patch the extracted CRDs:
-	@# - Insert a metadata.annotations block with helm.sh/resource-policy: keep so
-	@#   CRDs survive `helm uninstall` (along with the CRs they back). Upstream CRDs
-	@#   ship without a metadata-level annotations: block, so we create one.
-	@# - Wrap each CRD in a Helm conditional so it can be opted out (.Values.crds.install).
+# We sync and patch the whole upstream chart instead of having a classic dependency.
+# Reason: we are not happy with the way the upstream chart manages CRDs,
+#                and we can't prevent it from installing them from values.
+#                 So we move them from crds/ to templates/ so we can upgrade them along the app.
+sync-chart:
+	@echo "====> Syncing subchart from upstream $(UPSTREAM_CHART_REPO)/$(UPSTREAM_CHART_REPO) $(UPSTREAM_CHART_VERSION)"
+	rm -rf $(CHART_DIR)/charts/strimzi-kafka-operator $(CHART_DIR)/templates/crds
+	helm pull --repo $(UPSTREAM_CHART_REPO) $(UPSTREAM_CHART_NAME) --version $(UPSTREAM_CHART_VERSION) --destination $(CHART_DIR)/charts --untar
+	mv $(CHART_DIR)/charts/strimzi-kafka-operator/crds $(CHART_DIR)/templates/crds
+	@# Patch in the helm.sh/resource-policy: keep annotation so CRDs survive helm uninstall.
+	@# The sed patterns do:
+	@# - inserts after the 'annotations:' key at the metadata level.
+	@# - add Helm conditionals to wrap all CRDs so they can be optionally installed (Values.crds.install).
 	sed \
 		-e '/^metadata:$$/a\  annotations:\n    "helm.sh/resource-policy": keep' \
 		-e '1s/^/{{- if .Values.crds.install }}\n/' \
 		-e '$$a {{- end }}' \
 		-i $(CHART_DIR)/templates/crds/*.yaml
-	@echo "CRDs synced to $(CHART_DIR)/templates/crds/. Review the diff and commit."
+	@echo "Subchart synced to $(CHART_DIR). Review the diff and commit."
 
 .PHONY: sync-dashboards
 sync-dashboards: ## Download and patch Grafana dashboard JSONs from upstream GitHub after a version bump.

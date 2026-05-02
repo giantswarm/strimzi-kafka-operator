@@ -70,19 +70,18 @@ All images are sourced from `gsoci.azurecr.io` (retagged from upstream `quay.io/
 ## CRD management
 
 CRDs are managed by this chart's `templates/crds/` (updated on `helm upgrade`, kept on
-`helm uninstall`). **Flux and Argo CD users:** the bundled subchart also ships CRDs and
-needs `--skip-crds` equivalents — see the `crds:` block in
+`helm uninstall`). See the `crds:` block in
 [helm/strimzi-kafka-operator/values.yaml](helm/strimzi-kafka-operator/values.yaml) for the
-full lifecycle, rationale, and per-tool flags.
+full lifecycle.
 
 ### After a version bump (Renovate PR)
 
-When Renovate bumps the chart version in `Chart.yaml`, re-extract the CRDs:
+When Renovate bumps the chart version in `Chart.yaml`, re-sync the upstream chart:
 
 ```bash
-make sync-crds
-git add helm/strimzi-kafka-operator/templates/crds/
-git commit -m "Sync CRDs for strimzi-kafka-operator v<new-version>"
+make sync-chart
+git add helm/strimzi-kafka-operator/
+git commit -m "Sync upstream chart for strimzi-kafka-operator v<new-version>"
 ```
 
 ## Compatibility
@@ -94,11 +93,8 @@ git commit -m "Sync CRDs for strimzi-kafka-operator v<new-version>"
 ## Development
 
 ```bash
-# Update upstream chart dependency
-helm dep update helm/strimzi-kafka-operator
-
-# Re-extract CRDs after version bump
-make sync-crds
+# Update upstream chart dependency and CRDs
+make sync-chart
 
 # Lint
 helm lint helm/strimzi-kafka-operator --values helm/strimzi-kafka-operator/ci/default-values.yaml

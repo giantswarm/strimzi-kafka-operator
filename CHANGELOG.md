@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Upgrade to Strimzi Kafka Operator v1.0.0, which moves CRDs to v1 while dropping support for beta versions, and various bug fixes and improvements.
+- Vendor the upstream chart directly into this repo to provide seamless CRDs installation and upgrades by patching the upstream chart and removeing the CRDs from it.
 
 ### Fixed
 

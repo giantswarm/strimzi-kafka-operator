@@ -19,5 +19,17 @@
         "renovate: datasource=(?<datasource>[^ ]+) depName=(?<depName>[^\n]+)\n\\s+tag: \"(?<currentValue>[^\"]+)\"",
       ],
     },
+    // Track the upstream Helm chart version pinned in Makefile.custom.mk.
+    // The chart is vendored via `helm pull` (driven by UPSTREAM_CHART_VERSION)
+    // rather than declared as a Chart.yaml dependency, so Renovate's helmv3
+    // manager cannot see it.
+    {
+      "customType": "regex",
+      "managerFilePatterns": ["^Makefile\\.custom\\.mk$"],
+      "matchStrings": [
+        "UPSTREAM_CHART_REPO := (?<registryUrl>\\S+)\\s+UPSTREAM_CHART_NAME := (?<depName>\\S+)\\s+UPSTREAM_CHART_VERSION := (?<currentValue>\\S+)",
+      ],
+      "datasourceTemplate": "helm",
+    },
   ],
 }
