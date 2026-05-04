@@ -1,0 +1,47 @@
+# Forked from devctl pre-commit config, that you can generate with:
+#    devctl gen precommit --repo-name strimzi-kafka-operator --flavors helmchart
+# then we updated `exclude` to ignore the imported upstream strimzi-kafka-operator chart
+---
+minimum_pre_commit_version: '2.17'
+repos:
+  # base hooks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: check-merge-conflict
+      - id: check-shebang-scripts-are-executable
+      - id: detect-private-key
+      - id: end-of-file-fixer
+        # helm-docs generates a README with broken EOL
+        exclude: ".*testdata/.*|helm/strimzi-kafka-operator/charts|helm/strimzi-kafka-operator/README.md"
+      - id: mixed-line-ending
+      - id: trailing-whitespace
+        exclude: ".*testdata/.*|helm/strimzi-kafka-operator/charts/.*"
+
+  # Helm chart hooks for strimzi-kafka-operator
+  - repo: https://github.com/losisin/helm-values-schema-json
+    rev: v2.3.1
+    hooks:
+      - id: helm-schema
+        args:
+          - --config
+          - helm/strimzi-kafka-operator/.schema.yaml
+  - repo: https://github.com/giantswarm/schemalint
+    rev: v2.6.1
+    hooks:
+      - id: schemalint-normalize
+        args:
+          - helm/strimzi-kafka-operator/values.schema.json
+          - -o
+          - helm/strimzi-kafka-operator/values.schema.json
+          - --force
+      - id: schemalint-verify
+        args:
+          - helm/strimzi-kafka-operator/values.schema.json
+  - repo: https://github.com/norwoodj/helm-docs
+    rev: "v1.14.2"
+    hooks:
+      - id: helm-docs
+        args:
+          - --chart-search-root=helm
+          - --sort-values-order=file
