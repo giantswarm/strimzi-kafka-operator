@@ -5,7 +5,7 @@ description: >
 
 type: application
 # version is replaced by app-build-suite with the git tag
-version: 0.1.0
+version: 0.1.1
 # appVersion tracks the upstream strimzi-kafka-operator version
 appVersion: 1.0.0
 home: https://github.com/giantswarm/strimzi-kafka-operator
