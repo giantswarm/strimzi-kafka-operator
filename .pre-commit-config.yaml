@@ -1,6 +1,6 @@
-# Forked from devctl pre-commit config:
-# https://github.com/giantswarm/devctl/blob/e7d0bc971fcd7c2c857099ffb66585b1e2ba977f/pkg/gen/input/precommit/internal/file/pre-commit-config.yaml.template
-# Except we want to ignore the imported upstream strimzi-kafka-operator chart
+# Forked from devctl pre-commit config, that you can generate with:
+#    devctl gen precommit --repo-name strimzi-kafka-operator --flavors helmchart
+# then we updated `exclude` to ignore the imported upstream strimzi-kafka-operator chart
 ---
 minimum_pre_commit_version: '2.17'
 repos:
