@@ -1,85 +1,418 @@
 {
-  "$schema": "http://json-schema.org/schema#",
-  "type": "object",
-  "properties": {
-    "crds": {
-      "type": "object",
-      "properties": {
-        "install": {
-          "type": "boolean",
-          "description": "Whether to install/upgrade CRDs from templates/crds/. Set to false to manage CRDs externally."
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "type": "object",
+    "properties": {
+        "crds": {
+            "description": "CRD lifecycle management. CRDs are placed in templates/crds/ (not helm's crds/ dir) so they are updated on `helm upgrade`. The `helm.sh/resource-policy: keep` annotation prevents deletion on `helm uninstall` to protect user data.",
+            "type": "object",
+            "properties": {
+                "install": {
+                    "type": "boolean"
+                }
+            },
+            "additionalProperties": false
+        },
+        "dashboards": {
+            "description": "Grafana dashboards (9 dashboards: Kafka, KRaft, KafkaConnect, MirrorMaker2, Bridge, CruiseControl, Exporter, OAuth, Operators). The upstream chart's dashboard template is disabled because the JSON files lack \"uid\" fields required by the GS admission webhook. This wrapper manages the ConfigMaps instead, using JSONs extracted and UID-patched via `make sync-dashboards`. Docs: https://docs.giantswarm.io/overview/observability/dashboard-management/dashboard-creation/",
+            "type": "object",
+            "properties": {
+                "annotations": {
+                    "type": "object",
+                    "properties": {
+                        "observability.giantswarm.io/folder": {
+                            "type": "string"
+                        },
+                        "observability.giantswarm.io/organization": {
+                            "type": "string"
+                        }
+                    },
+                    "additionalProperties": false
+                },
+                "enabled": {
+                    "type": "boolean"
+                },
+                "label": {
+                    "type": "string"
+                },
+                "labelValue": {
+                    "type": "string"
+                },
+                "namespace": {
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false
+        },
+        "global": {
+            "description": "Global values shared between all subcharts",
+            "$comment": "Added automatically by 'helm schema' to allow this chart to be used as a Helm dependency, as the `additionalProperties` setting would otherwise collide with Helm's special 'global' values key.",
+            "type": [
+                "object",
+                "null"
+            ]
+        },
+        "podMonitor": {
+            "description": "PodMonitor for scraping operator metrics (port 8080 / Prometheus format). Docs: https://docs.giantswarm.io/overview/observability/data-management/data-ingestion/",
+            "type": "object",
+            "properties": {
+                "enabled": {
+                    "type": "boolean"
+                },
+                "labels": {
+                    "type": "object",
+                    "properties": {
+                        "observability.giantswarm.io/tenant": {
+                            "type": "string"
+                        }
+                    },
+                    "additionalProperties": false
+                },
+                "workloads": {
+                    "description": "PodMonitors for Kafka workloads managed by the operator (cross-namespace).",
+                    "type": "object",
+                    "properties": {
+                        "enabled": {
+                            "type": "boolean"
+                        }
+                    },
+                    "additionalProperties": false
+                }
+            },
+            "additionalProperties": false
+        },
+        "strimzi-kafka-operator": {
+            "description": "--------------------------------------------------------------------- Upstream strimzi-kafka-operator chart values. All keys below are passed through to the upstream chart. See https://artifacthub.io/packages/helm/strimzi/strimzi-kafka-operator",
+            "type": "object",
+            "properties": {
+                "affinity": {
+                    "description": "Pod anti-affinity to spread operator replicas across nodes. preferredDuringScheduling so single-node clusters are not blocked.",
+                    "type": "object",
+                    "properties": {
+                        "podAntiAffinity": {
+                            "type": "object",
+                            "properties": {
+                                "preferredDuringSchedulingIgnoredDuringExecution": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "podAffinityTerm": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "labelSelector": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "matchLabels": {
+                                                                "type": "object",
+                                                                "properties": {
+                                                                    "name": {
+                                                                        "type": "string"
+                                                                    },
+                                                                    "strimzi.io/kind": {
+                                                                        "type": "string"
+                                                                    }
+                                                                },
+                                                                "additionalProperties": false
+                                                            }
+                                                        },
+                                                        "additionalProperties": false
+                                                    },
+                                                    "topologyKey": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "additionalProperties": false
+                                            },
+                                            "weight": {
+                                                "type": "integer"
+                                            }
+                                        },
+                                        "additionalProperties": false
+                                    }
+                                }
+                            },
+                            "additionalProperties": false
+                        }
+                    },
+                    "additionalProperties": false
+                },
+                "dashboards": {
+                    "description": "Subchart dashboard template disabled permanently. Two reasons we manage dashboards in the wrapper instead: 1. The upstream JSONs lack \"uid\" fields required by the GS admission webhook (dashboardconfigmap.observability.giantswarm.io). 2. The subchart ships JMX-based dashboards; we use the strimzi-metrics-reporter dashboards (+ strimzi-kafka-exporter) which require metricsConfig.type: strimziMetricsReporter. Dashboards are managed via the wrapper's dashboards: block and synced with `make sync-dashboards`.",
+                    "type": "object",
+                    "properties": {
+                        "annotations": {
+                            "type": "object",
+                            "properties": {
+                                "observability.giantswarm.io/folder": {
+                                    "type": "string"
+                                },
+                                "observability.giantswarm.io/organization": {
+                                    "type": "string"
+                                }
+                            },
+                            "additionalProperties": false
+                        },
+                        "enabled": {
+                            "type": "boolean"
+                        },
+                        "label": {
+                            "type": "string"
+                        },
+                        "labelValue": {
+                            "type": "string"
+                        }
+                    },
+                    "additionalProperties": false
+                },
+                "defaultImageRegistry": {
+                    "description": "Global image registry/repository defaults. All component images fall back to these when their per-component registry/repository fields are empty.  Images retagged from quay.io/strimzi/* to gsoci: quay.io/strimzi/operator          → gsoci.azurecr.io/giantswarm/strimzi/operator quay.io/strimzi/kafka             → gsoci.azurecr.io/giantswarm/strimzi/kafka quay.io/strimzi/kafka-bridge      → gsoci.azurecr.io/giantswarm/strimzi/kafka-bridge quay.io/strimzi/kaniko-executor   → gsoci.azurecr.io/giantswarm/strimzi/kaniko-executor quay.io/strimzi/buildah           → gsoci.azurecr.io/giantswarm/strimzi/buildah quay.io/strimzi/maven-builder     → gsoci.azurecr.io/giantswarm/strimzi/maven-builder",
+                    "type": "string"
+                },
+                "defaultImageRepository": {
+                    "type": "string"
+                },
+                "enabled": {
+                    "type": "boolean"
+                },
+                "extraEnvs": {
+                    "description": "Use the restricted pod security provider so all Strimzi-generated pods (Kafka brokers, EntityOperator, etc.) get capabilities.drop=ALL, allowPrivilegeEscalation=false, runAsNonRoot=true, and seccompProfile=RuntimeDefault injected automatically. This satisfies GS Kyverno strict policies without needing a KyvernoPolicyException.",
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "name": {
+                                "type": "string"
+                            },
+                            "value": {
+                                "type": "string"
+                            }
+                        },
+                        "additionalProperties": false
+                    }
+                },
+                "generateNetworkPolicy": {
+                    "description": "Keep Strimzi-generated NetworkPolicies for Kafka component pods.",
+                    "type": "boolean"
+                },
+                "kafkaBridge": {
+                    "type": "object",
+                    "properties": {
+                        "image": {
+                            "type": "object",
+                            "properties": {
+                                "name": {
+                                    "type": "string"
+                                },
+                                "registry": {
+                                    "type": "string"
+                                },
+                                "repository": {
+                                    "type": "string"
+                                },
+                                "tag": {
+                                    "type": "string"
+                                }
+                            },
+                            "additionalProperties": false
+                        }
+                    },
+                    "additionalProperties": false
+                },
+                "labels": {
+                    "description": "Pod labels applied to the operator Deployment's pod template. The tenant label enables GS log ingestion for the operator pod. Docs: https://docs.giantswarm.io/overview/observability/data-management/data-ingestion/",
+                    "type": "object",
+                    "properties": {
+                        "observability.giantswarm.io/tenant": {
+                            "type": "string"
+                        }
+                    },
+                    "additionalProperties": false
+                },
+                "leaderElection": {
+                    "description": "Enable leader election. Must be true when replicas \u003e 1 to avoid multiple active operators writing conflicting state.",
+                    "type": "object",
+                    "properties": {
+                        "enable": {
+                            "type": "boolean"
+                        }
+                    },
+                    "additionalProperties": false
+                },
+                "operatorNetworkPolicy": {
+                    "description": "NetworkPolicy for the operator pod, managed by the upstream chart. egress must be [{} ] (single empty rule) to allow all egress — the upstream template uses `with` so an empty map `{}` renders as blocked.",
+                    "type": "object",
+                    "properties": {
+                        "egress": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "additionalProperties": false
+                            }
+                        },
+                        "enabled": {
+                            "type": "boolean"
+                        }
+                    },
+                    "additionalProperties": false
+                },
+                "podDisruptionBudget": {
+                    "description": "PodDisruptionBudget for the operator Deployment. Ensures at least one replica is available during voluntary disruptions (node drain, rolling upgrades). Requires replicas \u003e= 2 to have any effect.",
+                    "type": "object",
+                    "properties": {
+                        "enabled": {
+                            "type": "boolean"
+                        },
+                        "minAvailable": {
+                            "type": "integer"
+                        }
+                    },
+                    "additionalProperties": false
+                },
+                "podSecurityContext": {
+                    "description": "Operator pod security context (hardened for GS standards).",
+                    "type": "object",
+                    "properties": {
+                        "runAsNonRoot": {
+                            "type": "boolean"
+                        },
+                        "seccompProfile": {
+                            "type": "object",
+                            "properties": {
+                                "type": {
+                                    "type": "string"
+                                }
+                            },
+                            "additionalProperties": false
+                        }
+                    },
+                    "additionalProperties": false
+                },
+                "replicas": {
+                    "description": "Number of operator replicas. Strimzi uses leader election so only one replica is active at a time; additional replicas are hot standbys. Requires replicas \u003e= 2 for the PodDisruptionBudget to allow node drains.",
+                    "type": "integer"
+                },
+                "resources": {
+                    "description": "Operator resource limits (tune based on number of Kafka clusters watched).",
+                    "type": "object",
+                    "properties": {
+                        "limits": {
+                            "type": "object",
+                            "properties": {
+                                "cpu": {
+                                    "type": "string"
+                                },
+                                "memory": {
+                                    "type": "string"
+                                }
+                            },
+                            "additionalProperties": false
+                        },
+                        "requests": {
+                            "type": "object",
+                            "properties": {
+                                "cpu": {
+                                    "type": "string"
+                                },
+                                "memory": {
+                                    "type": "string"
+                                }
+                            },
+                            "additionalProperties": false
+                        }
+                    },
+                    "additionalProperties": false
+                },
+                "securityContext": {
+                    "description": "Operator container security context.",
+                    "type": "object",
+                    "properties": {
+                        "allowPrivilegeEscalation": {
+                            "type": "boolean"
+                        },
+                        "capabilities": {
+                            "type": "object",
+                            "properties": {
+                                "drop": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string"
+                                    }
+                                }
+                            },
+                            "additionalProperties": false
+                        },
+                        "readOnlyRootFilesystem": {
+                            "type": "boolean"
+                        },
+                        "runAsNonRoot": {
+                            "type": "boolean"
+                        },
+                        "seccompProfile": {
+                            "type": "object",
+                            "properties": {
+                                "type": {
+                                    "type": "string"
+                                }
+                            },
+                            "additionalProperties": false
+                        }
+                    },
+                    "additionalProperties": false
+                },
+                "topologySpreadConstraints": {
+                    "description": "TopologySpreadConstraints spread operator pods across nodes. Uses ScheduleAnyway so scheduling is never blocked on single-node clusters. NOTE: requires upstream PR https://github.com/strimzi/strimzi-kafka-operator/pull/12560 to be merged before these values have any effect.",
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "labelSelector": {
+                                "type": "object",
+                                "properties": {
+                                    "matchLabels": {
+                                        "type": "object",
+                                        "properties": {
+                                            "name": {
+                                                "type": "string"
+                                            }
+                                        },
+                                        "additionalProperties": false
+                                    }
+                                },
+                                "additionalProperties": false
+                            },
+                            "maxSkew": {
+                                "type": "integer"
+                            },
+                            "topologyKey": {
+                                "type": "string"
+                            },
+                            "whenUnsatisfiable": {
+                                "type": "string"
+                            }
+                        },
+                        "additionalProperties": false
+                    }
+                },
+                "watchAnyNamespace": {
+                    "description": "Watch all namespaces for Kafka CRs. Set to false and configure watchNamespaces if you want to restrict the operator to specific namespaces (e.g. in a shared cluster where teams manage their own operators).",
+                    "type": "boolean"
+                }
+            },
+            "additionalProperties": false
+        },
+        "verticalPodAutoscaler": {
+            "description": "VerticalPodAutoscaler for the operator Deployment. Requires the VPA CRD to be installed on the cluster (available on most GS CAPI clusters). Disabled by default; enable per-installation if VPA is available.",
+            "type": "object",
+            "properties": {
+                "enabled": {
+                    "type": "boolean"
+                },
+                "updateMode": {
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false
         }
-      },
-      "additionalProperties": false
     },
-    "dashboards": {
-      "type": "object",
-      "properties": {
-        "enabled": {
-          "type": "boolean",
-          "description": "Create Grafana dashboard ConfigMaps from files/grafana-dashboards/. Run make sync-dashboards after a version bump to refresh."
-        },
-        "namespace": {
-          "type": "string",
-          "description": "Namespace for dashboard ConfigMaps. Defaults to .Release.Namespace when empty."
-        },
-        "label": {
-          "type": "string",
-          "description": "ConfigMap label key used for Grafana dashboard discovery."
-        },
-        "labelValue": {
-          "type": "string",
-          "description": "ConfigMap label value used for Grafana dashboard discovery."
-        },
-        "annotations": {
-          "type": "object",
-          "description": "Annotations added to each dashboard ConfigMap (e.g. observability.giantswarm.io/organization).",
-          "additionalProperties": { "type": "string" }
-        }
-      },
-      "additionalProperties": false
-    },
-    "verticalPodAutoscaler": {
-      "type": "object",
-      "properties": {
-        "enabled": {
-          "type": "boolean",
-          "description": "Create a VerticalPodAutoscaler for the operator. Requires VPA CRDs on the cluster."
-        },
-        "updateMode": {
-          "type": "string",
-          "enum": ["Auto", "Recreate", "Initial", "Off"],
-          "description": "VPA update mode: Auto/Recreate restart pods to apply recommendations; Initial applies only at creation; Off disables updates."
-        }
-      },
-      "additionalProperties": false
-    },
-    "podMonitor": {
-      "type": "object",
-      "properties": {
-        "enabled": {
-          "type": "boolean",
-          "description": "Create a PodMonitor to scrape operator metrics on port 8080."
-        },
-        "labels": {
-          "type": "object",
-          "description": "Labels added to the PodMonitor resource. Use 'observability.giantswarm.io/tenant' to route metrics to a Grafana Organization.",
-          "additionalProperties": { "type": "string" }
-        },
-        "workloads": {
-          "type": "object",
-          "description": "PodMonitors for Kafka workloads managed by the operator (cross-namespace).",
-          "properties": {
-            "enabled": {
-              "type": "boolean",
-              "description": "Create PodMonitors for Kafka, KafkaBridge, and Entity Operator pods across all namespaces."
-            }
-          },
-          "additionalProperties": false
-        }
-      },
-      "additionalProperties": false
-    }
-  },
-  "additionalProperties": true
+    "additionalProperties": false
 }
