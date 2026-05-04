@@ -34,16 +34,6 @@ Or using GitOps — see [Adding an App via GitOps](https://docs.giantswarm.io/tu
 crds:
   install: true
 
-# NetworkPolicy flavor — matches your cluster's CNI
-networkPolicy:
-  enabled: true
-  flavor: cilium        # "cilium" | "kubernetes"
-
-# Kyverno policy exceptions
-kyvernoPolicyExceptions:
-  enabled: true
-  namespace: giantswarm
-
 # Upstream overrides (see full list in values.yaml)
 strimzi-kafka-operator:
   # Default: true (watches all namespaces — recommended for a platform operator).
