@@ -23,6 +23,7 @@ sync-chart:
 		-e '1s/^/{{- if .Values.crds.install }}\n/' \
 		-e '$$a {{- end }}' \
 		-i $(CHART_DIR)/templates/crds/*.yaml
+	pre-commit run --all-files || true # fixes formatting and linting issues in the synced files
 	@echo "Subchart synced to $(CHART_DIR). Review the diff and commit."
 
 .PHONY: sync-dashboards
