@@ -152,6 +152,13 @@ strimzi-kafka-operator:
 
 See [helm/strimzi-kafka-operator/values.yaml](helm/strimzi-kafka-operator/values.yaml) for all options.
 
+## CRD management
+
+CRDs are managed by this chart's `templates/crds/` (updated on `helm upgrade`, kept on
+`helm uninstall`). See the `crds:` block in
+[helm/strimzi-kafka-operator/values.yaml](helm/strimzi-kafka-operator/values.yaml) for the
+full lifecycle.
+
 ## Images
 
 All images are sourced from `gsoci.azurecr.io` (retagged from upstream `quay.io/strimzi`).
@@ -164,13 +171,6 @@ All images are sourced from `gsoci.azurecr.io` (retagged from upstream `quay.io/
 | `gsoci.azurecr.io/giantswarm/strimzi/kaniko-executor` | `1.0.0` |
 | `gsoci.azurecr.io/giantswarm/strimzi/buildah` | `1.0.0` |
 | `gsoci.azurecr.io/giantswarm/strimzi/maven-builder` | `1.0.0` |
-
-## CRD management
-
-CRDs are managed by this chart's `templates/crds/` (updated on `helm upgrade`, kept on
-`helm uninstall`). See the `crds:` block in
-[helm/strimzi-kafka-operator/values.yaml](helm/strimzi-kafka-operator/values.yaml) for the
-full lifecycle.
 
 ## Compatibility
 
