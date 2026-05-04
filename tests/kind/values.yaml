@@ -1,0 +1,13 @@
+# Helm values for the Kind integration test (.github/workflows/kind-integration-test.yaml).
+# Disables wrapper-level features whose CRDs or admission webhooks are not
+# available in vanilla Kind. Subchart values are intentionally left untouched
+# so the test exercises the production-equivalent operator configuration.
+
+verticalPodAutoscaler:
+  enabled: false
+
+podMonitor:
+  enabled: false
+
+dashboards:
+  enabled: false

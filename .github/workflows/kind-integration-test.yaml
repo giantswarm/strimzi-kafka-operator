@@ -1,0 +1,60 @@
+name: Kind integration test
+
+on:
+  pull_request:
+    paths:
+      - 'helm/**'
+      - 'examples/**'
+      - 'tests/kind/**'
+      - '.github/workflows/kind-integration-test.yaml'
+
+permissions: {}
+
+jobs:
+  kind-integration-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: azure/setup-helm@v5
+
+      - uses: helm/kind-action@v1
+        with:
+          cluster_name: strimzi-kind
+
+      - name: Install strimzi-kafka-operator chart
+        run: |
+          helm install strimzi-kafka-operator ./helm/strimzi-kafka-operator \
+            --namespace strimzi-system --create-namespace \
+            --values ./tests/kind/values.yaml \
+            --wait --timeout 5m
+
+      - name: Apply Kafka cluster
+        run: kubectl apply -f examples/kafka-ephemeral
+
+      - name: Wait for Kafka cluster to be ready
+        run: kubectl wait kafka/my-cluster --for=condition=Ready --timeout=10m
+
+      - name: Create topic and produce a message on broker 1
+        run: |
+          kubectl exec my-cluster-broker-1 -- \
+            bin/kafka-topics.sh --bootstrap-server localhost:9092 \
+            --create --topic quickstart-events
+          echo "hello from CI" | kubectl exec -i my-cluster-broker-1 -- \
+            bin/kafka-console-producer.sh --bootstrap-server localhost:9092 \
+            --topic quickstart-events
+
+      - name: Consume the message from broker 2
+        run: |
+          kubectl exec my-cluster-broker-2 -- \
+            bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 \
+            --topic quickstart-events --from-beginning \
+            --max-messages 1 --timeout-ms 60000
+
+      - name: Dump diagnostics on failure
+        if: failure()
+        run: |
+          kubectl get pods -A
+          kubectl describe kafka/my-cluster || true
+          kubectl describe kafkanodepool/controller kafkanodepool/broker || true
+          kubectl logs -n strimzi-system deploy/strimzi-cluster-operator --tail=200 || true
