@@ -74,35 +74,11 @@ CRDs are managed by this chart's `templates/crds/` (updated on `helm upgrade`, k
 [helm/strimzi-kafka-operator/values.yaml](helm/strimzi-kafka-operator/values.yaml) for the
 full lifecycle.
 
-### After a version bump (Renovate PR)
-
-When Renovate bumps the chart version in `Chart.yaml`, re-sync the upstream chart:
-
-```bash
-make sync-chart
-git add helm/strimzi-kafka-operator/
-git commit -m "Sync upstream chart for strimzi-kafka-operator v<new-version>"
-```
-
 ## Compatibility
 
 | App version | Upstream chart | Kubernetes |
 |---|---|---|
 | 0.1.x | strimzi-kafka-operator 1.0.0 | 1.30+ |
-
-## Development
-
-```bash
-# Update upstream chart dependency and CRDs
-make sync-chart
-
-# Lint
-helm lint helm/strimzi-kafka-operator --values helm/strimzi-kafka-operator/ci/default-values.yaml
-
-# Template render (dry-run)
-helm template strimzi-kafka-operator helm/strimzi-kafka-operator \
-  --values helm/strimzi-kafka-operator/ci/default-values.yaml --debug
-```
 
 ## Creating and testing a Kafka cluster
 
@@ -124,6 +100,7 @@ Start with the upstream docs:
 ## References
 
 - Changelog: [CHANGELOG.md](CHANGELOG.md)
+- Contributing: [CONTRIBUTING.md](CONTRIBUTING.md)
 - Security policy: [SECURITY.md](SECURITY.md)
 - Upstream values reference: [strimzi-kafka-operator on ArtifactHub](https://artifacthub.io/packages/helm/strimzi/strimzi-kafka-operator)
 - Upstream source: [strimzi/strimzi-kafka-operator](https://github.com/strimzi/strimzi-kafka-operator)
