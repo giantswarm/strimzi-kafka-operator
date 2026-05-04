@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.0] - 2026-05-04
+
 ### Added
 
 - Add pre-commit setup
@@ -50,6 +52,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - TopologySpreadConstraints to spread operator pods across nodes (`whenUnsatisfiable: ScheduleAnyway`).
 - VerticalPodAutoscaler template (`verticalPodAutoscaler.enabled`, disabled by default; requires VPA CRDs on the cluster).
 
-[Unreleased]: https://github.com/giantswarm/strimzi-kafka-operator/compare/v0.0.2...HEAD
+[Unreleased]: https://github.com/giantswarm/strimzi-kafka-operator/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/giantswarm/strimzi-kafka-operator/compare/v0.0.2...v0.1.0
 [0.0.2]: https://github.com/giantswarm/strimzi-kafka-operator/compare/v0.0.1...v0.0.2
 [0.0.1]: https://github.com/giantswarm/strimzi-kafka-operator/releases/tag/v0.0.1
