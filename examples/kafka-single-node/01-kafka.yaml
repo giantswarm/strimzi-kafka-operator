@@ -2,7 +2,6 @@ apiVersion: kafka.strimzi.io/v1
 kind: Kafka
 metadata:
   name: my-cluster
-  namespace: strimzi-system
   annotations:
     strimzi.io/node-pools: enabled
     strimzi.io/kraft: enabled
