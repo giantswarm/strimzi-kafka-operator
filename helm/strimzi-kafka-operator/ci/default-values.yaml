@@ -10,10 +10,6 @@ dashboards:
   # Disable during lint; no Grafana in CI.
   enabled: false
 
-networkPolicy:
-  # Disable: kind clusters used in CI have no Cilium or advanced NetworkPolicy.
-  enabled: false
-
 podMonitor:
   # Disable: no Prometheus CRDs in CI kind clusters.
   enabled: false
