@@ -135,22 +135,12 @@ Upstream documentation:
 
 ## Configuring
 
-### Key values
+Here are some configuration options to consider when configuring your Helm chart values:
 
 ```yaml
 # CRD management (disable if you manage CRDs externally)
 crds:
   install: true
-
-# NetworkPolicy flavor — matches your cluster's CNI
-networkPolicy:
-  enabled: true
-  flavor: cilium        # "cilium" | "kubernetes"
-
-# Kyverno policy exceptions
-kyvernoPolicyExceptions:
-  enabled: true
-  namespace: giantswarm
 
 # Upstream overrides (see full list in values.yaml)
 strimzi-kafka-operator:
