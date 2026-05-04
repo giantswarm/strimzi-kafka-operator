@@ -108,7 +108,7 @@ Make sure you are logged into the cluster where the operator is running.
 Then run the following commands to create a Kafka cluster:
 
 ```
-$ kubectl apply -f kafka-ephemeral.yaml
+$ kubectl apply -f examples/kafka-ephemeral.yaml
 kafkanodepool.kafka.strimzi.io/controller created
 kafkanodepool.kafka.strimzi.io/broker created
 kafka.kafka.strimzi.io/my-cluster created
