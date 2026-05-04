@@ -22,8 +22,6 @@ strimzi-kafka-operator:
   defaultImageRepository: giantswarm/strimzi
   defaultImageTag: 1.0.0
 
-  watchNamespace: []
-
   resources:
     requests:
       cpu: 200m
