@@ -11,27 +11,30 @@
 # updated on `helm upgrade`. The `helm.sh/resource-policy: keep` annotation
 # prevents deletion on `helm uninstall` to protect user data.
 crds:
-  install: true
+  # -- Whether to install/upgrade CRDs from templates/crds/. Set to false to manage CRDs externally.
+  install: true # @schema type: boolean
 
 # -- VerticalPodAutoscaler for the operator Deployment.
 # Requires the VPA CRD to be installed on the cluster (available on most GS CAPI clusters).
 # Disabled by default; enable per-installation if VPA is available.
 verticalPodAutoscaler:
-  enabled: true
-  # "Recreate" | "Initial" | "Off"
-  updateMode: "Recreate"
+  # -- Create a VerticalPodAutoscaler for the operator. Requires VPA CRDs on the cluster.
+  enabled: true # @schema type: boolean
+  # -- VPA update mode: Recreate restarts pods to apply recommendations; Initial applies only at creation; Off disables updates.
+  updateMode: "Recreate" # @schema type: string; enum: [Recreate, Initial, Off]
 
 # -- PodMonitor for scraping operator metrics (port 8080 / Prometheus format).
 # Docs: https://docs.giantswarm.io/overview/observability/data-management/data-ingestion/
 podMonitor:
-  enabled: true
-  # labels are added to the PodMonitor resource itself.
-  # The tenant label routes metrics to the correct Grafana Organization.
-  labels:
+  # -- Create a PodMonitor to scrape operator metrics on port 8080.
+  enabled: true # @schema type: boolean
+  # -- Labels added to the PodMonitor resource. Use 'observability.giantswarm.io/tenant' to route metrics to a Grafana Organization.
+  labels: # @schema type: object; additionalProperties: {type: string}
     "observability.giantswarm.io/tenant": giantswarm
   # -- PodMonitors for Kafka workloads managed by the operator (cross-namespace).
   workloads:
-    enabled: true
+    # -- Create PodMonitors for Kafka, KafkaBridge, and Entity Operator pods across all namespaces.
+    enabled: true # @schema type: boolean
 
 # -- Grafana dashboards (9 dashboards: Kafka, KRaft, KafkaConnect, MirrorMaker2,
 # Bridge, CruiseControl, Exporter, OAuth, Operators).
@@ -40,13 +43,16 @@ podMonitor:
 # ConfigMaps instead, using JSONs extracted and UID-patched via `make sync-dashboards`.
 # Docs: https://docs.giantswarm.io/overview/observability/dashboard-management/dashboard-creation/
 dashboards:
-  enabled: true
-  # namespace defaults to .Release.Namespace when empty.
-  namespace: ""
-  # GS uses ConfigMap label 'app.giantswarm.io/kind: dashboard' for dashboard discovery.
-  label: "app.giantswarm.io/kind"
-  labelValue: "dashboard"
-  annotations:
+  # -- Create Grafana dashboard ConfigMaps from files/grafana-dashboards/. Run `make sync-dashboards` after a version bump to refresh.
+  enabled: true # @schema type: boolean
+  # -- Namespace for dashboard ConfigMaps. Defaults to .Release.Namespace when empty.
+  namespace: "" # @schema type: string
+  # -- ConfigMap label key used for Grafana dashboard discovery.
+  label: "app.giantswarm.io/kind" # @schema type: string; minLength: 1
+  # -- ConfigMap label value used for Grafana dashboard discovery.
+  labelValue: "dashboard" # @schema type: string; minLength: 1
+  # -- Annotations added to each dashboard ConfigMap (e.g. observability.giantswarm.io/organization).
+  annotations: # @schema type: object; additionalProperties: {type: string}
     # Set to your Grafana organization slug.
     "observability.giantswarm.io/organization": "Shared Org"
     "observability.giantswarm.io/folder": Kafka
@@ -56,8 +62,9 @@ dashboards:
 # All keys below are passed through to the upstream chart.
 # See https://artifacthub.io/packages/helm/strimzi/strimzi-kafka-operator
 # -----------------------------------------------------------------------
-strimzi-kafka-operator:
-  enabled: true
+strimzi-kafka-operator: # @schema additionalProperties: true
+  # -- Enable the upstream strimzi-kafka-operator subchart.
+  enabled: true # @schema type: boolean
 
   # -- Global image registry/repository defaults.
   # All component images fall back to these when their per-component
@@ -70,8 +77,8 @@ strimzi-kafka-operator:
   #   quay.io/strimzi/kaniko-executor   → gsoci.azurecr.io/giantswarm/strimzi/kaniko-executor
   #   quay.io/strimzi/buildah           → gsoci.azurecr.io/giantswarm/strimzi/buildah
   #   quay.io/strimzi/maven-builder     → gsoci.azurecr.io/giantswarm/strimzi/maven-builder
-  defaultImageRegistry: gsoci.azurecr.io
-  defaultImageRepository: giantswarm/strimzi
+  defaultImageRegistry: gsoci.azurecr.io # @schema type: string
+  defaultImageRepository: giantswarm/strimzi # @schema type: string
   # defaultImageTag is intentionally not set here.
   # The sub-chart owns this value (it equals the upstream appVersion).
   # Renovate bumps it automatically when it updates the Chart.yaml dependency.
@@ -79,88 +86,90 @@ strimzi-kafka-operator:
   # Per-component images inherit registry/repository from defaults above
   # when left empty. Only override here if a component needs a different path.
   # kafkaBridge has its own release cadence independent of the operator.
-  kafkaBridge:
-    image:
-      registry: ""
-      repository: ""
-      name: kafka-bridge
+  kafkaBridge: # @schema additionalProperties: true
+    image: # @schema additionalProperties: true
+      registry: "" # @schema type: string
+      repository: "" # @schema type: string
+      name: kafka-bridge # @schema type: string
       # renovate: datasource=docker depName=gsoci.azurecr.io/giantswarm/strimzi/kafka-bridge
-      tag: 1.0.0
+      tag: 1.0.0 # @schema type: string
 
   # -- Number of operator replicas. Strimzi uses leader election so only one
   # replica is active at a time; additional replicas are hot standbys.
   # Requires replicas >= 2 for the PodDisruptionBudget to allow node drains.
-  replicas: 2
+  replicas: 2 # @schema type: integer; minimum: 1
 
   # -- Operator resource limits (tune based on number of Kafka clusters watched).
-  resources:
-    requests:
+  resources: # @schema additionalProperties: true
+    requests: # @schema additionalProperties: true
       cpu: 200m
       memory: 384Mi
-    limits:
+    limits: # @schema additionalProperties: true
       cpu: 1000m
       memory: 384Mi
 
   # -- Operator pod security context (hardened for GS standards).
-  podSecurityContext:
-    runAsNonRoot: true
-    seccompProfile:
-      type: RuntimeDefault
+  podSecurityContext: # @schema additionalProperties: true
+    runAsNonRoot: true # @schema type: boolean
+    seccompProfile: # @schema additionalProperties: true
+      type: RuntimeDefault # @schema type: string
 
   # -- Operator container security context.
-  securityContext:
-    allowPrivilegeEscalation: false
-    capabilities:
+  securityContext: # @schema additionalProperties: true
+    allowPrivilegeEscalation: false # @schema type: boolean
+    capabilities: # @schema additionalProperties: true
       drop:
         - ALL
-    readOnlyRootFilesystem: true
-    runAsNonRoot: true
-    seccompProfile:
-      type: RuntimeDefault
+    readOnlyRootFilesystem: true # @schema type: boolean
+    runAsNonRoot: true # @schema type: boolean
+    seccompProfile: # @schema additionalProperties: true
+      type: RuntimeDefault # @schema type: string
 
-  # -- Use the restricted pod security provider so all Strimzi-generated pods
-  # (Kafka brokers, EntityOperator, etc.) get capabilities.drop=ALL,
-  # allowPrivilegeEscalation=false, runAsNonRoot=true, and seccompProfile=RuntimeDefault
-  # injected automatically. This satisfies GS Kyverno strict policies without
-  # needing a KyvernoPolicyException.
-  extraEnvs:
+  # -- STRIMZI_POD_SECURITY_PROVIDER_CLASS makes the operator inject
+  # capabilities.drop=ALL, allowPrivilegeEscalation=false, runAsNonRoot=true,
+  # and seccompProfile=RuntimeDefault into all Strimzi-generated pods
+  # (Kafka brokers, EntityOperator, etc.) — required to satisfy GS Kyverno
+  # strict policies without a KyvernoPolicyException.
+
+  # -- Additional environment variables to inject into the operator container.
+  extraEnvs: # @schema item: object
     - name: STRIMZI_POD_SECURITY_PROVIDER_CLASS
       value: io.strimzi.plugin.security.profiles.impl.RestrictedPodSecurityProvider
 
   # -- NetworkPolicy for the operator pod, managed by the upstream chart.
   # egress must be [{} ] (single empty rule) to allow all egress — the upstream
   # template uses `with` so an empty map `{}` renders as blocked.
-  operatorNetworkPolicy:
-    enabled: true
-    egress:
+  operatorNetworkPolicy: # @schema additionalProperties: true
+    enabled: true # @schema type: boolean
+    egress: # @schema item: object
       - {}
 
   # -- Keep Strimzi-generated NetworkPolicies for Kafka component pods.
-  generateNetworkPolicy: true
+  generateNetworkPolicy: true # @schema type: boolean
 
   # -- Enable leader election. Must be true when replicas > 1 to avoid
   # multiple active operators writing conflicting state.
-  leaderElection:
-    enable: true
+  leaderElection: # @schema additionalProperties: true
+    enable: true # @schema type: boolean
 
   # -- Watch all namespaces for Kafka CRs.
   # Set to false and configure watchNamespaces if you want to restrict the
   # operator to specific namespaces (e.g. in a shared cluster where teams
   # manage their own operators).
-  watchAnyNamespace: true
+  watchAnyNamespace: true # @schema type: boolean
 
   # -- PodDisruptionBudget for the operator Deployment.
   # Ensures at least one replica is available during voluntary disruptions
   # (node drain, rolling upgrades). Requires replicas >= 2 to have any effect.
-  podDisruptionBudget:
-    enabled: true
-    minAvailable: 1
+  podDisruptionBudget: # @schema additionalProperties: true
+    enabled: true # @schema type: boolean
+    minAvailable: 1 # @schema type: [integer, string]
 
   # -- Pod anti-affinity to spread operator replicas across nodes.
   # preferredDuringScheduling so single-node clusters are not blocked.
-  affinity:
-    podAntiAffinity:
-      preferredDuringSchedulingIgnoredDuringExecution:
+  affinity: # @schema additionalProperties: true
+    podAntiAffinity: # @schema additionalProperties: true
+      preferredDuringSchedulingIgnoredDuringExecution: # @schema item: object
         - weight: 100
           podAffinityTerm:
             labelSelector:
@@ -173,7 +182,7 @@ strimzi-kafka-operator:
   # Uses ScheduleAnyway so scheduling is never blocked on single-node clusters.
   # NOTE: requires upstream PR https://github.com/strimzi/strimzi-kafka-operator/pull/12560
   # to be merged before these values have any effect.
-  topologySpreadConstraints:
+  topologySpreadConstraints: # @schema item: object
     - maxSkew: 1
       topologyKey: kubernetes.io/hostname
       whenUnsatisfiable: ScheduleAnyway
@@ -184,7 +193,7 @@ strimzi-kafka-operator:
   # -- Pod labels applied to the operator Deployment's pod template.
   # The tenant label enables GS log ingestion for the operator pod.
   # Docs: https://docs.giantswarm.io/overview/observability/data-management/data-ingestion/
-  labels:
+  labels: # @schema type: object; additionalProperties: {type: string}
     "observability.giantswarm.io/tenant": giantswarm
 
   # -- Subchart dashboard template disabled permanently.
@@ -194,12 +203,12 @@ strimzi-kafka-operator:
   # 2. The subchart ships JMX-based dashboards; we use the strimzi-metrics-reporter
   #    dashboards (+ strimzi-kafka-exporter) which require metricsConfig.type: strimziMetricsReporter.
   # Dashboards are managed via the wrapper's dashboards: block and synced with `make sync-dashboards`.
-  dashboards:
-    enabled: false
+  dashboards: # @schema additionalProperties: true
+    enabled: false # @schema type: boolean
     # GS uses ConfigMap label 'app.giantswarm.io/kind: dashboard' for dashboard discovery.
-    label: "app.giantswarm.io/kind"
-    labelValue: "dashboard"
-    annotations:
+    label: "app.giantswarm.io/kind" # @schema type: string
+    labelValue: "dashboard" # @schema type: string
+    annotations: # @schema type: object; additionalProperties: {type: string}
       # Set to your Grafana organization slug.
       "observability.giantswarm.io/organization": "Shared Org"
       "observability.giantswarm.io/folder": Kafka
