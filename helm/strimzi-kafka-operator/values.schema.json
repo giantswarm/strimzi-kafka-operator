@@ -10,8 +10,7 @@
                     "description": "Whether to install/upgrade CRDs from templates/crds/. Set to false to manage CRDs externally.",
                     "type": "boolean"
                 }
-            },
-            "additionalProperties": false
+            }
         },
         "dashboards": {
             "description": "Grafana dashboards (9 dashboards: Kafka, KRaft, KafkaConnect, MirrorMaker2, Bridge, CruiseControl, Exporter, OAuth, Operators). The upstream chart's dashboard template is disabled because the JSON files lack \"uid\" fields required by the GS admission webhook. This wrapper manages the ConfigMaps instead, using JSONs extracted and UID-patched via `make sync-dashboards`. Docs: https://docs.giantswarm.io/overview/observability/dashboard-management/dashboard-creation/",
@@ -50,8 +49,7 @@
                     "description": "Namespace for dashboard ConfigMaps. Defaults to .Release.Namespace when empty.",
                     "type": "string"
                 }
-            },
-            "additionalProperties": false
+            }
         },
         "global": {
             "description": "Global values shared between all subcharts",
@@ -89,11 +87,9 @@
                             "description": "Create PodMonitors for Kafka, KafkaBridge, and Entity Operator pods across all namespaces.",
                             "type": "boolean"
                         }
-                    },
-                    "additionalProperties": false
+                    }
                 }
-            },
-            "additionalProperties": false
+            }
         },
         "strimzi-kafka-operator": {
             "description": "--------------------------------------------------------------------- Upstream strimzi-kafka-operator chart values. All keys below are passed through to the upstream chart. See https://artifacthub.io/packages/helm/strimzi/strimzi-kafka-operator",
@@ -126,23 +122,19 @@
                                                                     "strimzi.io/kind": {
                                                                         "type": "string"
                                                                     }
-                                                                },
-                                                                "additionalProperties": false
+                                                                }
                                                             }
-                                                        },
-                                                        "additionalProperties": false
+                                                        }
                                                     },
                                                     "topologyKey": {
                                                         "type": "string"
                                                     }
-                                                },
-                                                "additionalProperties": false
+                                                }
                                             },
                                             "weight": {
                                                 "type": "integer"
                                             }
-                                        },
-                                        "additionalProperties": false
+                                        }
                                     }
                                 }
                             },
@@ -204,8 +196,7 @@
                             "value": {
                                 "type": "string"
                             }
-                        },
-                        "additionalProperties": false
+                        }
                     }
                 },
                 "generateNetworkPolicy": {
@@ -265,8 +256,7 @@
                         "egress": {
                             "type": "array",
                             "items": {
-                                "type": "object",
-                                "additionalProperties": false
+                                "type": "object"
                             }
                         },
                         "enabled": {
@@ -398,11 +388,9 @@
                                             "name": {
                                                 "type": "string"
                                             }
-                                        },
-                                        "additionalProperties": false
+                                        }
                                     }
-                                },
-                                "additionalProperties": false
+                                }
                             },
                             "maxSkew": {
                                 "type": "integer"
@@ -413,8 +401,7 @@
                             "whenUnsatisfiable": {
                                 "type": "string"
                             }
-                        },
-                        "additionalProperties": false
+                        }
                     }
                 },
                 "watchAnyNamespace": {
@@ -441,8 +428,7 @@
                         "Off"
                     ]
                 }
-            },
-            "additionalProperties": false
+            }
         }
     },
     "additionalProperties": false
