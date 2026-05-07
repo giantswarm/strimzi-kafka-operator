@@ -5,6 +5,7 @@ go 1.26.2
 require (
 	github.com/giantswarm/apptest-framework/v4 v4.2.0
 	github.com/giantswarm/clustertest/v4 v4.3.1
+	github.com/giantswarm/clustertest/v5 v5.0.0
 	github.com/onsi/ginkgo/v2 v2.28.3
 	github.com/onsi/gomega v1.40.0
 	k8s.io/api v0.36.0
@@ -164,7 +165,7 @@ require (
 	k8s.io/cluster-bootstrap v0.36.0 // indirect
 	k8s.io/component-base v0.36.0 // indirect
 	k8s.io/klog/v2 v2.140.0 // indirect
-	k8s.io/kube-openapi v0.0.0-20260502001324-b7f5293f4787 // indirect
+	k8s.io/kube-openapi v0.0.0-20260504175024-7bfe71ffdc10 // indirect
 	k8s.io/kubectl v0.36.0 // indirect
 	k8s.io/streaming v0.36.0 // indirect
 	k8s.io/utils v0.0.0-20260319190234-28399d86e0b5 // indirect
