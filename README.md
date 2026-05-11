@@ -14,15 +14,17 @@ Apache Kafka clusters natively on Kubernetes via custom resources (CRDs).
 
 This install method requires [`kubectl gs`](https://docs.giantswarm.io/reference/kubectl-gs/installation/) CLI and also make sure you are logged into a **management cluster** using `kubectl gs login`.
 
-Then run the following command to deploy the app to your cluster. This will create the necessary `OCIRepository` and `HelmRelease` resources for Flux to deploy the app:
+Then run the following commands to deploy the app to your cluster. This will create the necessary `OCIRepository` and `HelmRelease` resources for Flux to deploy the app:
 
 ```shell
-$ kubectl gs deploy chart \
-    --chart-name strimzi-kafka-operator \
-    --version 0.1.1 \
-    --organization demo \
-    --target-cluster test \
-    --target-namespace kafka
+kubectl gs deploy chart --chart-name strimzi-kafka-operator --version 0.1.1 --organization demo --target-cluster test --target-namespace kafka
+kubectl --namespace org-demo wait --for=condition=Ready helmrelease/test-strimzi-kafka-operator
+```
+
+Example output:
+
+```shell
+$ kubectl gs deploy chart --chart-name strimzi-kafka-operator --version 0.1.1 --organization demo --target-cluster test --target-namespace kafka
 apiVersion: source.toolkit.fluxcd.io/v1
 kind: OCIRepository
 metadata:
@@ -58,8 +60,7 @@ spec:
   targetNamespace: kafka
 Applied OCIRepository org-demo/test-strimzi-kafka-operator
 Applied HelmRelease org-demo/test-strimzi-kafka-operator
-
-$ kubectl -n org-demo wait --for=condition=Ready helmrelease/test-strimzi-kafka-operator
+$ kubectl --namespace org-demo wait --for=condition=Ready helmrelease/test-strimzi-kafka-operator
 helmrelease.helm.toolkit.fluxcd.io/test-strimzi-kafka-operator condition met
 ```
 
@@ -73,7 +74,15 @@ This method requires [`Helm`](https://helm.sh/docs/intro/install/) and also make
 
 Then run the following commands to add the chart repository and install the chart:
 
+
+```shell
+helm repo add giantswarm https://giantswarm.github.io/giantswarm-catalog/
+helm repo update
 ```
+
+Example output:
+
+```shell
 $ helm repo add giantswarm https://giantswarm.github.io/giantswarm-catalog/
 "giantswarm" has been added to your repositories
 $ helm repo update
@@ -107,8 +116,15 @@ Make sure you are logged into the cluster where the operator is running.
 
 Then run the following commands to create a Kafka cluster:
 
+```shell
+kubectl apply --filename examples/kafka-ephemeral.yaml
+kubectl wait kafka/my-cluster --for=condition=Ready --timeout=10m
 ```
-$ kubectl apply -f examples/kafka-ephemeral.yaml
+
+Example output:
+
+```shell
+$ kubectl apply --filename examples/kafka-ephemeral.yaml
 kafkanodepool.kafka.strimzi.io/controller created
 kafkanodepool.kafka.strimzi.io/broker created
 kafka.kafka.strimzi.io/my-cluster created
