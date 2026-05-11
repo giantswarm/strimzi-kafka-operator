@@ -7,9 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Added CONTRIBUTING.md with development instructions
+
 ### Changed
 
-- Rework `README.md`: more installation methods, enriched Kafka cluster creation example, reworded configuration options/Helm values, moved CRDs management section, added `examples/kafka-ephemeral`, fixed `examples/kafka-single-node`, and moved development instructions to `CONTRIBUTING.md`.
+- Rework README.md: more installation methods, enriched Kafka cluster creation example, reworded configuration options/Helm values, moved CRDs management section, removed examples manifests.
 
 ## [0.1.1] - 2026-05-04
 
