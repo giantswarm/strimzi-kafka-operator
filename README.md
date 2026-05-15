@@ -167,6 +167,14 @@ strimzi-kafka-operator:
 
 See [helm/strimzi-kafka-operator/values.yaml](helm/strimzi-kafka-operator/values.yaml) for all options.
 
+### Kafka cluster metrics
+
+The [`examples/kafka-single-node`](examples/kafka-single-node) Kafka CR enables Prometheus
+metrics via `metricsConfig.type: strimziMetricsReporter` — a lightweight alternative to
+`jmxPrometheusExporter` that's built into the Kafka image (Strimzi 0.44+) and needs no
+ConfigMap or mapping rules. Metrics are exposed on port 9404 on the broker and controller
+pods.
+
 ## CRD management
 
 CRDs are managed by this chart's `templates/crds/` (updated on `helm upgrade`, kept on

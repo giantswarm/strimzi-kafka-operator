@@ -29,6 +29,7 @@ spec:
       transaction.state.log.min.isr: 1
     # Expose metrics natively via the Strimzi Metrics Reporter on port 9404.
     # No ConfigMap required — the reporter is built into the Kafka image since Strimzi 0.44.
+    # Lightweight alternative to jmxPrometheusExporter: no mapping rules, lower overhead.
     metricsConfig:
       type: strimziMetricsReporter
   entityOperator:
