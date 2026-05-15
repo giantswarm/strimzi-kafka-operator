@@ -170,10 +170,7 @@ See [helm/strimzi-kafka-operator/values.yaml](helm/strimzi-kafka-operator/values
 ### Kafka cluster metrics
 
 The [`examples/kafka-single-node`](examples/kafka-single-node) Kafka CR enables Prometheus
-metrics via `metricsConfig.type: strimziMetricsReporter` — a lightweight alternative to
-`jmxPrometheusExporter` that's built into the Kafka image (Strimzi 0.44+) and needs no
-ConfigMap or mapping rules. Metrics are exposed on port 9404 on the broker and controller
-pods.
+metrics via `metricsConfig.type: strimziMetricsReporter`. By enabling these, you can monitor your kafka clusters in the Giantswarm observability platform.
 
 ## CRD management
 
