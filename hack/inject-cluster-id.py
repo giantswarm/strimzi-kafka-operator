@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Inject a cluster_id template variable into Strimzi Grafana dashboards.
+"""Patch Strimzi Grafana dashboards with GS-specific tweaks.
 
 For every dashboard JSON given as an argument:
 - Prepend a `cluster_id` (label "Cluster") query variable as the first entry
@@ -11,6 +11,10 @@ For every dashboard JSON given as an argument:
   Detection of bare metric names is restricted to identifiers starting with
   one of the prefixes used in these dashboards: kafka_, strimzi_, jvm_,
   process_, container_, kubelet_.
+- Relabel the `strimzi_cluster_name` template variable from "Cluster Name" to
+  "Kafka Cluster" so it doesn't collide with the new `cluster_id` ("Cluster")
+  variable. The Connect/MirrorMaker variants keep their original label since
+  they don't select a Kafka cluster.
 """
 import json
 import re
@@ -110,6 +114,8 @@ def transform_dashboard(path: str) -> None:
     # Transform existing variable queries and panel expressions.
     for var in templating:
         transform_variable(var)
+        if var.get("name") == "strimzi_cluster_name" and var.get("label") == "Cluster Name":
+            var["label"] = "Kafka Cluster"
     walk_inject_expr(dash.get("panels", []))
     walk_inject_expr(dash.get("rows", []))
 
