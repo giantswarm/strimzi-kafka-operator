@@ -6,43 +6,157 @@
 Giant Swarm app wrapping the [Strimzi Kafka Operator](https://strimzi.io/), which manages
 Apache Kafka clusters natively on Kubernetes via custom resources (CRDs).
 
-## Installing
+## Quick Start
 
-Deploy via the Giant Swarm App Platform:
+### Install strimzi-kafka-operator
 
-```yaml
-apiVersion: application.giantswarm.io/v1alpha1
-kind: App
-metadata:
-  name: strimzi-kafka-operator
-  namespace: <cluster-id>
-spec:
-  name: strimzi-kafka-operator
-  namespace: strimzi-system
-  version: 0.1.0
-  catalog: giantswarm
+#### Install via Giant Swarm App plaform CLI
+
+This install method requires [`kubectl gs`](https://docs.giantswarm.io/reference/kubectl-gs/installation/) CLI and also make sure you are logged into a **management cluster** using `kubectl gs login`.
+
+Then run the following commands to deploy the app to your cluster. This will create the necessary `OCIRepository` and `HelmRelease` resources for Flux to deploy the app:
+
+```shell
+kubectl gs deploy chart --chart-name strimzi-kafka-operator --version 0.1.1 --organization demo --target-cluster test --target-namespace kafka
+kubectl --namespace org-demo wait --for=condition=Ready helmrelease/test-strimzi-kafka-operator
 ```
 
-Or using GitOps — see [Adding an App via GitOps](https://docs.giantswarm.io/tutorials/continuous-deployment/apps/add-appcr/).
+Example output:
+
+```shell
+$ kubectl gs deploy chart --chart-name strimzi-kafka-operator --version 0.1.1 --organization demo --target-cluster test --target-namespace kafka
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: OCIRepository
+metadata:
+  labels:
+    giantswarm.io/cluster: test
+  name: test-strimzi-kafka-operator
+  namespace: org-demo
+spec:
+  interval: 10m0s
+  provider: generic
+  ref:
+    tag: 0.1.1
+  url: oci://gsoci.azurecr.io/charts/giantswarm/strimzi-kafka-operator
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  labels:
+    giantswarm.io/cluster: test
+  name: test-strimzi-kafka-operator
+  namespace: org-demo
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: test-strimzi-kafka-operator
+  install:
+    createNamespace: true
+  interval: 10m0s
+  kubeConfig:
+    secretRef:
+      name: test-kubeconfig
+  releaseName: strimzi-kafka-operator
+  targetNamespace: kafka
+Applied OCIRepository org-demo/test-strimzi-kafka-operator
+Applied HelmRelease org-demo/test-strimzi-kafka-operator
+$ kubectl --namespace org-demo wait --for=condition=Ready helmrelease/test-strimzi-kafka-operator
+helmrelease.helm.toolkit.fluxcd.io/test-strimzi-kafka-operator condition met
+```
+
+#### Install via GitOps on a Giant Swarm cluster
+
+See [Adding an App via GitOps](https://docs.giantswarm.io/tutorials/continuous-deployment/apps/add-appcr/).
+
+#### Install via Helm
+
+This method requires [`Helm`](https://helm.sh/docs/intro/install/) and also make sure you are logged into a **workload cluster** using `kubectl gs login`.
+
+Then run the following commands to add the chart repository and install the chart:
+
+
+```shell
+helm repo add giantswarm https://giantswarm.github.io/giantswarm-catalog/
+helm repo update
+```
+
+Example output:
+
+```shell
+$ helm repo add giantswarm https://giantswarm.github.io/giantswarm-catalog/
+"giantswarm" has been added to your repositories
+$ helm repo update
+Hang tight while we grab the latest from your chart repositories...
+...Successfully got an update from the "giantswarm" chart repository
+Update Complete. ⎈Happy Helming!⎈
+$ helm install strimzi giantswarm/strimzi-kafka-operator
+NAME: strimzi
+LAST DEPLOYED: Mon May  4 17:34:03 2026
+NAMESPACE: kafka
+STATUS: deployed
+REVISION: 1
+DESCRIPTION: Install complete
+TEST SUITE: None
+NOTES:
+Strimzi Kafka Operator 1.0.0 is now running in kube-system namespace.
+It watches for Kafka custom resources in: all namespaces.
+
+To create a Kafka cluster refer to the following documentation.
+
+https://strimzi.io/docs/operators/latest/deploying#deploying-kafka-cluster-kraft-str
+
+For full documentation see:
+  https://github.com/giantswarm/strimzi-kafka-operator
+  https://strimzi.io/documentation/
+```
+
+## Create a Kafka cluster
+
+Make sure you are logged into the cluster where the operator is running.
+
+Then run the following commands to create a Kafka cluster:
+
+```shell
+kubectl apply --filename https://raw.githubusercontent.com/strimzi/strimzi-kafka-operator/refs/tags/1.0.0/examples/kafka/kafka-ephemeral.yaml
+kubectl wait kafka/my-cluster --for=condition=Ready --timeout=10m
+```
+
+Example output:
+
+```shell
+$ kubectl apply --filename https://raw.githubusercontent.com/strimzi/strimzi-kafka-operator/refs/tags/1.0.0/examples/kafka/kafka-ephemeral.yaml
+kafkanodepool.kafka.strimzi.io/controller created
+kafkanodepool.kafka.strimzi.io/broker created
+kafka.kafka.strimzi.io/my-cluster created
+$ kubectl wait kafka/my-cluster --for=condition=Ready --timeout=10m
+kafka.kafka.strimzi.io/my-cluster condition met
+```
+
+You can now test your cluster using the [official Kafka Quickstart](https://kafka.apache.org/quickstart/#step-3-create-a-topic-to-store-your-events) in order to create a topic and sending + reading messages. In order to run the CLI tools from the official Kafka Quickstart, you can exec into a broker pod as follow:
+
+```bash
+kubectl exec -ti my-cluster-broker-0 -- /bin/sh
+# then: bin/kafka-console-producer.sh, bin/kafka-topics.sh, ...
+```
+
+**Giant Swarm note:** the hardened pod security policies on GS clusters block the
+`kubectl run` commands in the upstream quickstart. Instead, exec into a broker pod
+and run the producer/consumer scripts from there.
+
+Upstream documentation:
+
+- [Strimzi Quickstart](https://strimzi.io/quickstarts/) — create a cluster, send and receive messages
+- [Strimzi overview](https://strimzi.io/docs/operators/latest/overview)
+- [Example Kafka resources](https://github.com/strimzi/strimzi-kafka-operator/tree/1.0.0/examples/kafka)
 
 ## Configuring
 
-### Key values
+Here are some configuration options to consider when configuring your Helm chart values:
 
 ```yaml
 # CRD management (disable if you manage CRDs externally)
 crds:
   install: true
-
-# NetworkPolicy flavor — matches your cluster's CNI
-networkPolicy:
-  enabled: true
-  flavor: cilium        # "cilium" | "kubernetes"
-
-# Kyverno policy exceptions
-kyvernoPolicyExceptions:
-  enabled: true
-  namespace: giantswarm
 
 # Upstream overrides (see full list in values.yaml)
 strimzi-kafka-operator:
@@ -53,6 +167,13 @@ strimzi-kafka-operator:
 ```
 
 See [helm/strimzi-kafka-operator/values.yaml](helm/strimzi-kafka-operator/values.yaml) for all options.
+
+## CRD management
+
+CRDs are managed by this chart's `templates/crds/` (updated on `helm upgrade`, kept on
+`helm uninstall`). See the `crds:` block in
+[helm/strimzi-kafka-operator/values.yaml](helm/strimzi-kafka-operator/values.yaml) for the
+full lifecycle.
 
 ## Images
 
@@ -67,63 +188,16 @@ All images are sourced from `gsoci.azurecr.io` (retagged from upstream `quay.io/
 | `gsoci.azurecr.io/giantswarm/strimzi/buildah` | `1.0.0` |
 | `gsoci.azurecr.io/giantswarm/strimzi/maven-builder` | `1.0.0` |
 
-## CRD management
-
-CRDs are managed by this chart's `templates/crds/` (updated on `helm upgrade`, kept on
-`helm uninstall`). See the `crds:` block in
-[helm/strimzi-kafka-operator/values.yaml](helm/strimzi-kafka-operator/values.yaml) for the
-full lifecycle.
-
-### After a version bump (Renovate PR)
-
-When Renovate bumps the chart version in `Chart.yaml`, re-sync the upstream chart:
-
-```bash
-make sync-chart
-git add helm/strimzi-kafka-operator/
-git commit -m "Sync upstream chart for strimzi-kafka-operator v<new-version>"
-```
-
 ## Compatibility
 
 | App version | Upstream chart | Kubernetes |
 |---|---|---|
 | 0.1.x | strimzi-kafka-operator 1.0.0 | 1.30+ |
 
-## Development
-
-```bash
-# Update upstream chart dependency and CRDs
-make sync-chart
-
-# Lint
-helm lint helm/strimzi-kafka-operator --values helm/strimzi-kafka-operator/ci/default-values.yaml
-
-# Template render (dry-run)
-helm template strimzi-kafka-operator helm/strimzi-kafka-operator \
-  --values helm/strimzi-kafka-operator/ci/default-values.yaml --debug
-```
-
-## Creating and testing a Kafka cluster
-
-Start with the upstream docs:
-
-- [Strimzi Quickstart](https://strimzi.io/quickstarts/) — create a cluster, send and receive messages
-- [Strimzi overview](https://strimzi.io/docs/operators/latest/overview)
-- [Example Kafka resources](https://github.com/strimzi/strimzi-kafka-operator/tree/0.51.0/examples/kafka)
-
-> **Giant Swarm note:** the hardened pod security policies on GS clusters block the
-> `kubectl run` commands in the upstream quickstart. Instead, exec into a broker pod
-> and run the producer/consumer scripts from there:
->
-> ```bash
-> kubectl exec -ti my-cluster-broker-0 -- /bin/sh
-> # then: bin/kafka-console-producer.sh, bin/kafka-topics.sh, ...
-> ```
-
 ## References
 
 - Changelog: [CHANGELOG.md](CHANGELOG.md)
+- Contributing: [CONTRIBUTING.md](CONTRIBUTING.md)
 - Security policy: [SECURITY.md](SECURITY.md)
 - Upstream values reference: [strimzi-kafka-operator on ArtifactHub](https://artifacthub.io/packages/helm/strimzi/strimzi-kafka-operator)
 - Upstream source: [strimzi/strimzi-kafka-operator](https://github.com/strimzi/strimzi-kafka-operator)
