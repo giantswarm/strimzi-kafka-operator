@@ -2042,7 +2042,7 @@
         "definition": "query_result(kafka_cruisecontrol_loadmonitor_valid_windows_value{cluster_id=\"$cluster_id\",namespace=\"$kubernetes_namespace\"})",
         "hide": 0,
         "includeAll": false,
-        "label": "Cluster Name",
+        "label": "Kafka Cluster",
         "multi": false,
         "name": "strimzi_cluster_name",
         "options": [],
