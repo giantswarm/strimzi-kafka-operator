@@ -127,7 +127,7 @@
       "targets": [
         {
           "datasource": "${DS_PROMETHEUS}",
-          "expr": "sum(kafka_connect_connect_worker_metrics_connector_count{strimzi_io_kind=~\"KafkaConnect.*\",strimzi_io_cluster=\"$strimzi_connect_cluster_name\"})",
+          "expr": "sum(kafka_connect_connect_worker_metrics_connector_count{cluster_id=\"$cluster_id\",strimzi_io_kind=~\"KafkaConnect.*\",strimzi_io_cluster=\"$strimzi_connect_cluster_name\"})",
           "format": "time_series",
           "interval": "",
           "intervalFactor": 2,
@@ -202,7 +202,7 @@
       "targets": [
         {
           "datasource": "${DS_PROMETHEUS}",
-          "expr": "sum(kafka_connect_connect_worker_metrics_task_count{strimzi_io_kind=~\"KafkaConnect.*\",strimzi_io_cluster=\"$strimzi_connect_cluster_name\"})",
+          "expr": "sum(kafka_connect_connect_worker_metrics_task_count{cluster_id=\"$cluster_id\",strimzi_io_kind=~\"KafkaConnect.*\",strimzi_io_cluster=\"$strimzi_connect_cluster_name\"})",
           "format": "time_series",
           "intervalFactor": 2,
           "refId": "A",
@@ -295,7 +295,7 @@
       "targets": [
         {
           "datasource": "${DS_PROMETHEUS}",
-          "expr": "sum(kafka_consumer_consumer_metrics_connection_count{strimzi_io_kind=~\"KafkaConnect.*\",strimzi_io_cluster=\"$strimzi_connect_cluster_name\"})",
+          "expr": "sum(kafka_consumer_consumer_metrics_connection_count{cluster_id=\"$cluster_id\",strimzi_io_kind=~\"KafkaConnect.*\",strimzi_io_cluster=\"$strimzi_connect_cluster_name\"})",
           "hide": false,
           "interval": "",
           "legendFormat": "#consumer connections",
@@ -303,14 +303,14 @@
         },
         {
           "datasource": "${DS_PROMETHEUS}",
-          "expr": "sum(kafka_producer_producer_metrics_connection_count{strimzi_io_kind=~\"KafkaConnect.*\",strimzi_io_cluster=\"$strimzi_connect_cluster_name\"})",
+          "expr": "sum(kafka_producer_producer_metrics_connection_count{cluster_id=\"$cluster_id\",strimzi_io_kind=~\"KafkaConnect.*\",strimzi_io_cluster=\"$strimzi_connect_cluster_name\"})",
           "interval": "",
           "legendFormat": "#producer connections",
           "refId": "B"
         },
         {
           "datasource": "${DS_PROMETHEUS}",
-          "expr": "sum(kafka_admin_client_admin_client_metrics_connection_count{strimzi_io_kind=~\"KafkaConnect.*\",strimzi_io_cluster=\"$strimzi_connect_cluster_name\"})",
+          "expr": "sum(kafka_admin_client_admin_client_metrics_connection_count{cluster_id=\"$cluster_id\",strimzi_io_kind=~\"KafkaConnect.*\",strimzi_io_cluster=\"$strimzi_connect_cluster_name\"})",
           "interval": "",
           "legendFormat": "#admin connections",
           "refId": "C"
@@ -404,7 +404,7 @@
       "targets": [
         {
           "datasource": "${DS_PROMETHEUS}",
-          "expr": "sum(rate(kafka_producer_producer_metrics_outgoing_byte{strimzi_io_kind=~\"KafkaConnect.*\",strimzi_io_cluster=\"$strimzi_connect_cluster_name\"}[5m])) by (kubernetes_pod_name)",
+          "expr": "sum(rate(kafka_producer_producer_metrics_outgoing_byte{cluster_id=\"$cluster_id\",strimzi_io_kind=~\"KafkaConnect.*\",strimzi_io_cluster=\"$strimzi_connect_cluster_name\"}[5m])) by (kubernetes_pod_name)",
           "interval": "",
           "legendFormat": "{{kubernetes_pod_name}}",
           "refId": "A"
@@ -498,7 +498,7 @@
       "targets": [
         {
           "datasource": "${DS_PROMETHEUS}",
-          "expr": "sum(rate(kafka_producer_producer_node_metrics_incoming_byte{strimzi_io_kind=~\"KafkaConnect.*\",strimzi_io_cluster=\"$strimzi_connect_cluster_name\"}[5m])) by (kubernetes_pod_name)",
+          "expr": "sum(rate(kafka_producer_producer_node_metrics_incoming_byte{cluster_id=\"$cluster_id\",strimzi_io_kind=~\"KafkaConnect.*\",strimzi_io_cluster=\"$strimzi_connect_cluster_name\"}[5m])) by (kubernetes_pod_name)",
           "interval": "",
           "legendFormat": "{{kubernetes_pod_name}}",
           "refId": "A"
@@ -577,7 +577,7 @@
       "targets": [
         {
           "datasource": "${DS_PROMETHEUS}",
-          "expr": "sum(kafka_connect_connect_coordinator_metrics_assigned_connectors{strimzi_io_kind=~\"KafkaConnect.*\",strimzi_io_cluster=\"$strimzi_connect_cluster_name\"}) by (kubernetes_pod_name)",
+          "expr": "sum(kafka_connect_connect_coordinator_metrics_assigned_connectors{cluster_id=\"$cluster_id\",strimzi_io_kind=~\"KafkaConnect.*\",strimzi_io_cluster=\"$strimzi_connect_cluster_name\"}) by (kubernetes_pod_name)",
           "interval": "",
           "legendFormat": "{{kubernetes_pod_name}}",
           "refId": "A"
@@ -669,7 +669,7 @@
       "targets": [
         {
           "datasource": "${DS_PROMETHEUS}",
-          "expr": "sum(kafka_connect_connect_worker_rebalance_metrics_rebalancing{strimzi_io_kind=~\"KafkaConnect.*\",strimzi_io_cluster=\"$strimzi_connect_cluster_name\"})",
+          "expr": "sum(kafka_connect_connect_worker_rebalance_metrics_rebalancing{cluster_id=\"$cluster_id\",strimzi_io_kind=~\"KafkaConnect.*\",strimzi_io_cluster=\"$strimzi_connect_cluster_name\"})",
           "interval": "",
           "legendFormat": "",
           "refId": "A"
@@ -728,7 +728,7 @@
       "targets": [
         {
           "datasource": "${DS_PROMETHEUS}",
-          "expr": "sum(kafka_connect_connect_coordinator_metrics_assigned_tasks{strimzi_io_kind=~\"KafkaConnect.*\",strimzi_io_cluster=\"$strimzi_connect_cluster_name\"}) by (kubernetes_pod_name)",
+          "expr": "sum(kafka_connect_connect_coordinator_metrics_assigned_tasks{cluster_id=\"$cluster_id\",strimzi_io_kind=~\"KafkaConnect.*\",strimzi_io_cluster=\"$strimzi_connect_cluster_name\"}) by (kubernetes_pod_name)",
           "interval": "",
           "legendFormat": "{{kubernetes_pod_name}}",
           "refId": "A"
@@ -856,7 +856,7 @@
       "targets": [
         {
           "datasource": "${DS_PROMETHEUS}",
-          "expr": "sum(kafka_connect_connect_worker_metrics_connector_paused_task_count{namespace=\"$kubernetes_namespace\",strimzi_io_kind=~\"KafkaConnect.*\",strimzi_io_cluster=\"$strimzi_connect_cluster_name\"}) by (connector) != 0",
+          "expr": "sum(kafka_connect_connect_worker_metrics_connector_paused_task_count{cluster_id=\"$cluster_id\",namespace=\"$kubernetes_namespace\",strimzi_io_kind=~\"KafkaConnect.*\",strimzi_io_cluster=\"$strimzi_connect_cluster_name\"}) by (connector) != 0",
           "format": "table",
           "instant": true,
           "interval": "",
@@ -865,7 +865,7 @@
         },
         {
           "datasource": "${DS_PROMETHEUS}",
-          "expr": "sum(kafka_connect_connect_worker_metrics_connector_failed_task_count{namespace=\"$kubernetes_namespace\",strimzi_io_kind=~\"KafkaConnect.*\",strimzi_io_cluster=\"$strimzi_connect_cluster_name\"}) by (connector) != 0",
+          "expr": "sum(kafka_connect_connect_worker_metrics_connector_failed_task_count{cluster_id=\"$cluster_id\",namespace=\"$kubernetes_namespace\",strimzi_io_kind=~\"KafkaConnect.*\",strimzi_io_cluster=\"$strimzi_connect_cluster_name\"}) by (connector) != 0",
           "format": "table",
           "instant": true,
           "interval": "",
@@ -874,7 +874,7 @@
         },
         {
           "datasource": "${DS_PROMETHEUS}",
-          "expr": "sum(kafka_connect_connect_worker_metrics_connector_unassigned_task_count{namespace=\"$kubernetes_namespace\",strimzi_io_kind=~\"KafkaConnect.*\",strimzi_io_cluster=\"$strimzi_connect_cluster_name\"}) by (connector) != 0",
+          "expr": "sum(kafka_connect_connect_worker_metrics_connector_unassigned_task_count{cluster_id=\"$cluster_id\",namespace=\"$kubernetes_namespace\",strimzi_io_kind=~\"KafkaConnect.*\",strimzi_io_cluster=\"$strimzi_connect_cluster_name\"}) by (connector) != 0",
           "format": "table",
           "instant": true,
           "interval": "",
@@ -883,7 +883,7 @@
         },
         {
           "datasource": "${DS_PROMETHEUS}",
-          "expr": "sum(kafka_connect_connect_worker_metrics_connector_destroyed_task_count{namespace=\"$kubernetes_namespace\",strimzi_io_kind=~\"KafkaConnect.*\",strimzi_io_cluster=\"$strimzi_connect_cluster_name\"}) by (connector) != 0",
+          "expr": "sum(kafka_connect_connect_worker_metrics_connector_destroyed_task_count{cluster_id=\"$cluster_id\",namespace=\"$kubernetes_namespace\",strimzi_io_kind=~\"KafkaConnect.*\",strimzi_io_cluster=\"$strimzi_connect_cluster_name\"}) by (connector) != 0",
           "format": "table",
           "instant": true,
           "interval": "",
@@ -1006,7 +1006,7 @@
       "targets": [
         {
           "datasource": "${DS_PROMETHEUS}",
-          "expr": "sum(kafka_connect_connect_worker_metrics_connector_running_task_count{strimzi_io_kind=~\"KafkaConnect.*\",strimzi_io_cluster=\"$strimzi_connect_cluster_name\"})",
+          "expr": "sum(kafka_connect_connect_worker_metrics_connector_running_task_count{cluster_id=\"$cluster_id\",strimzi_io_kind=~\"KafkaConnect.*\",strimzi_io_cluster=\"$strimzi_connect_cluster_name\"})",
           "format": "time_series",
           "hide": false,
           "instant": false,
@@ -1019,28 +1019,28 @@
         },
         {
           "datasource": "${DS_PROMETHEUS}",
-          "expr": "sum(kafka_connect_connect_worker_metrics_connector_paused_task_count{strimzi_io_kind=~\"KafkaConnect.*\",strimzi_io_cluster=\"$strimzi_connect_cluster_name\"})",
+          "expr": "sum(kafka_connect_connect_worker_metrics_connector_paused_task_count{cluster_id=\"$cluster_id\",strimzi_io_kind=~\"KafkaConnect.*\",strimzi_io_cluster=\"$strimzi_connect_cluster_name\"})",
           "interval": "",
           "legendFormat": "paused",
           "refId": "B"
         },
         {
           "datasource": "${DS_PROMETHEUS}",
-          "expr": "sum(kafka_connect_connect_worker_metrics_connector_failed_task_count{strimzi_io_kind=~\"KafkaConnect.*\",strimzi_io_cluster=\"$strimzi_connect_cluster_name\"})",
+          "expr": "sum(kafka_connect_connect_worker_metrics_connector_failed_task_count{cluster_id=\"$cluster_id\",strimzi_io_kind=~\"KafkaConnect.*\",strimzi_io_cluster=\"$strimzi_connect_cluster_name\"})",
           "interval": "",
           "legendFormat": "failed",
           "refId": "D"
         },
         {
           "datasource": "${DS_PROMETHEUS}",
-          "expr": "sum(kafka_connect_connect_worker_metrics_connector_unassigned_task_count{strimzi_io_kind=~\"KafkaConnect.*\",strimzi_io_cluster=\"$strimzi_connect_cluster_name\"})",
+          "expr": "sum(kafka_connect_connect_worker_metrics_connector_unassigned_task_count{cluster_id=\"$cluster_id\",strimzi_io_kind=~\"KafkaConnect.*\",strimzi_io_cluster=\"$strimzi_connect_cluster_name\"})",
           "interval": "",
           "legendFormat": "unassigned",
           "refId": "C"
         },
         {
           "datasource": "${DS_PROMETHEUS}",
-          "expr": "sum(kafka_connect_connect_worker_metrics_connector_destroyed_task_count{strimzi_io_kind=~\"KafkaConnect.*\",strimzi_io_cluster=\"$strimzi_connect_cluster_name\"})",
+          "expr": "sum(kafka_connect_connect_worker_metrics_connector_destroyed_task_count{cluster_id=\"$cluster_id\",strimzi_io_kind=~\"KafkaConnect.*\",strimzi_io_cluster=\"$strimzi_connect_cluster_name\"})",
           "instant": false,
           "interval": "",
           "legendFormat": "destroyed",
@@ -1112,7 +1112,7 @@
         {
           "datasource": "${DS_PROMETHEUS}",
           "exemplar": true,
-          "expr": "sum(kafka_connect_connector_metrics_status_info{strimzi_io_kind=~\"KafkaConnect.*\",strimzi_io_cluster=\"$strimzi_connect_cluster_name\"} * on (connector) group_left(connector_class) kafka_connect_connector_metrics_connector_class_info{} * on (connector) group_left(connector_version) kafka_connect_connector_metrics_connector_version_info{} * on (connector) group_left(connector_type) kafka_connect_connector_metrics_connector_type_info{}) by (connector, status, connector_class, kubernetes_pod_name, connector_version, connector_type)",
+          "expr": "sum(kafka_connect_connector_metrics_status_info{cluster_id=\"$cluster_id\",strimzi_io_kind=~\"KafkaConnect.*\",strimzi_io_cluster=\"$strimzi_connect_cluster_name\"} * on (connector) group_left(connector_class) kafka_connect_connector_metrics_connector_class_info{cluster_id=\"$cluster_id\"} * on (connector) group_left(connector_version) kafka_connect_connector_metrics_connector_version_info{cluster_id=\"$cluster_id\"} * on (connector) group_left(connector_type) kafka_connect_connector_metrics_connector_type_info{cluster_id=\"$cluster_id\"}) by (connector, status, connector_class, kubernetes_pod_name, connector_version, connector_type)",
           "format": "table",
           "instant": true,
           "interval": "",
@@ -1253,7 +1253,7 @@
         {
           "datasource": "${DS_PROMETHEUS}",
           "exemplar": true,
-          "expr": "sum(kafka_connect_task_error_metrics_total_record_failures{strimzi_io_kind=~\"KafkaConnect.*\",strimzi_io_cluster=\"$strimzi_connect_cluster_name\"} * on(connector, task) group_left(status) kafka_connect_connector_task_metrics_status_info{}) by (connector, status, kubernetes_pod_name, task)",
+          "expr": "sum(kafka_connect_task_error_metrics_total_record_failures{cluster_id=\"$cluster_id\",strimzi_io_kind=~\"KafkaConnect.*\",strimzi_io_cluster=\"$strimzi_connect_cluster_name\"} * on(connector, task) group_left(status) kafka_connect_connector_task_metrics_status_info{cluster_id=\"$cluster_id\"}) by (connector, status, kubernetes_pod_name, task)",
           "format": "table",
           "instant": true,
           "interval": "",
@@ -1407,7 +1407,7 @@
       "targets": [
         {
           "datasource": "${DS_PROMETHEUS}",
-          "expr": "sum(rate(process_cpu_seconds_total{namespace=\"$kubernetes_namespace\",pod=~\"$strimzi_connect_cluster_name-connect-.+\",container=\"$strimzi_connect_cluster_name-connect\"}[5m])) by (pod)",
+          "expr": "sum(rate(process_cpu_seconds_total{cluster_id=\"$cluster_id\",namespace=\"$kubernetes_namespace\",pod=~\"$strimzi_connect_cluster_name-connect-.+\",container=\"$strimzi_connect_cluster_name-connect\"}[5m])) by (pod)",
           "format": "time_series",
           "hide": false,
           "intervalFactor": 2,
@@ -1502,7 +1502,7 @@
       "targets": [
         {
           "datasource": "${DS_PROMETHEUS}",
-          "expr": "sum (jvm_memory_used_bytes{strimzi_io_kind=~\"KafkaConnect.*\",strimzi_io_cluster=\"$strimzi_connect_cluster_name\"}) by (kubernetes_pod_name)",
+          "expr": "sum (jvm_memory_used_bytes{cluster_id=\"$cluster_id\",strimzi_io_kind=~\"KafkaConnect.*\",strimzi_io_cluster=\"$strimzi_connect_cluster_name\"}) by (kubernetes_pod_name)",
           "format": "time_series",
           "hide": false,
           "intervalFactor": 2,
@@ -1599,7 +1599,7 @@
       "targets": [
         {
           "datasource": "${DS_PROMETHEUS}",
-          "expr": "sum(rate(jvm_gc_collection_seconds_sum{strimzi_io_kind=~\"KafkaConnect.*\",strimzi_io_cluster=\"$strimzi_connect_cluster_name\"}[5m])) by (kubernetes_pod_name)",
+          "expr": "sum(rate(jvm_gc_collection_seconds_sum{cluster_id=\"$cluster_id\",strimzi_io_kind=~\"KafkaConnect.*\",strimzi_io_cluster=\"$strimzi_connect_cluster_name\"}[5m])) by (kubernetes_pod_name)",
           "format": "time_series",
           "hide": false,
           "intervalFactor": 2,
@@ -1695,7 +1695,7 @@
       "targets": [
         {
           "datasource": "${DS_PROMETHEUS}",
-          "expr": "sum(jvm_threads_current{namespace=\"$kubernetes_namespace\",strimzi_io_kind=~\"KafkaConnect.*\",strimzi_io_cluster=\"$strimzi_connect_cluster_name\"}) by (kubernetes_pod_name)",
+          "expr": "sum(jvm_threads_current{cluster_id=\"$cluster_id\",namespace=\"$kubernetes_namespace\",strimzi_io_kind=~\"KafkaConnect.*\",strimzi_io_cluster=\"$strimzi_connect_cluster_name\"}) by (kubernetes_pod_name)",
           "format": "time_series",
           "intervalFactor": 1,
           "legendFormat": "{{kubernetes_pod_name}}",
@@ -1715,6 +1715,26 @@
   ],
   "templating": {
     "list": [
+      {
+        "current": {},
+        "datasource": "${DS_PROMETHEUS}",
+        "definition": "label_values(cluster_id)",
+        "hide": 0,
+        "includeAll": false,
+        "label": "Cluster",
+        "multi": false,
+        "name": "cluster_id",
+        "options": [],
+        "query": {
+          "query": "label_values(cluster_id)",
+          "refId": "PrometheusVariableQueryEditor-VariableQuery"
+        },
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 1,
+        "type": "query"
+      },
       {
         "current": {},
         "error": null,
@@ -1740,7 +1760,7 @@
         "multi": false,
         "name": "kubernetes_namespace",
         "options": [],
-        "query": "query_result(kafka_connect_connect_worker_metrics_connector_count{strimzi_io_kind=~\"KafkaConnect.*\"})",
+        "query": "query_result(kafka_connect_connect_worker_metrics_connector_count{cluster_id=\"$cluster_id\",strimzi_io_kind=~\"KafkaConnect.*\"})",
         "refresh": 1,
         "regex": "/.*namespace=\"([^\"]*).*/",
         "skipUrlSync": false,
@@ -1756,11 +1776,11 @@
         "definition": "",
         "hide": 0,
         "includeAll": false,
-        "label": "Cluster Name",
+        "label": "Connect Cluster",
         "multi": false,
         "name": "strimzi_connect_cluster_name",
         "options": [],
-        "query": "query_result(kafka_connect_connect_worker_metrics_connector_count{namespace=\"$kubernetes_namespace\", strimzi_io_kind=~\"KafkaConnect.*\"})",
+        "query": "query_result(kafka_connect_connect_worker_metrics_connector_count{cluster_id=\"$cluster_id\",namespace=\"$kubernetes_namespace\", strimzi_io_kind=~\"KafkaConnect.*\"})",
         "refresh": 1,
         "regex": "/.*strimzi_io_cluster=\"([^\"]*).*/",
         "skipUrlSync": false,
