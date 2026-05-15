@@ -11,10 +11,12 @@ For every dashboard JSON given as an argument:
   Detection of bare metric names is restricted to identifiers starting with
   one of the prefixes used in these dashboards: kafka_, strimzi_, jvm_,
   process_, container_, kubelet_.
-- Relabel the `strimzi_cluster_name` template variable from "Cluster Name" to
-  "Kafka Cluster" so it doesn't collide with the new `cluster_id` ("Cluster")
-  variable. The Connect/MirrorMaker variants keep their original label since
-  they don't select a Kafka cluster.
+- Relabel cluster-picker template variables away from the upstream
+  "Cluster Name" so they don't collide with the new `cluster_id` ("Cluster")
+  variable:
+    strimzi_cluster_name              -> "Kafka Cluster"
+    strimzi_connect_cluster_name      -> "Connect Cluster"
+    strimzi_mirror_maker_cluster_name -> "MirrorMaker Cluster"
 """
 import json
 import re
@@ -34,6 +36,12 @@ SELECTOR_RE = re.compile(rf'\b({METRIC_PREFIX}[A-Za-z0-9_]+)\{{([^}}]*)\}}')
 # and `!` so label names like `strimzi_io_cluster="..."` are not rewritten,
 # and excludes `{` so already-converted selectors don't re-match.
 BARE_RE = re.compile(rf'(?<!\$)\b({METRIC_PREFIX}[A-Za-z0-9_]+)(?=[\)\[\s,]|$)')
+
+CLUSTER_VAR_RELABEL = {
+    "strimzi_cluster_name": "Kafka Cluster",
+    "strimzi_connect_cluster_name": "Connect Cluster",
+    "strimzi_mirror_maker_cluster_name": "MirrorMaker Cluster",
+}
 
 CLUSTER_VAR = {
     "current": {},
@@ -114,8 +122,9 @@ def transform_dashboard(path: str) -> None:
     # Transform existing variable queries and panel expressions.
     for var in templating:
         transform_variable(var)
-        if var.get("name") == "strimzi_cluster_name" and var.get("label") == "Cluster Name":
-            var["label"] = "Kafka Cluster"
+        new_label = CLUSTER_VAR_RELABEL.get(var.get("name"))
+        if new_label and var.get("label") == "Cluster Name":
+            var["label"] = new_label
     walk_inject_expr(dash.get("panels", []))
     walk_inject_expr(dash.get("rows", []))
 

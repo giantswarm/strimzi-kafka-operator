@@ -2329,7 +2329,7 @@
         "definition": "",
         "hide": 0,
         "includeAll": false,
-        "label": "Cluster Name",
+        "label": "MirrorMaker Cluster",
         "multi": false,
         "name": "strimzi_mirror_maker_cluster_name",
         "options": [],

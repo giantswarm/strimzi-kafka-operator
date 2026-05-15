@@ -1776,7 +1776,7 @@
         "definition": "",
         "hide": 0,
         "includeAll": false,
-        "label": "Cluster Name",
+        "label": "Connect Cluster",
         "multi": false,
         "name": "strimzi_connect_cluster_name",
         "options": [],
