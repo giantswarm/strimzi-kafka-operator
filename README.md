@@ -142,13 +142,18 @@ kubectl exec -ti my-cluster-broker-0 -- /bin/sh
 `kubectl run` commands in the upstream quickstart. Instead, exec into a broker pod
 and run the producer/consumer scripts from there.
 
+### Kafka cluster metrics
+
+The [`examples/kafka-single-node`](examples/kafka-single-node) Kafka CR enables Prometheus
+metrics via `metricsConfig.type: strimziMetricsReporter`. By enabling these, you can monitor your kafka clusters in the Giantswarm observability platform.
+
 Upstream documentation:
 
 - [Strimzi Quickstart](https://strimzi.io/quickstarts/) — create a cluster, send and receive messages
 - [Strimzi overview](https://strimzi.io/docs/operators/latest/overview)
 - [Example Kafka resources](https://github.com/strimzi/strimzi-kafka-operator/tree/1.0.0/examples/kafka)
 
-## Configuring
+## Configuring the operator
 
 Here are some configuration options to consider when configuring your Helm chart values:
 
@@ -166,11 +171,6 @@ strimzi-kafka-operator:
 ```
 
 See [helm/strimzi-kafka-operator/values.yaml](helm/strimzi-kafka-operator/values.yaml) for all options.
-
-### Kafka cluster metrics
-
-The [`examples/kafka-single-node`](examples/kafka-single-node) Kafka CR enables Prometheus
-metrics via `metricsConfig.type: strimziMetricsReporter`. By enabling these, you can monitor your kafka clusters in the Giantswarm observability platform.
 
 ## CRD management
 
