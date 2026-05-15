@@ -57,7 +57,16 @@ sync-dashboards: ## Download and patch Grafana dashboard JSONs from upstream Git
 	  uid=$$(basename "$$f" .json); \
 	  jq --arg uid "$$uid" '. + {uid: $$uid}' "$$f" > "$$f.tmp" && mv "$$f.tmp" "$$f"; \
 	done
+	@# Prepend a `cluster_id` template variable (label "Cluster") and inject
+	@# `cluster_id="$$cluster_id"` into every panel expression and variable
+	@# query, so dashboards scope to a single GS cluster in shared Prometheus.
+	@$(MAKE) patch-dashboards
 	@echo "Dashboards synced to $(CHART_DIR)/files/grafana-dashboards/. Review the diff and commit."
+
+.PHONY: patch-dashboards
+patch-dashboards: ## Apply GS-specific tweaks to dashboard JSONs (cluster_id variable + filter, label fixups).
+	@echo "====> Patching dashboards"
+	python3 hack/patch-dashboards.py $(CHART_DIR)/files/grafana-dashboards/*.json
 
 .PHONY: install-helm-unittest
 install-helm-unittest:

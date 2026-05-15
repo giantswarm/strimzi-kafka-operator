@@ -132,7 +132,7 @@
       "targets": [
         {
           "datasource": "${DS_PROMETHEUS}",
-          "expr": "sum(strimzi_bridge_http_server_active_connections{container=~\"^.+-bridge\"})",
+          "expr": "sum(strimzi_bridge_http_server_active_connections{cluster_id=\"$cluster_id\",container=~\"^.+-bridge\"})",
           "format": "time_series",
           "interval": "",
           "intervalFactor": 1,
@@ -207,7 +207,7 @@
       "targets": [
         {
           "datasource": "${DS_PROMETHEUS}",
-          "expr": "sum(strimzi_bridge_http_server_active_requests{container=~\"^.+-bridge\"})",
+          "expr": "sum(strimzi_bridge_http_server_active_requests{cluster_id=\"$cluster_id\",container=~\"^.+-bridge\"})",
           "format": "time_series",
           "interval": "",
           "intervalFactor": 1,
@@ -282,7 +282,7 @@
       "targets": [
         {
           "datasource": "${DS_PROMETHEUS}",
-          "expr": "count(kafka_producer_kafka_metrics_count_count)",
+          "expr": "count(kafka_producer_kafka_metrics_count_count{cluster_id=\"$cluster_id\"})",
           "format": "time_series",
           "instant": true,
           "interval": "",
@@ -358,7 +358,7 @@
       "targets": [
         {
           "datasource": "${DS_PROMETHEUS}",
-          "expr": "sum(kafka_producer_producer_metrics_connection_count)",
+          "expr": "sum(kafka_producer_producer_metrics_connection_count{cluster_id=\"$cluster_id\"})",
           "format": "time_series",
           "instant": true,
           "interval": "",
@@ -434,7 +434,7 @@
       "targets": [
         {
           "datasource": "${DS_PROMETHEUS}",
-          "expr": "sum(kafka_consumer_consumer_coordinator_metrics_last_heartbeat_seconds_ago != bool -1)",
+          "expr": "sum(kafka_consumer_consumer_coordinator_metrics_last_heartbeat_seconds_ago{cluster_id=\"$cluster_id\"} != bool -1)",
           "format": "time_series",
           "instant": true,
           "interval": "",
@@ -510,7 +510,7 @@
       "targets": [
         {
           "datasource": "${DS_PROMETHEUS}",
-          "expr": "sum(kafka_consumer_consumer_metrics_connection_count)",
+          "expr": "sum(kafka_consumer_consumer_metrics_connection_count{cluster_id=\"$cluster_id\"})",
           "format": "time_series",
           "instant": true,
           "interval": "",
@@ -618,7 +618,7 @@
           "targets": [
             {
               "datasource": "${DS_PROMETHEUS}",
-              "expr": "sum(rate(kafka_producer_producer_topic_metrics_record_send{topic != \"\"}[5m])) by (client_id, topic)",
+              "expr": "sum(rate(kafka_producer_producer_topic_metrics_record_send{cluster_id=\"$cluster_id\",topic != \"\"}[5m])) by (client_id, topic)",
               "format": "time_series",
               "intervalFactor": 1,
               "refId": "B"
@@ -709,7 +709,7 @@
           "targets": [
             {
               "datasource": "${DS_PROMETHEUS}",
-              "expr": "sum(rate(kafka_producer_producer_topic_metrics_byte{topic != \"\"}[5m])) by (clientId, topic)",
+              "expr": "sum(rate(kafka_producer_producer_topic_metrics_byte{cluster_id=\"$cluster_id\",topic != \"\"}[5m])) by (clientId, topic)",
               "format": "time_series",
               "intervalFactor": 1,
               "refId": "B"
@@ -800,7 +800,7 @@
           "targets": [
             {
               "datasource": "${DS_PROMETHEUS}",
-              "expr": "sum(kafka_producer_producer_node_metrics_request_latency_avg{}) by (client_id)",
+              "expr": "sum(kafka_producer_producer_node_metrics_request_latency_avg{cluster_id=\"$cluster_id\"}) by (client_id)",
               "format": "time_series",
               "intervalFactor": 1,
               "refId": "A"
@@ -891,7 +891,7 @@
           "targets": [
             {
               "datasource": "${DS_PROMETHEUS}",
-              "expr": "sum(rate(kafka_consumer_consumer_fetch_manager_metrics_bytes_consumed{topic != \"\"}[5m])) by (clientId, topic)",
+              "expr": "sum(rate(kafka_consumer_consumer_fetch_manager_metrics_bytes_consumed{cluster_id=\"$cluster_id\",topic != \"\"}[5m])) by (clientId, topic)",
               "format": "time_series",
               "intervalFactor": 1,
               "refId": "B"
@@ -982,7 +982,7 @@
           "targets": [
             {
               "datasource": "${DS_PROMETHEUS}",
-              "expr": "sum(rate(kafka_consumer_consumer_fetch_manager_metrics_records_consumed{topic != \"\"}[5m])) by (clientId, topic)",
+              "expr": "sum(rate(kafka_consumer_consumer_fetch_manager_metrics_records_consumed{cluster_id=\"$cluster_id\",topic != \"\"}[5m])) by (clientId, topic)",
               "format": "time_series",
               "hide": false,
               "intervalFactor": 1,
@@ -1074,7 +1074,7 @@
           "targets": [
             {
               "datasource": "${DS_PROMETHEUS}",
-              "expr": "sum(kafka_consumer_consumer_coordinator_metrics_assigned_partitions) by (clientId)",
+              "expr": "sum(kafka_consumer_consumer_coordinator_metrics_assigned_partitions{cluster_id=\"$cluster_id\"}) by (clientId)",
               "format": "time_series",
               "interval": "",
               "intervalFactor": 1,
@@ -1167,7 +1167,7 @@
           "targets": [
             {
               "datasource": "${DS_PROMETHEUS}",
-              "expr": "sum(kafka_consumer_consumer_metrics_poll_idle_ratio_avg) by (clientId)",
+              "expr": "sum(kafka_consumer_consumer_metrics_poll_idle_ratio_avg{cluster_id=\"$cluster_id\"}) by (clientId)",
               "format": "time_series",
               "interval": "",
               "intervalFactor": 1,
@@ -1260,7 +1260,7 @@
           "targets": [
             {
               "datasource": "${DS_PROMETHEUS}",
-              "expr": "sum(rate(kafka_consumer_consumer_coordinator_metrics_commit[5m])) by (clientId)",
+              "expr": "sum(rate(kafka_consumer_consumer_coordinator_metrics_commit{cluster_id=\"$cluster_id\"}[5m])) by (clientId)",
               "format": "time_series",
               "interval": "",
               "intervalFactor": 1,
@@ -1353,7 +1353,7 @@
           "targets": [
             {
               "datasource": "${DS_PROMETHEUS}",
-              "expr": "sum(kafka_consumer_consumer_coordinator_metrics_commit_latency_avg) by (clientId)",
+              "expr": "sum(kafka_consumer_consumer_coordinator_metrics_commit_latency_avg{cluster_id=\"$cluster_id\"}) by (clientId)",
               "format": "time_series",
               "interval": "",
               "intervalFactor": 1,
@@ -1446,7 +1446,7 @@
           "targets": [
             {
               "datasource": "${DS_PROMETHEUS}",
-              "expr": "sum(kafka_consumer_consumer_fetch_manager_metrics_fetch_rate) by (clientId)",
+              "expr": "sum(kafka_consumer_consumer_fetch_manager_metrics_fetch_rate{cluster_id=\"$cluster_id\"}) by (clientId)",
               "format": "time_series",
               "interval": "",
               "intervalFactor": 1,
@@ -1539,7 +1539,7 @@
           "targets": [
             {
               "datasource": "${DS_PROMETHEUS}",
-              "expr": "sum(kafka_consumer_consumer_fetch_manager_metrics_fetch_latency_avg) by (clientId)",
+              "expr": "sum(kafka_consumer_consumer_fetch_manager_metrics_fetch_latency_avg{cluster_id=\"$cluster_id\"}) by (clientId)",
               "format": "time_series",
               "interval": "",
               "intervalFactor": 1,
@@ -1669,7 +1669,7 @@
       "targets": [
         {
           "datasource": "${DS_PROMETHEUS}",
-          "expr": "sum(rate(strimzi_bridge_http_server_requests_total{container=~\"^.+-bridge\"}[5m])) by (method)",
+          "expr": "sum(rate(strimzi_bridge_http_server_requests_total{cluster_id=\"$cluster_id\",container=~\"^.+-bridge\"}[5m])) by (method)",
           "format": "time_series",
           "interval": "",
           "intervalFactor": 1,
@@ -1761,7 +1761,7 @@
       "targets": [
         {
           "datasource": "${DS_PROMETHEUS}",
-          "expr": "sum(rate(strimzi_bridge_http_server_requests_total{container=~\"^.+-bridge\"}[5m]))",
+          "expr": "sum(rate(strimzi_bridge_http_server_requests_total{cluster_id=\"$cluster_id\",container=~\"^.+-bridge\"}[5m]))",
           "format": "time_series",
           "interval": "",
           "intervalFactor": 1,
@@ -1770,7 +1770,7 @@
         },
         {
           "datasource": "${DS_PROMETHEUS}",
-          "expr": "sum(rate(strimzi_bridge_http_server_requests_total{code=~\"^2..$\", container=~\"^.+-bridge\"}[5m]))",
+          "expr": "sum(rate(strimzi_bridge_http_server_requests_total{cluster_id=\"$cluster_id\",code=~\"^2..$\", container=~\"^.+-bridge\"}[5m]))",
           "format": "time_series",
           "interval": "",
           "intervalFactor": 1,
@@ -1779,7 +1779,7 @@
         },
         {
           "datasource": "${DS_PROMETHEUS}",
-          "expr": "sum(rate(strimzi_bridge_http_server_requests_total{code=~\"^4..$\", container=~\"^.+-bridge\"}[5m]))",
+          "expr": "sum(rate(strimzi_bridge_http_server_requests_total{cluster_id=\"$cluster_id\",code=~\"^4..$\", container=~\"^.+-bridge\"}[5m]))",
           "format": "time_series",
           "interval": "",
           "intervalFactor": 1,
@@ -1788,7 +1788,7 @@
         },
         {
           "datasource": "${DS_PROMETHEUS}",
-          "expr": "sum(rate(strimzi_bridge_http_server_requests_total{code=~\"^5..$\", container=~\"^.+-bridge\"}[5m]))",
+          "expr": "sum(rate(strimzi_bridge_http_server_requests_total{cluster_id=\"$cluster_id\",code=~\"^5..$\", container=~\"^.+-bridge\"}[5m]))",
           "format": "time_series",
           "interval": "",
           "intervalFactor": 1,
@@ -1881,7 +1881,7 @@
       "targets": [
         {
           "datasource": "${DS_PROMETHEUS}",
-          "expr": "sum(rate(strimzi_bridge_http_server_bytes_written_total{container=~\"^.+-bridge\"}[5m])) by (container)",
+          "expr": "sum(rate(strimzi_bridge_http_server_bytes_written_total{cluster_id=\"$cluster_id\",container=~\"^.+-bridge\"}[5m])) by (container)",
           "format": "time_series",
           "interval": "",
           "intervalFactor": 1,
@@ -1974,7 +1974,7 @@
       "targets": [
         {
           "datasource": "${DS_PROMETHEUS}",
-          "expr": "sum(rate(strimzi_bridge_http_server_bytes_read_total{container=~\"^.+-bridge\"}[5m])) by (container)",
+          "expr": "sum(rate(strimzi_bridge_http_server_bytes_read_total{cluster_id=\"$cluster_id\",container=~\"^.+-bridge\"}[5m])) by (container)",
           "format": "time_series",
           "interval": "",
           "intervalFactor": 1,
@@ -2066,7 +2066,7 @@
       "targets": [
         {
           "datasource": "${DS_PROMETHEUS}",
-          "expr": "sum(rate(strimzi_bridge_http_server_requests_total{container=~\"^.+-bridge\",method=\"POST\",path=~\"/topics/[^/]+\"}[5m])) by (path)",
+          "expr": "sum(rate(strimzi_bridge_http_server_requests_total{cluster_id=\"$cluster_id\",container=~\"^.+-bridge\",method=\"POST\",path=~\"/topics/[^/]+\"}[5m])) by (path)",
           "format": "time_series",
           "intervalFactor": 1,
           "refId": "B"
@@ -2156,7 +2156,7 @@
       "targets": [
         {
           "datasource": "${DS_PROMETHEUS}",
-          "expr": "sum(rate(strimzi_bridge_http_server_requests_total{container=~\"^.+-bridge\",method=\"POST\",path=~\"/topics/.+/partitions/[0-9]+\"}[5m])) by (path)",
+          "expr": "sum(rate(strimzi_bridge_http_server_requests_total{cluster_id=\"$cluster_id\",container=~\"^.+-bridge\",method=\"POST\",path=~\"/topics/.+/partitions/[0-9]+\"}[5m])) by (path)",
           "format": "time_series",
           "interval": "",
           "intervalFactor": 1,
@@ -2248,7 +2248,7 @@
       "targets": [
         {
           "datasource": "${DS_PROMETHEUS}",
-          "expr": "sum(rate(strimzi_bridge_http_server_requests_total{container=~\"^.+-bridge\",method=\"POST\",path=~\"/consumers/[^/]+\"}[5m])) by (path)",
+          "expr": "sum(rate(strimzi_bridge_http_server_requests_total{cluster_id=\"$cluster_id\",container=~\"^.+-bridge\",method=\"POST\",path=~\"/consumers/[^/]+\"}[5m])) by (path)",
           "format": "time_series",
           "interval": "",
           "intervalFactor": 1,
@@ -2341,7 +2341,7 @@
       "targets": [
         {
           "datasource": "${DS_PROMETHEUS}",
-          "expr": "sum(rate(strimzi_bridge_http_server_requests_total{container=~\"^.+-bridge\",method=\"POST\",path=~\"/consumers/.+/instances/.+/subscription\"}[5m])) by (path)",
+          "expr": "sum(rate(strimzi_bridge_http_server_requests_total{cluster_id=\"$cluster_id\",container=~\"^.+-bridge\",method=\"POST\",path=~\"/consumers/.+/instances/.+/subscription\"}[5m])) by (path)",
           "format": "time_series",
           "interval": "",
           "intervalFactor": 1,
@@ -2434,7 +2434,7 @@
       "targets": [
         {
           "datasource": "${DS_PROMETHEUS}",
-          "expr": "sum(rate(strimzi_bridge_http_server_requests_total{container=~\"^.+-bridge\",method=\"DELETE\",path=~\"/consumers/.+/instances/.+\"}[5m])) by (path)",
+          "expr": "sum(rate(strimzi_bridge_http_server_requests_total{cluster_id=\"$cluster_id\",container=~\"^.+-bridge\",method=\"DELETE\",path=~\"/consumers/.+/instances/.+\"}[5m])) by (path)",
           "format": "time_series",
           "instant": false,
           "interval": "",
@@ -2528,7 +2528,7 @@
       "targets": [
         {
           "datasource": "${DS_PROMETHEUS}",
-          "expr": "sum(rate(strimzi_bridge_http_server_requests_total{container=~\"^.+-bridge\",method=\"GET\",path=~\"/consumers/.+/instances/.+/records\"}[5m])) by (path)",
+          "expr": "sum(rate(strimzi_bridge_http_server_requests_total{cluster_id=\"$cluster_id\",container=~\"^.+-bridge\",method=\"GET\",path=~\"/consumers/.+/instances/.+/records\"}[5m])) by (path)",
           "format": "time_series",
           "interval": "",
           "intervalFactor": 1,
@@ -2621,7 +2621,7 @@
       "targets": [
         {
           "datasource": "${DS_PROMETHEUS}",
-          "expr": "sum(rate(strimzi_bridge_http_server_requests_total{container=~\"^.+-bridge\",method=\"POST\",path=~\"/consumers/.+/instances/.+/offsets\"}[5m])) by (path)",
+          "expr": "sum(rate(strimzi_bridge_http_server_requests_total{cluster_id=\"$cluster_id\",container=~\"^.+-bridge\",method=\"POST\",path=~\"/consumers/.+/instances/.+/offsets\"}[5m])) by (path)",
           "format": "time_series",
           "interval": "",
           "intervalFactor": 1,
@@ -2736,7 +2736,7 @@
       "targets": [
         {
           "datasource": "${DS_PROMETHEUS}",
-          "expr": "sum(jvm_memory_used_bytes{container=~\"^.+-bridge\"})",
+          "expr": "sum(jvm_memory_used_bytes{cluster_id=\"$cluster_id\",container=~\"^.+-bridge\"})",
           "format": "time_series",
           "intervalFactor": 1,
           "refId": "A"
@@ -2825,7 +2825,7 @@
       "targets": [
         {
           "datasource": "${DS_PROMETHEUS}",
-          "expr": "sum(rate(jvm_gc_pause_seconds_sum{container=~\"^.+-bridge\"}[5m]))",
+          "expr": "sum(rate(jvm_gc_pause_seconds_sum{cluster_id=\"$cluster_id\",container=~\"^.+-bridge\"}[5m]))",
           "format": "time_series",
           "intervalFactor": 1,
           "refId": "A"
@@ -2914,7 +2914,7 @@
       "targets": [
         {
           "datasource": "${DS_PROMETHEUS}",
-          "expr": "sum(rate(jvm_gc_pause_seconds_count{container=~\"^.+-bridge\"}[5m]))",
+          "expr": "sum(rate(jvm_gc_pause_seconds_count{cluster_id=\"$cluster_id\",container=~\"^.+-bridge\"}[5m]))",
           "format": "time_series",
           "intervalFactor": 1,
           "refId": "A"
@@ -2933,6 +2933,26 @@
   ],
   "templating": {
     "list": [
+      {
+        "current": {},
+        "datasource": "${DS_PROMETHEUS}",
+        "definition": "label_values(cluster_id)",
+        "hide": 0,
+        "includeAll": false,
+        "label": "Cluster",
+        "multi": false,
+        "name": "cluster_id",
+        "options": [],
+        "query": {
+          "query": "label_values(cluster_id)",
+          "refId": "PrometheusVariableQueryEditor-VariableQuery"
+        },
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 1,
+        "type": "query"
+      },
       {
         "current": {},
         "error": null,
@@ -2958,7 +2978,7 @@
         "multi": false,
         "name": "kubernetes_namespace",
         "options": [],
-        "query": "query_result(strimzi_bridge_http_server_active_connections)",
+        "query": "query_result(strimzi_bridge_http_server_active_connections{cluster_id=\"$cluster_id\"})",
         "refresh": 1,
         "regex": "/.*namespace=\"([^\"]*).*/",
         "skipUrlSync": false,
@@ -2978,7 +2998,7 @@
         "multi": false,
         "name": "bridge_container_name",
         "options": [],
-        "query": "query_result(strimzi_bridge_http_server_active_connections{namespace=\"$kubernetes_namespace\"})",
+        "query": "query_result(strimzi_bridge_http_server_active_connections{cluster_id=\"$cluster_id\",namespace=\"$kubernetes_namespace\"})",
         "refresh": 1,
         "regex": "/.*container=\"([^\"]*).*/",
         "skipUrlSync": false,

@@ -133,7 +133,7 @@
       "targets": [
         {
           "datasource": "${DS_PROMETHEUS}",
-          "expr": "sum(strimzi_resources{kind=\"Kafka\"})",
+          "expr": "sum(strimzi_resources{cluster_id=\"$cluster_id\",kind=\"Kafka\"})",
           "format": "time_series",
           "intervalFactor": 1,
           "refId": "A"
@@ -205,7 +205,7 @@
       "targets": [
         {
           "datasource": "${DS_PROMETHEUS}",
-          "expr": "sum(strimzi_resources{kind=\"KafkaUser\"})",
+          "expr": "sum(strimzi_resources{cluster_id=\"$cluster_id\",kind=\"KafkaUser\"})",
           "format": "time_series",
           "intervalFactor": 1,
           "refId": "A"
@@ -277,7 +277,7 @@
       "targets": [
         {
           "datasource": "${DS_PROMETHEUS}",
-          "expr": "sum(strimzi_resources{kind=\"KafkaTopic\"})",
+          "expr": "sum(strimzi_resources{cluster_id=\"$cluster_id\",kind=\"KafkaTopic\"})",
           "format": "time_series",
           "intervalFactor": 1,
           "refId": "A"
@@ -349,7 +349,7 @@
       "targets": [
         {
           "datasource": "${DS_PROMETHEUS}",
-          "expr": "sum(strimzi_resources{kind=\"KafkaConnect\"})",
+          "expr": "sum(strimzi_resources{cluster_id=\"$cluster_id\",kind=\"KafkaConnect\"})",
           "format": "time_series",
           "intervalFactor": 1,
           "refId": "A"
@@ -421,7 +421,7 @@
       "targets": [
         {
           "datasource": "${DS_PROMETHEUS}",
-          "expr": "sum(strimzi_resources{kind=\"KafkaMirrorMaker2\"})",
+          "expr": "sum(strimzi_resources{cluster_id=\"$cluster_id\",kind=\"KafkaMirrorMaker2\"})",
           "format": "time_series",
           "intervalFactor": 1,
           "refId": "A"
@@ -493,7 +493,7 @@
       "targets": [
         {
           "datasource": "${DS_PROMETHEUS}",
-          "expr": "sum(strimzi_resources{kind=\"KafkaNodePool\"})",
+          "expr": "sum(strimzi_resources{cluster_id=\"$cluster_id\",kind=\"KafkaNodePool\"})",
           "format": "time_series",
           "intervalFactor": 1,
           "refId": "A"
@@ -565,7 +565,7 @@
       "targets": [
         {
           "datasource": "${DS_PROMETHEUS}",
-          "expr": "sum(strimzi_resources{kind=\"KafkaBridge\"})",
+          "expr": "sum(strimzi_resources{cluster_id=\"$cluster_id\",kind=\"KafkaBridge\"})",
           "format": "time_series",
           "intervalFactor": 1,
           "refId": "A"
@@ -637,7 +637,7 @@
       "targets": [
         {
           "datasource": "${DS_PROMETHEUS}",
-          "expr": "sum(strimzi_resources{kind=\"KafkaConnector\"})",
+          "expr": "sum(strimzi_resources{cluster_id=\"$cluster_id\",kind=\"KafkaConnector\"})",
           "format": "time_series",
           "intervalFactor": 1,
           "refId": "A"
@@ -709,7 +709,7 @@
       "targets": [
         {
           "datasource": "${DS_PROMETHEUS}",
-          "expr": "sum(strimzi_resources{kind=\"KafkaRebalance\"})",
+          "expr": "sum(strimzi_resources{cluster_id=\"$cluster_id\",kind=\"KafkaRebalance\"})",
           "format": "time_series",
           "intervalFactor": 1,
           "refId": "A"
@@ -825,7 +825,7 @@
       "targets": [
         {
           "datasource": "${DS_PROMETHEUS}",
-          "expr": "sum(increase(strimzi_reconciliations_successful_total[1h])) by (kind)",
+          "expr": "sum(increase(strimzi_reconciliations_successful_total{cluster_id=\"$cluster_id\"}[1h])) by (kind)",
           "format": "time_series",
           "intervalFactor": 1,
           "legendFormat": "{{kind}}",
@@ -916,7 +916,7 @@
       "targets": [
         {
           "datasource": "${DS_PROMETHEUS}",
-          "expr": "sum(increase(strimzi_reconciliations_failed_total[1h])) by (kind)",
+          "expr": "sum(increase(strimzi_reconciliations_failed_total{cluster_id=\"$cluster_id\"}[1h])) by (kind)",
           "format": "time_series",
           "intervalFactor": 1,
           "legendFormat": "{{kind}}",
@@ -1007,7 +1007,7 @@
       "targets": [
         {
           "datasource": "${DS_PROMETHEUS}",
-          "expr": "sum(increase(strimzi_reconciliations_locked_total[1h])) by (kind)",
+          "expr": "sum(increase(strimzi_reconciliations_locked_total{cluster_id=\"$cluster_id\"}[1h])) by (kind)",
           "format": "time_series",
           "intervalFactor": 1,
           "legendFormat": "{{kind}}",
@@ -1098,7 +1098,7 @@
       "targets": [
         {
           "datasource": "${DS_PROMETHEUS}",
-          "expr": "sum(increase(strimzi_reconciliations_total[1h])) by (kind)",
+          "expr": "sum(increase(strimzi_reconciliations_total{cluster_id=\"$cluster_id\"}[1h])) by (kind)",
           "format": "time_series",
           "intervalFactor": 1,
           "legendFormat": "{{kind}}",
@@ -1189,7 +1189,7 @@
       "targets": [
         {
           "datasource": "${DS_PROMETHEUS}",
-          "expr": "sum(increase(strimzi_reconciliations_periodical_total[1h])) by (kind)",
+          "expr": "sum(increase(strimzi_reconciliations_periodical_total{cluster_id=\"$cluster_id\"}[1h])) by (kind)",
           "format": "time_series",
           "intervalFactor": 1,
           "legendFormat": "{{kind}}",
@@ -1281,7 +1281,7 @@
       "targets": [
         {
           "datasource": "${DS_PROMETHEUS}",
-          "expr": "sum(strimzi_reconciliations_duration_seconds_max) by (kind)",
+          "expr": "sum(strimzi_reconciliations_duration_seconds_max{cluster_id=\"$cluster_id\"}) by (kind)",
           "format": "time_series",
           "interval": "",
           "intervalFactor": 1,
@@ -1366,7 +1366,7 @@
       "pluginVersion": "7.4.5",
       "targets": [
         {
-          "expr": "sort (min by (cluster, type, resource_namespace) (strimzi_certificate_expiration_timestamp_ms))",
+          "expr": "sort (min by (cluster, type, resource_namespace) (strimzi_certificate_expiration_timestamp_ms{cluster_id=\"$cluster_id\"}))",
           "format": "table",
           "instant": true,
           "interval": "",
@@ -1521,7 +1521,7 @@
       "targets": [
         {
           "datasource": "${DS_PROMETHEUS}",
-          "expr": "sum(jvm_memory_used_bytes{container=~\"user-operator|topic-operator|strimzi-cluster-operator\"}) by (container)",
+          "expr": "sum(jvm_memory_used_bytes{cluster_id=\"$cluster_id\",container=~\"user-operator|topic-operator|strimzi-cluster-operator\"}) by (container)",
           "format": "time_series",
           "intervalFactor": 1,
           "legendFormat": "{{container}}",
@@ -1612,7 +1612,7 @@
       "targets": [
         {
           "datasource": "${DS_PROMETHEUS}",
-          "expr": "sum(rate(jvm_gc_pause_seconds_sum{container=~\"user-operator|topic-operator|strimzi-cluster-operator\"}[5m])) by (container)",
+          "expr": "sum(rate(jvm_gc_pause_seconds_sum{cluster_id=\"$cluster_id\",container=~\"user-operator|topic-operator|strimzi-cluster-operator\"}[5m])) by (container)",
           "format": "time_series",
           "intervalFactor": 1,
           "legendFormat": "{{container}}",
@@ -1703,7 +1703,7 @@
       "targets": [
         {
           "datasource": "${DS_PROMETHEUS}",
-          "expr": "sum(rate(jvm_gc_pause_seconds_count{container=~\"user-operator|topic-operator|strimzi-cluster-operator\"}[5m])) by (container)",
+          "expr": "sum(rate(jvm_gc_pause_seconds_count{cluster_id=\"$cluster_id\",container=~\"user-operator|topic-operator|strimzi-cluster-operator\"}[5m])) by (container)",
           "format": "time_series",
           "intervalFactor": 1,
           "legendFormat": "{{container}}",
@@ -1722,6 +1722,26 @@
   ],
   "templating": {
     "list": [
+      {
+        "current": {},
+        "datasource": "${DS_PROMETHEUS}",
+        "definition": "label_values(cluster_id)",
+        "hide": 0,
+        "includeAll": false,
+        "label": "Cluster",
+        "multi": false,
+        "name": "cluster_id",
+        "options": [],
+        "query": {
+          "query": "label_values(cluster_id)",
+          "refId": "PrometheusVariableQueryEditor-VariableQuery"
+        },
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 1,
+        "type": "query"
+      },
       {
         "current": {},
         "error": null,
