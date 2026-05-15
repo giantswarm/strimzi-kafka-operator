@@ -117,17 +117,16 @@ Make sure you are logged into the cluster where the operator is running.
 Then run the following commands to create a Kafka cluster:
 
 ```shell
-kubectl apply --filename https://raw.githubusercontent.com/strimzi/strimzi-kafka-operator/refs/tags/1.0.0/examples/kafka/kafka-ephemeral.yaml
+kubectl apply --filename examples/kafka-single-node
 kubectl wait kafka/my-cluster --for=condition=Ready --timeout=10m
 ```
 
 Example output:
 
 ```shell
-$ kubectl apply --filename https://raw.githubusercontent.com/strimzi/strimzi-kafka-operator/refs/tags/1.0.0/examples/kafka/kafka-ephemeral.yaml
-kafkanodepool.kafka.strimzi.io/controller created
-kafkanodepool.kafka.strimzi.io/broker created
+$ kubectl apply --filename examples/kafka-single-node
 kafka.kafka.strimzi.io/my-cluster created
+kafkanodepool.kafka.strimzi.io/dual-role created
 $ kubectl wait kafka/my-cluster --for=condition=Ready --timeout=10m
 kafka.kafka.strimzi.io/my-cluster condition met
 ```
