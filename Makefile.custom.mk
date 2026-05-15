@@ -35,20 +35,22 @@ sync-dashboards: ## Download and patch Grafana dashboard JSONs from upstream Git
 	@# (dashboardconfigmap.observability.giantswarm.io) requires them.
 	@# TODO: remove uid injection once Strimzi adds stable uid fields upstream.
 	@# Track at: https://github.com/strimzi/strimzi-kafka-operator (open an issue)
-	$(eval VERSION := $(shell awk '$$1 == "appVersion:" {gsub(/"/, "", $$2); printf $$2}' $(CHART_DIR)/Chart.yaml))
-	@echo "====> Syncing Grafana dashboards for strimzi-kafka-operator $(VERSION)"
+	@echo "====> Syncing Grafana dashboards for strimzi-kafka-operator $(UPSTREAM_CHART_VERSION)"
 	rm -rf $(CHART_DIR)/files/grafana-dashboards/
 	mkdir -p $(CHART_DIR)/files/grafana-dashboards/
 	@# 5 strimzi-metrics-reporter dashboards
 	@for dash in strimzi-kafka strimzi-kraft strimzi-kafka-connect strimzi-kafka-mirror-maker-2 strimzi-kafka-bridge; do \
 	  echo "  Downloading $$dash.json"; \
-	  curl -sSfL "https://raw.githubusercontent.com/strimzi/strimzi-kafka-operator/$(VERSION)/examples/metrics/strimzi-metrics-reporter/grafana-dashboards/$$dash.json" \
+	  curl -sSfL "https://raw.githubusercontent.com/strimzi/strimzi-kafka-operator/$(UPSTREAM_CHART_VERSION)/examples/metrics/strimzi-metrics-reporter/grafana-dashboards/$$dash.json" \
 	    -o "$(CHART_DIR)/files/grafana-dashboards/$$dash.json"; \
 	done
 	@# kafka exporter dashboard (topic + consumer group lag metrics)
-	@echo "  Downloading strimzi-kafka-exporter.json"
-	curl -sSfL "https://raw.githubusercontent.com/strimzi/strimzi-kafka-operator/$(VERSION)/examples/metrics/grafana-dashboards/strimzi-kafka-exporter.json" \
-	  -o "$(CHART_DIR)/files/grafana-dashboards/strimzi-kafka-exporter.json"
+	@# 5 strimzi-metrics-reporter dashboards
+	@for dash in strimzi-cruise-control strimzi-kafka-exporter strimzi-operators; do \
+	  echo "  Downloading $$dash.json"; \
+		curl -sSfL "https://raw.githubusercontent.com/strimzi/strimzi-kafka-operator/$(UPSTREAM_CHART_VERSION)/examples/metrics/grafana-dashboards/$$dash.json" \
+	    -o "$(CHART_DIR)/files/grafana-dashboards/$$dash.json"; \
+	done
 	@# Inject "uid" into each dashboard JSON (filename stem used as UID, e.g.
 	@# strimzi-kafka.json → "uid": "strimzi-kafka"). Required by the GS admission webhook.
 	@for f in $(CHART_DIR)/files/grafana-dashboards/*.json; do \
