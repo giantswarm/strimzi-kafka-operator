@@ -1,12 +1,12 @@
 module github.com/giantswarm/strimzi-kafka-operator/tests/e2e
 
-go 1.26.2
+go 1.26.3
 
 require (
 	github.com/giantswarm/apptest-framework/v4 v4.2.0
 	github.com/giantswarm/apptest-framework/v5 v5.0.0
 	github.com/giantswarm/clustertest/v4 v4.3.1
-	github.com/giantswarm/clustertest/v5 v5.0.0
+	github.com/giantswarm/clustertest/v5 v5.0.1
 	github.com/onsi/ginkgo/v2 v2.28.3
 	github.com/onsi/gomega v1.40.0
 	k8s.io/api v0.36.0
@@ -166,10 +166,10 @@ require (
 	k8s.io/cluster-bootstrap v0.36.0 // indirect
 	k8s.io/component-base v0.36.0 // indirect
 	k8s.io/klog/v2 v2.140.0 // indirect
-	k8s.io/kube-openapi v0.0.0-20260505163821-33341827b392 // indirect
+	k8s.io/kube-openapi v0.0.0-20260507235316-19c3011e7fa0 // indirect
 	k8s.io/kubectl v0.36.0 // indirect
 	k8s.io/streaming v0.36.0 // indirect
-	k8s.io/utils v0.0.0-20260319190234-28399d86e0b5 // indirect
+	k8s.io/utils v0.0.0-20260507154919-ff6756f316d2 // indirect
 	oras.land/oras-go/v2 v2.6.0 // indirect
 	sigs.k8s.io/cluster-api v1.13.1 // indirect
 	sigs.k8s.io/e2e-framework v0.7.0 // indirect
