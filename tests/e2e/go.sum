@@ -133,6 +133,7 @@ github.com/giantswarm/apptest-framework/v4 v4.1.0/go.mod h1:wKjmWuxDd6Rjgsi293OR
 github.com/giantswarm/apptest-framework/v4 v4.2.0 h1:wWWBYDPSYlW9PV20O0y47pPfx2bAcSyNU+vr+HloNk4=
 github.com/giantswarm/apptest-framework/v4 v4.2.0/go.mod h1:DGUzrgRKMhSAlM+wEmo7W3EZo1F0p+S0lP/C0oAu+Vk=
 github.com/giantswarm/apptest-framework/v5 v5.0.0/go.mod h1:nRbfCcctLivdzrnf7dyYXVzqRQWZAF64NWNE+uPfycY=
+github.com/giantswarm/apptest-framework/v5 v5.0.1/go.mod h1:t1QjcAXN00w9Q3qhnE/r+5qbZ042VQKdnKIqTt28x5I=
 github.com/giantswarm/cluster-standup-teardown/v5 v5.0.1 h1:cYFhOD8cyJpqG8VzqPAikcMchpgSZ45NjX0n4mZRoIY=
 github.com/giantswarm/cluster-standup-teardown/v5 v5.0.1/go.mod h1:bdrzkiULjlsU/VPOf17MUyQbHYhjTRzAsnZH9ndmQoA=
 github.com/giantswarm/cluster-standup-teardown/v5 v5.2.0 h1:CfJfrr5MbmcR5sZFyeTEQO2pqATQhWf1LOxWYGXtgXU=
@@ -265,6 +266,8 @@ github.com/google/pprof v0.0.0-20260302011040-a15ffb7f9dcc h1:VBbFa1lDYWEeV5FZKU
 github.com/google/pprof v0.0.0-20260302011040-a15ffb7f9dcc/go.mod h1:MxpfABSjhmINe3F1It9d+8exIHFvUqtLIRCdOGNXqiI=
 github.com/google/pprof v0.0.0-20260402051712-545e8a4df936 h1:EwtI+Al+DeppwYX2oXJCETMO23COyaKGP6fHVpkpWpg=
 github.com/google/pprof v0.0.0-20260402051712-545e8a4df936/go.mod h1:MxpfABSjhmINe3F1It9d+8exIHFvUqtLIRCdOGNXqiI=
+github.com/google/pprof v0.0.0-20260507013755-92041b743c96 h1:YDDnaZ9afWajDboPMt9Vikqca/yWAX7KAxVzb4lJU1M=
+github.com/google/pprof v0.0.0-20260507013755-92041b743c96/go.mod h1:MxpfABSjhmINe3F1It9d+8exIHFvUqtLIRCdOGNXqiI=
 github.com/google/uuid v1.6.0 h1:NIvaJDMOsjHA8n1jAhLSgzrAzy1Hgr+hNrb57e+94F0=
 github.com/google/uuid v1.6.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
 github.com/gorilla/handlers v1.5.2 h1:cLTUSsNkgcwhgRqvCNmdbRWG0A3N4F+M2nWKdScwyEE=
