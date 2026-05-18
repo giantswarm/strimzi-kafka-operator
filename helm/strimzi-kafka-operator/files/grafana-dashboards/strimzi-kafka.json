@@ -38,14 +38,14 @@
       }
     ]
   },
-  "editable": true,
+  "editable": false,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
   "id": 22,
   "links": [],
   "panels": [
     {
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "${datasource}",
       "description": "Number of brokers online",
       "fieldConfig": {
         "defaults": {
@@ -112,7 +112,7 @@
       "repeatDirection": "h",
       "targets": [
         {
-          "datasource": "${DS_PROMETHEUS}",
+          "datasource": "${datasource}",
           "expr": "count(kafka_server_replicamanager_leadercount{cluster_id=\"$cluster_id\",namespace=\"$kubernetes_namespace\",strimzi_io_cluster=\"$strimzi_cluster_name\"})",
           "format": "time_series",
           "hide": false,
@@ -125,7 +125,7 @@
       "type": "stat"
     },
     {
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "${datasource}",
       "description": "Number of active controllers in the cluster",
       "fieldConfig": {
         "defaults": {
@@ -190,7 +190,7 @@
       "pluginVersion": "7.4.5",
       "targets": [
         {
-          "datasource": "${DS_PROMETHEUS}",
+          "datasource": "${datasource}",
           "expr": "sum(kafka_controller_kafkacontroller_activecontrollercount{cluster_id=\"$cluster_id\",namespace=\"$kubernetes_namespace\",strimzi_io_cluster=\"$strimzi_cluster_name\"})",
           "format": "time_series",
           "hide": false,
@@ -202,7 +202,7 @@
       "type": "stat"
     },
     {
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "${datasource}",
       "description": "Unclean leader election rate",
       "fieldConfig": {
         "defaults": {
@@ -267,7 +267,7 @@
       "pluginVersion": "7.4.5",
       "targets": [
         {
-          "datasource": "${DS_PROMETHEUS}",
+          "datasource": "${datasource}",
           "expr": "sum(irate(kafka_controller_controllerstats_uncleanleaderelectionspersec_total{cluster_id=\"$cluster_id\",namespace=\"$kubernetes_namespace\",strimzi_io_cluster=\"$strimzi_cluster_name\"}[5m]))",
           "format": "time_series",
           "hide": false,
@@ -279,7 +279,7 @@
       "type": "stat"
     },
     {
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "${datasource}",
       "description": "Replicas that are online",
       "fieldConfig": {
         "defaults": {
@@ -345,7 +345,7 @@
       "pluginVersion": "7.4.5",
       "targets": [
         {
-          "datasource": "${DS_PROMETHEUS}",
+          "datasource": "${datasource}",
           "expr": "sum(kafka_server_replicamanager_partitioncount{cluster_id=\"$cluster_id\",namespace=\"$kubernetes_namespace\",strimzi_io_cluster=\"$strimzi_cluster_name\"})",
           "format": "time_series",
           "intervalFactor": 1,
@@ -356,7 +356,7 @@
       "type": "stat"
     },
     {
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "${datasource}",
       "description": "Number of under-replicated partitions (| ISR | < | all replicas |).",
       "fieldConfig": {
         "defaults": {
@@ -422,7 +422,7 @@
       "pluginVersion": "7.4.5",
       "targets": [
         {
-          "datasource": "${DS_PROMETHEUS}",
+          "datasource": "${datasource}",
           "expr": "sum(kafka_server_replicamanager_underreplicatedpartitions{cluster_id=\"$cluster_id\",namespace=\"$kubernetes_namespace\",strimzi_io_cluster=\"$strimzi_cluster_name\"})",
           "format": "time_series",
           "hide": false,
@@ -434,7 +434,7 @@
       "type": "stat"
     },
     {
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "${datasource}",
       "description": "Number of partitions which are at their minimum in sync replica count (| ISR | == | min.insync.replicas |)",
       "fieldConfig": {
         "defaults": {
@@ -501,7 +501,7 @@
       "pluginVersion": "7.4.5",
       "targets": [
         {
-          "datasource": "${DS_PROMETHEUS}",
+          "datasource": "${datasource}",
           "expr": "sum(kafka_cluster_partition_atminisr{cluster_id=\"$cluster_id\",namespace=\"$kubernetes_namespace\",strimzi_io_cluster=\"$strimzi_cluster_name\"})",
           "format": "time_series",
           "hide": false,
@@ -513,7 +513,7 @@
       "type": "stat"
     },
     {
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "${datasource}",
       "description": "Number of partitions which are under their minimum in sync replica count (| ISR | < | min.insync.replicas |)",
       "fieldConfig": {
         "defaults": {
@@ -580,7 +580,7 @@
       "pluginVersion": "7.4.5",
       "targets": [
         {
-          "datasource": "${DS_PROMETHEUS}",
+          "datasource": "${datasource}",
           "expr": "sum(kafka_cluster_partition_underminisr{cluster_id=\"$cluster_id\",namespace=\"$kubernetes_namespace\",strimzi_io_cluster=\"$strimzi_cluster_name\"})",
           "format": "time_series",
           "hide": false,
@@ -592,7 +592,7 @@
       "type": "stat"
     },
     {
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "${datasource}",
       "description": "Number of partitions that don\u2019t have an active leader and are hence not writable or readable",
       "fieldConfig": {
         "defaults": {
@@ -658,7 +658,7 @@
       "pluginVersion": "7.4.5",
       "targets": [
         {
-          "datasource": "${DS_PROMETHEUS}",
+          "datasource": "${datasource}",
           "expr": "sum(kafka_controller_kafkacontroller_offlinepartitionscount{cluster_id=\"$cluster_id\",namespace=\"$kubernetes_namespace\",strimzi_io_cluster=\"$strimzi_cluster_name\"})",
           "format": "time_series",
           "hide": false,
@@ -696,7 +696,7 @@
       "type": "row"
     },
     {
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "${datasource}",
       "description": "Kafka broker pods memory usage",
       "fieldConfig": {
         "defaults": {
@@ -775,7 +775,7 @@
       "pluginVersion": "7.4.5",
       "targets": [
         {
-          "datasource": "${DS_PROMETHEUS}",
+          "datasource": "${datasource}",
           "expr": "sum(container_memory_usage_bytes{cluster_id=\"$cluster_id\",namespace=\"$kubernetes_namespace\",pod=~\"$strimzi_cluster_name-$kafka_broker\",container=\"kafka\"}) by (pod)",
           "format": "time_series",
           "hide": false,
@@ -788,7 +788,7 @@
       "type": "timeseries"
     },
     {
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "${datasource}",
       "description": "Aggregated Kafka broker pods CPU usage",
       "fieldConfig": {
         "defaults": {
@@ -867,7 +867,7 @@
       "pluginVersion": "7.4.5",
       "targets": [
         {
-          "datasource": "${DS_PROMETHEUS}",
+          "datasource": "${datasource}",
           "expr": "sum(rate(container_cpu_usage_seconds_total{cluster_id=\"$cluster_id\",namespace=\"$kubernetes_namespace\",pod=~\"$strimzi_cluster_name-$kafka_broker\",container=\"kafka\"}[5m])) by (pod)",
           "format": "time_series",
           "hide": false,
@@ -880,7 +880,7 @@
       "type": "timeseries"
     },
     {
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "${datasource}",
       "description": "Kafka broker pods disk usage",
       "fieldConfig": {
         "defaults": {
@@ -959,7 +959,7 @@
       "pluginVersion": "7.4.5",
       "targets": [
         {
-          "datasource": "${DS_PROMETHEUS}",
+          "datasource": "${datasource}",
           "expr": "sum(kubelet_volume_stats_available_bytes{cluster_id=\"$cluster_id\",namespace=\"$kubernetes_namespace\",persistentvolumeclaim=~\"data(-[0-9]+)?-$strimzi_cluster_name-$kafka_broker\", persistentvolumeclaim!~\".*zookeeper(-[0-9]+)?$\"}) by (persistentvolumeclaim)",
           "format": "time_series",
           "hide": false,
@@ -972,7 +972,7 @@
       "type": "timeseries"
     },
     {
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "${datasource}",
       "description": "Open File Descriptors",
       "fieldConfig": {
         "defaults": {
@@ -1051,7 +1051,7 @@
       "pluginVersion": "7.4.5",
       "targets": [
         {
-          "datasource": "${DS_PROMETHEUS}",
+          "datasource": "${datasource}",
           "expr": "sum(process_open_fds{cluster_id=\"$cluster_id\",namespace=\"$kubernetes_namespace\",kubernetes_pod_name=~\"$strimzi_cluster_name-$kafka_broker\",container=\"kafka\"}) by (kubernetes_pod_name)",
           "format": "time_series",
           "hide": false,
@@ -1064,7 +1064,7 @@
       "type": "timeseries"
     },
     {
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "${datasource}",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -1142,7 +1142,7 @@
       "pluginVersion": "7.4.5",
       "targets": [
         {
-          "datasource": "${DS_PROMETHEUS}",
+          "datasource": "${datasource}",
           "expr": "sum(jvm_memory_used_bytes{cluster_id=\"$cluster_id\",namespace=\"$kubernetes_namespace\",kubernetes_pod_name=~\"$strimzi_cluster_name-$kafka_broker\",strimzi_io_name=\"$strimzi_cluster_name-kafka\"}) by (kubernetes_pod_name)",
           "format": "time_series",
           "intervalFactor": 1,
@@ -1154,7 +1154,7 @@
       "type": "timeseries"
     },
     {
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "${datasource}",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -1232,7 +1232,7 @@
       "pluginVersion": "7.4.5",
       "targets": [
         {
-          "datasource": "${DS_PROMETHEUS}",
+          "datasource": "${datasource}",
           "expr": "sum(rate(jvm_gc_collection_seconds_sum{cluster_id=\"$cluster_id\",namespace=\"$kubernetes_namespace\",kubernetes_pod_name=~\"$strimzi_cluster_name-$kafka_broker\",strimzi_io_name=\"$strimzi_cluster_name-kafka\"}[5m])) by (kubernetes_pod_name)",
           "format": "time_series",
           "intervalFactor": 1,
@@ -1244,7 +1244,7 @@
       "type": "timeseries"
     },
     {
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "${datasource}",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -1322,7 +1322,7 @@
       "pluginVersion": "7.4.5",
       "targets": [
         {
-          "datasource": "${DS_PROMETHEUS}",
+          "datasource": "${datasource}",
           "expr": "sum(rate(jvm_gc_collection_seconds_count{cluster_id=\"$cluster_id\",namespace=\"$kubernetes_namespace\",kubernetes_pod_name=~\"$strimzi_cluster_name-$kafka_broker\",strimzi_io_name=\"$strimzi_cluster_name-kafka\"}[5m])) by (kubernetes_pod_name)",
           "format": "time_series",
           "intervalFactor": 1,
@@ -1334,7 +1334,7 @@
       "type": "timeseries"
     },
     {
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "${datasource}",
       "description": "JVM thread count",
       "fieldConfig": {
         "defaults": {
@@ -1413,7 +1413,7 @@
       "pluginVersion": "7.4.5",
       "targets": [
         {
-          "datasource": "${DS_PROMETHEUS}",
+          "datasource": "${datasource}",
           "expr": "sum(jvm_threads_current{cluster_id=\"$cluster_id\",namespace=\"$kubernetes_namespace\",kubernetes_pod_name=~\"$strimzi_cluster_name-$kafka_broker\",strimzi_io_name=\"$strimzi_cluster_name-kafka\"}) by (kubernetes_pod_name)",
           "format": "time_series",
           "intervalFactor": 1,
@@ -1425,7 +1425,7 @@
       "type": "timeseries"
     },
     {
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "${datasource}",
       "description": "Total incoming byte rate",
       "fieldConfig": {
         "defaults": {
@@ -1493,7 +1493,7 @@
       "repeatDirection": "h",
       "targets": [
         {
-          "datasource": "${DS_PROMETHEUS}",
+          "datasource": "${datasource}",
           "expr": "sum(irate(kafka_server_brokertopicmetrics_bytesinpersec_total{cluster_id=\"$cluster_id\",namespace=\"$kubernetes_namespace\",strimzi_io_cluster=\"$strimzi_cluster_name\",topic=~\"$kafka_topic\",topic!=\"\",kubernetes_pod_name=~\"$strimzi_cluster_name-$kafka_broker\"}[5m]))",
           "format": "time_series",
           "hide": false,
@@ -1506,7 +1506,7 @@
       "type": "stat"
     },
     {
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "${datasource}",
       "description": "Total outgoing byte rate",
       "fieldConfig": {
         "defaults": {
@@ -1574,7 +1574,7 @@
       "repeatDirection": "h",
       "targets": [
         {
-          "datasource": "${DS_PROMETHEUS}",
+          "datasource": "${datasource}",
           "expr": "sum(irate(kafka_server_brokertopicmetrics_bytesoutpersec_total{cluster_id=\"$cluster_id\",namespace=\"$kubernetes_namespace\",strimzi_io_cluster=\"$strimzi_cluster_name\",topic=~\"$kafka_topic\",topic!=\"\",kubernetes_pod_name=~\"$strimzi_cluster_name-$kafka_broker\"}[5m]))",
           "format": "time_series",
           "hide": false,
@@ -1587,7 +1587,7 @@
       "type": "stat"
     },
     {
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "${datasource}",
       "description": "Incoming messages rate",
       "fieldConfig": {
         "defaults": {
@@ -1655,7 +1655,7 @@
       "repeatDirection": "h",
       "targets": [
         {
-          "datasource": "${DS_PROMETHEUS}",
+          "datasource": "${datasource}",
           "expr": "sum(irate(kafka_server_brokertopicmetrics_messagesinpersec_total{cluster_id=\"$cluster_id\",namespace=\"$kubernetes_namespace\",strimzi_io_cluster=\"$strimzi_cluster_name\",topic=~\"$kafka_topic\",topic!=\"\",kubernetes_pod_name=~\"$strimzi_cluster_name-$kafka_broker\"}[5m]))",
           "format": "time_series",
           "hide": false,
@@ -1668,7 +1668,7 @@
       "type": "stat"
     },
     {
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "${datasource}",
       "description": "Total produce request rate",
       "fieldConfig": {
         "defaults": {
@@ -1736,7 +1736,7 @@
       "repeatDirection": "h",
       "targets": [
         {
-          "datasource": "${DS_PROMETHEUS}",
+          "datasource": "${datasource}",
           "expr": "sum(irate(kafka_server_brokertopicmetrics_totalproducerequestspersec_total{cluster_id=\"$cluster_id\",namespace=\"$kubernetes_namespace\",strimzi_io_cluster=\"$strimzi_cluster_name\",topic=~\"$kafka_topic\",topic!=\"\",kubernetes_pod_name=~\"$strimzi_cluster_name-$kafka_broker\"}[5m]))",
           "format": "time_series",
           "hide": false,
@@ -1749,7 +1749,7 @@
       "type": "stat"
     },
     {
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "${datasource}",
       "description": "Byte rate",
       "fieldConfig": {
         "defaults": {
@@ -1828,7 +1828,7 @@
       "pluginVersion": "7.4.5",
       "targets": [
         {
-          "datasource": "${DS_PROMETHEUS}",
+          "datasource": "${datasource}",
           "expr": "sum(irate(kafka_server_brokertopicmetrics_bytesinpersec_total{cluster_id=\"$cluster_id\",namespace=\"$kubernetes_namespace\",strimzi_io_cluster=\"$strimzi_cluster_name\",topic=~\"$kafka_topic\",topic!=\"\",kubernetes_pod_name=~\"$strimzi_cluster_name-$kafka_broker\"}[5m]))",
           "format": "time_series",
           "hide": false,
@@ -1839,7 +1839,7 @@
           "refId": "A"
         },
         {
-          "datasource": "${DS_PROMETHEUS}",
+          "datasource": "${datasource}",
           "expr": "sum(irate(kafka_server_brokertopicmetrics_bytesoutpersec_total{cluster_id=\"$cluster_id\",namespace=\"$kubernetes_namespace\",strimzi_io_cluster=\"$strimzi_cluster_name\",topic=~\"$kafka_topic\",topic!=\"\",kubernetes_pod_name=~\"$strimzi_cluster_name-$kafka_broker\"}[5m]))",
           "format": "time_series",
           "hide": false,
@@ -1852,7 +1852,7 @@
       "type": "timeseries"
     },
     {
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "${datasource}",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -1930,7 +1930,7 @@
       "pluginVersion": "7.4.5",
       "targets": [
         {
-          "datasource": "${DS_PROMETHEUS}",
+          "datasource": "${datasource}",
           "expr": "sum(irate(kafka_server_brokertopicmetrics_messagesinpersec_total{cluster_id=\"$cluster_id\",namespace=\"$kubernetes_namespace\",strimzi_io_cluster=\"$strimzi_cluster_name\",topic=~\"$kafka_topic\",topic!=\"\",kubernetes_pod_name=~\"$strimzi_cluster_name-$kafka_broker\"}[5m]))",
           "format": "time_series",
           "intervalFactor": 1,
@@ -1942,7 +1942,7 @@
       "type": "timeseries"
     },
     {
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "${datasource}",
       "description": "Produce request rate",
       "fieldConfig": {
         "defaults": {
@@ -2021,7 +2021,7 @@
       "pluginVersion": "7.4.5",
       "targets": [
         {
-          "datasource": "${DS_PROMETHEUS}",
+          "datasource": "${datasource}",
           "expr": "sum(irate(kafka_server_brokertopicmetrics_totalproducerequestspersec_total{cluster_id=\"$cluster_id\",namespace=\"$kubernetes_namespace\",strimzi_io_cluster=\"$strimzi_cluster_name\",topic=~\"$kafka_topic\",topic!=\"\",kubernetes_pod_name=~\"$strimzi_cluster_name-$kafka_broker\"}[5m]))",
           "format": "time_series",
           "intervalFactor": 1,
@@ -2029,7 +2029,7 @@
           "refId": "A"
         },
         {
-          "datasource": "${DS_PROMETHEUS}",
+          "datasource": "${datasource}",
           "expr": "sum(irate(kafka_server_brokertopicmetrics_failedproducerequestspersec_total{cluster_id=\"$cluster_id\",namespace=\"$kubernetes_namespace\",strimzi_io_cluster=\"$strimzi_cluster_name\",topic=~\"$kafka_topic\",topic!=\"\",kubernetes_pod_name=~\"$strimzi_cluster_name-$kafka_broker\"}[5m]))",
           "format": "time_series",
           "hide": false,
@@ -2042,7 +2042,7 @@
       "type": "timeseries"
     },
     {
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "${datasource}",
       "description": "Fetch request rate",
       "fieldConfig": {
         "defaults": {
@@ -2121,7 +2121,7 @@
       "pluginVersion": "7.4.5",
       "targets": [
         {
-          "datasource": "${DS_PROMETHEUS}",
+          "datasource": "${datasource}",
           "expr": "sum(irate(kafka_server_brokertopicmetrics_totalfetchrequestspersec_total{cluster_id=\"$cluster_id\",namespace=\"$kubernetes_namespace\",strimzi_io_cluster=\"$strimzi_cluster_name\",topic=~\"$kafka_topic\",topic!=\"\",kubernetes_pod_name=~\"$strimzi_cluster_name-$kafka_broker\"}[5m]))",
           "format": "time_series",
           "intervalFactor": 1,
@@ -2129,7 +2129,7 @@
           "refId": "A"
         },
         {
-          "datasource": "${DS_PROMETHEUS}",
+          "datasource": "${datasource}",
           "expr": "sum(irate(kafka_server_brokertopicmetrics_failedfetchrequestspersec_total{cluster_id=\"$cluster_id\",namespace=\"$kubernetes_namespace\",strimzi_io_cluster=\"$strimzi_cluster_name\",topic=~\"$kafka_topic\",topic!=\"\",kubernetes_pod_name=~\"$strimzi_cluster_name-$kafka_broker\"}[5m]))",
           "format": "time_series",
           "intervalFactor": 1,
@@ -2141,7 +2141,7 @@
       "type": "timeseries"
     },
     {
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "${datasource}",
       "description": "Average percentage of time network processor is idle",
       "fieldConfig": {
         "defaults": {
@@ -2220,7 +2220,7 @@
       "pluginVersion": "7.4.5",
       "targets": [
         {
-          "datasource": "${DS_PROMETHEUS}",
+          "datasource": "${datasource}",
           "expr": "sum(kafka_network_socketserver_networkprocessoravgidlepercent{cluster_id=\"$cluster_id\",namespace=\"$kubernetes_namespace\",strimzi_io_cluster=\"$strimzi_cluster_name\",kubernetes_pod_name=~\"$strimzi_cluster_name-$kafka_broker\"}*100) by (kubernetes_pod_name)",
           "format": "time_series",
           "intervalFactor": 1,
@@ -2232,7 +2232,7 @@
       "type": "timeseries"
     },
     {
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "${datasource}",
       "description": "Average percentage of time request handler threads are idle",
       "fieldConfig": {
         "defaults": {
@@ -2311,7 +2311,7 @@
       "pluginVersion": "7.4.5",
       "targets": [
         {
-          "datasource": "${DS_PROMETHEUS}",
+          "datasource": "${datasource}",
           "expr": "sum(irate(kafka_server_kafkarequesthandlerpool_requesthandleravgidlepercent_total{cluster_id=\"$cluster_id\",namespace=\"$kubernetes_namespace\",strimzi_io_cluster=\"$strimzi_cluster_name\",kubernetes_pod_name=~\"$strimzi_cluster_name-$kafka_broker\"}[$__rate_interval]) / 1e9 * 100) by (kubernetes_pod_name)",
           "format": "time_series",
           "hide": false,
@@ -2324,7 +2324,7 @@
       "type": "timeseries"
     },
     {
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "${datasource}",
       "description": "Disk writes",
       "fieldConfig": {
         "defaults": {
@@ -2403,7 +2403,7 @@
       "pluginVersion": "7.4.5",
       "targets": [
         {
-          "datasource": "${DS_PROMETHEUS}",
+          "datasource": "${datasource}",
           "expr": "sum(irate(kafka_server_kafkaserver_linux_disk_write_bytes{cluster_id=\"$cluster_id\",namespace=\"$kubernetes_namespace\",strimzi_io_cluster=\"$strimzi_cluster_name\",kubernetes_pod_name=~\"$strimzi_cluster_name-$kafka_broker\"}[5m])) by (kubernetes_pod_name)",
           "format": "time_series",
           "hide": false,
@@ -2416,7 +2416,7 @@
       "type": "timeseries"
     },
     {
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "${datasource}",
       "description": "Disk reads",
       "fieldConfig": {
         "defaults": {
@@ -2495,7 +2495,7 @@
       "pluginVersion": "7.4.5",
       "targets": [
         {
-          "datasource": "${DS_PROMETHEUS}",
+          "datasource": "${datasource}",
           "expr": "sum(irate(kafka_server_kafkaserver_linux_disk_read_bytes{cluster_id=\"$cluster_id\",namespace=\"$kubernetes_namespace\",strimzi_io_cluster=\"$strimzi_cluster_name\",kubernetes_pod_name=~\"$strimzi_cluster_name-$kafka_broker\"}[5m])) by (kubernetes_pod_name)",
           "format": "time_series",
           "hide": false,
@@ -2508,7 +2508,7 @@
       "type": "timeseries"
     },
     {
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "${datasource}",
       "description": "Disk reads",
       "fieldConfig": {
         "defaults": {
@@ -2587,7 +2587,7 @@
       "pluginVersion": "7.4.5",
       "targets": [
         {
-          "datasource": "${DS_PROMETHEUS}",
+          "datasource": "${datasource}",
           "expr": "sum(kafka_server_socket_server_metrics_connection_count{cluster_id=\"$cluster_id\",namespace=\"$kubernetes_namespace\",strimzi_io_cluster=\"$strimzi_cluster_name\",kubernetes_pod_name=~\"$strimzi_cluster_name-$kafka_broker\"}) by (kubernetes_pod_name, listener)",
           "format": "time_series",
           "hide": false,
@@ -2600,7 +2600,7 @@
       "type": "timeseries"
     },
     {
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "${datasource}",
       "fieldConfig": {
         "defaults": {
           "custom": {
@@ -2727,14 +2727,17 @@
   "refresh": "5s",
   "schemaVersion": 39,
   "tags": [
+    "Kafka",
     "Strimzi",
-    "Kafka"
+    "component:strimzi-kafka",
+    "owner:team-atlas",
+    "topic:kafka"
   ],
   "templating": {
     "list": [
       {
         "current": {},
-        "datasource": "${DS_PROMETHEUS}",
+        "datasource": "${datasource}",
         "definition": "label_values(cluster_id)",
         "hide": 0,
         "includeAll": false,
@@ -2757,9 +2760,9 @@
         "error": null,
         "hide": 0,
         "includeAll": false,
-        "label": "datasource",
+        "label": "Data source",
         "multi": false,
-        "name": "DS_PROMETHEUS",
+        "name": "datasource",
         "options": [],
         "query": "prometheus",
         "refresh": 1,
@@ -2769,7 +2772,7 @@
       },
       {
         "current": {},
-        "datasource": "${DS_PROMETHEUS}",
+        "datasource": "${datasource}",
         "definition": "",
         "hide": 0,
         "includeAll": false,
@@ -2789,7 +2792,7 @@
       },
       {
         "current": {},
-        "datasource": "${DS_PROMETHEUS}",
+        "datasource": "${datasource}",
         "definition": "",
         "hide": 0,
         "includeAll": false,
@@ -2810,7 +2813,7 @@
       {
         "allValue": ".*",
         "current": {},
-        "datasource": "${DS_PROMETHEUS}",
+        "datasource": "${datasource}",
         "definition": "",
         "hide": 0,
         "includeAll": true,
@@ -2831,7 +2834,7 @@
       {
         "allValue": ".+",
         "current": {},
-        "datasource": "${DS_PROMETHEUS}",
+        "datasource": "${datasource}",
         "definition": "",
         "hide": 0,
         "includeAll": true,
@@ -2852,7 +2855,7 @@
       {
         "allValue": ".*",
         "current": {},
-        "datasource": "${DS_PROMETHEUS}",
+        "datasource": "${datasource}",
         "definition": "",
         "hide": 0,
         "includeAll": true,
