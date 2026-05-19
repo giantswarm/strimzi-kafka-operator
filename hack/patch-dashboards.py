@@ -54,7 +54,7 @@ BASE_TAGS = ["owner:team-atlas", "topic:kafka"]
 
 CLUSTER_VAR = {
     "current": {},
-    "datasource": "${DS_PROMETHEUS}",
+    "datasource": "${datasource}",
     "definition": "label_values(cluster_id)",
     "hide": 0,
     "includeAll": False,
@@ -148,14 +148,8 @@ def transform_dashboard(path: str) -> None:
     existing = dash.get("tags") or []
     dash["tags"] = sorted(set(existing) | set(BASE_TAGS) | {component})
 
-    # Rename DS_PROMETHEUS -> datasource everywhere (variable name and every
-    # ${DS_PROMETHEUS} reference). Safe as a text substitution because these
-    # dashboards have no __inputs block where the token would have a separate
-    # meaning.
-    text = json.dumps(dash, indent=2).replace("DS_PROMETHEUS", "datasource")
-
     with open(path, "w") as f:
-        f.write(text)
+        f.write(json.dumps(dash, indent=2))
         f.write("\n")
 
 
