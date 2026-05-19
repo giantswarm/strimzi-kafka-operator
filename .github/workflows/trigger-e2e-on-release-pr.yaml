@@ -1,0 +1,22 @@
+name: Trigger E2E on Release PR
+on:
+  pull_request:
+    types: [opened]
+
+permissions:
+  pull-requests: write
+
+jobs:
+  trigger:
+    if: github.event.pull_request.user.login == 'taylorbot' && startsWith(github.event.pull_request.title, 'Release ')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: '/run app-test-suites'
+            })
