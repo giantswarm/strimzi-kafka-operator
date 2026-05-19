@@ -17,8 +17,15 @@ For every dashboard JSON given as an argument:
     strimzi_cluster_name              -> "Kafka Cluster"
     strimzi_connect_cluster_name      -> "Connect Cluster"
     strimzi_mirror_maker_cluster_name -> "MirrorMaker Cluster"
+- Apply giantswarm/dashboards conventions:
+    * rename the Prometheus datasource template variable from DS_PROMETHEUS
+      to datasource (also rewrites every ${DS_PROMETHEUS} reference)
+    * relabel that variable to "Data source"
+    * set `editable: false`
+    * add `owner:team-atlas`, `topic:kafka`, `component:<name>` tags
 """
 import json
+import os
 import re
 import sys
 
@@ -43,9 +50,11 @@ CLUSTER_VAR_RELABEL = {
     "strimzi_mirror_maker_cluster_name": "MirrorMaker Cluster",
 }
 
+BASE_TAGS = ["owner:team-atlas", "topic:kafka"]
+
 CLUSTER_VAR = {
     "current": {},
-    "datasource": "${DS_PROMETHEUS}",
+    "datasource": "${datasource}",
     "definition": "label_values(cluster_id)",
     "hide": 0,
     "includeAll": False,
@@ -125,14 +134,22 @@ def transform_dashboard(path: str) -> None:
         new_label = CLUSTER_VAR_RELABEL.get(var.get("name"))
         if new_label and var.get("label") == "Cluster Name":
             var["label"] = new_label
+        if var.get("type") == "datasource":
+            var["label"] = "Data source"
     walk_inject_expr(dash.get("panels", []))
     walk_inject_expr(dash.get("rows", []))
 
     # Prepend the new cluster_id variable so it is the first one.
     templating.insert(0, json.loads(json.dumps(CLUSTER_VAR)))
 
+    # Dashboards repo conventions.
+    dash["editable"] = False
+    component = f"component:{os.path.splitext(os.path.basename(path))[0]}"
+    existing = dash.get("tags") or []
+    dash["tags"] = sorted(set(existing) | set(BASE_TAGS) | {component})
+
     with open(path, "w") as f:
-        json.dump(dash, f, indent=2)
+        f.write(json.dumps(dash, indent=2))
         f.write("\n")
 
 

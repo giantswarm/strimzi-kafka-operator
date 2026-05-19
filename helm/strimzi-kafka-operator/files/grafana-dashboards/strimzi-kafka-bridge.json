@@ -38,7 +38,7 @@
       }
     ]
   },
-  "editable": true,
+  "editable": false,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
   "id": 16,
@@ -69,7 +69,7 @@
       "type": "row"
     },
     {
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "${datasource}",
       "description": "",
       "fieldConfig": {
         "defaults": {
@@ -131,7 +131,7 @@
       "pluginVersion": "7.4.5",
       "targets": [
         {
-          "datasource": "${DS_PROMETHEUS}",
+          "datasource": "${datasource}",
           "expr": "sum(strimzi_bridge_http_server_active_connections{cluster_id=\"$cluster_id\",container=~\"^.+-bridge\"})",
           "format": "time_series",
           "interval": "",
@@ -144,7 +144,7 @@
       "type": "stat"
     },
     {
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "${datasource}",
       "description": "",
       "fieldConfig": {
         "defaults": {
@@ -206,7 +206,7 @@
       "pluginVersion": "7.4.5",
       "targets": [
         {
-          "datasource": "${DS_PROMETHEUS}",
+          "datasource": "${datasource}",
           "expr": "sum(strimzi_bridge_http_server_active_requests{cluster_id=\"$cluster_id\",container=~\"^.+-bridge\"})",
           "format": "time_series",
           "interval": "",
@@ -219,7 +219,7 @@
       "type": "stat"
     },
     {
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "${datasource}",
       "description": "",
       "fieldConfig": {
         "defaults": {
@@ -281,7 +281,7 @@
       "pluginVersion": "7.4.5",
       "targets": [
         {
-          "datasource": "${DS_PROMETHEUS}",
+          "datasource": "${datasource}",
           "expr": "count(kafka_producer_kafka_metrics_count_count{cluster_id=\"$cluster_id\"})",
           "format": "time_series",
           "instant": true,
@@ -295,7 +295,7 @@
       "type": "stat"
     },
     {
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "${datasource}",
       "description": "",
       "fieldConfig": {
         "defaults": {
@@ -357,7 +357,7 @@
       "pluginVersion": "7.4.5",
       "targets": [
         {
-          "datasource": "${DS_PROMETHEUS}",
+          "datasource": "${datasource}",
           "expr": "sum(kafka_producer_producer_metrics_connection_count{cluster_id=\"$cluster_id\"})",
           "format": "time_series",
           "instant": true,
@@ -371,7 +371,7 @@
       "type": "stat"
     },
     {
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "${datasource}",
       "description": "",
       "fieldConfig": {
         "defaults": {
@@ -433,7 +433,7 @@
       "pluginVersion": "7.4.5",
       "targets": [
         {
-          "datasource": "${DS_PROMETHEUS}",
+          "datasource": "${datasource}",
           "expr": "sum(kafka_consumer_consumer_coordinator_metrics_last_heartbeat_seconds_ago{cluster_id=\"$cluster_id\"} != bool -1)",
           "format": "time_series",
           "instant": true,
@@ -447,7 +447,7 @@
       "type": "stat"
     },
     {
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "${datasource}",
       "description": "",
       "fieldConfig": {
         "defaults": {
@@ -509,7 +509,7 @@
       "pluginVersion": "7.4.5",
       "targets": [
         {
-          "datasource": "${DS_PROMETHEUS}",
+          "datasource": "${datasource}",
           "expr": "sum(kafka_consumer_consumer_metrics_connection_count{cluster_id=\"$cluster_id\"})",
           "format": "time_series",
           "instant": true,
@@ -537,7 +537,7 @@
       "id": 38,
       "panels": [
         {
-          "datasource": "${DS_PROMETHEUS}",
+          "datasource": "${datasource}",
           "description": "",
           "fieldConfig": {
             "defaults": {
@@ -617,7 +617,7 @@
           "pluginVersion": "7.4.5",
           "targets": [
             {
-              "datasource": "${DS_PROMETHEUS}",
+              "datasource": "${datasource}",
               "expr": "sum(rate(kafka_producer_producer_topic_metrics_record_send{cluster_id=\"$cluster_id\",topic != \"\"}[5m])) by (client_id, topic)",
               "format": "time_series",
               "intervalFactor": 1,
@@ -628,7 +628,7 @@
           "type": "timeseries"
         },
         {
-          "datasource": "${DS_PROMETHEUS}",
+          "datasource": "${datasource}",
           "description": "",
           "fieldConfig": {
             "defaults": {
@@ -708,7 +708,7 @@
           "pluginVersion": "7.4.5",
           "targets": [
             {
-              "datasource": "${DS_PROMETHEUS}",
+              "datasource": "${datasource}",
               "expr": "sum(rate(kafka_producer_producer_topic_metrics_byte{cluster_id=\"$cluster_id\",topic != \"\"}[5m])) by (clientId, topic)",
               "format": "time_series",
               "intervalFactor": 1,
@@ -719,7 +719,7 @@
           "type": "timeseries"
         },
         {
-          "datasource": "${DS_PROMETHEUS}",
+          "datasource": "${datasource}",
           "description": "",
           "fieldConfig": {
             "defaults": {
@@ -799,7 +799,7 @@
           "pluginVersion": "7.4.5",
           "targets": [
             {
-              "datasource": "${DS_PROMETHEUS}",
+              "datasource": "${datasource}",
               "expr": "sum(kafka_producer_producer_node_metrics_request_latency_avg{cluster_id=\"$cluster_id\"}) by (client_id)",
               "format": "time_series",
               "intervalFactor": 1,
@@ -810,7 +810,7 @@
           "type": "timeseries"
         },
         {
-          "datasource": "${DS_PROMETHEUS}",
+          "datasource": "${datasource}",
           "description": "",
           "fieldConfig": {
             "defaults": {
@@ -890,7 +890,7 @@
           "pluginVersion": "7.4.5",
           "targets": [
             {
-              "datasource": "${DS_PROMETHEUS}",
+              "datasource": "${datasource}",
               "expr": "sum(rate(kafka_consumer_consumer_fetch_manager_metrics_bytes_consumed{cluster_id=\"$cluster_id\",topic != \"\"}[5m])) by (clientId, topic)",
               "format": "time_series",
               "intervalFactor": 1,
@@ -901,7 +901,7 @@
           "type": "timeseries"
         },
         {
-          "datasource": "${DS_PROMETHEUS}",
+          "datasource": "${datasource}",
           "description": "",
           "fieldConfig": {
             "defaults": {
@@ -981,7 +981,7 @@
           "pluginVersion": "7.4.5",
           "targets": [
             {
-              "datasource": "${DS_PROMETHEUS}",
+              "datasource": "${datasource}",
               "expr": "sum(rate(kafka_consumer_consumer_fetch_manager_metrics_records_consumed{cluster_id=\"$cluster_id\",topic != \"\"}[5m])) by (clientId, topic)",
               "format": "time_series",
               "hide": false,
@@ -993,7 +993,7 @@
           "type": "timeseries"
         },
         {
-          "datasource": "${DS_PROMETHEUS}",
+          "datasource": "${datasource}",
           "description": "",
           "fieldConfig": {
             "defaults": {
@@ -1073,7 +1073,7 @@
           "pluginVersion": "7.4.5",
           "targets": [
             {
-              "datasource": "${DS_PROMETHEUS}",
+              "datasource": "${datasource}",
               "expr": "sum(kafka_consumer_consumer_coordinator_metrics_assigned_partitions{cluster_id=\"$cluster_id\"}) by (clientId)",
               "format": "time_series",
               "interval": "",
@@ -1086,7 +1086,7 @@
           "type": "timeseries"
         },
         {
-          "datasource": "${DS_PROMETHEUS}",
+          "datasource": "${datasource}",
           "description": "",
           "fieldConfig": {
             "defaults": {
@@ -1166,7 +1166,7 @@
           "pluginVersion": "7.4.5",
           "targets": [
             {
-              "datasource": "${DS_PROMETHEUS}",
+              "datasource": "${datasource}",
               "expr": "sum(kafka_consumer_consumer_metrics_poll_idle_ratio_avg{cluster_id=\"$cluster_id\"}) by (clientId)",
               "format": "time_series",
               "interval": "",
@@ -1179,7 +1179,7 @@
           "type": "timeseries"
         },
         {
-          "datasource": "${DS_PROMETHEUS}",
+          "datasource": "${datasource}",
           "description": "",
           "fieldConfig": {
             "defaults": {
@@ -1259,7 +1259,7 @@
           "pluginVersion": "7.4.5",
           "targets": [
             {
-              "datasource": "${DS_PROMETHEUS}",
+              "datasource": "${datasource}",
               "expr": "sum(rate(kafka_consumer_consumer_coordinator_metrics_commit{cluster_id=\"$cluster_id\"}[5m])) by (clientId)",
               "format": "time_series",
               "interval": "",
@@ -1272,7 +1272,7 @@
           "type": "timeseries"
         },
         {
-          "datasource": "${DS_PROMETHEUS}",
+          "datasource": "${datasource}",
           "description": "",
           "fieldConfig": {
             "defaults": {
@@ -1352,7 +1352,7 @@
           "pluginVersion": "7.4.5",
           "targets": [
             {
-              "datasource": "${DS_PROMETHEUS}",
+              "datasource": "${datasource}",
               "expr": "sum(kafka_consumer_consumer_coordinator_metrics_commit_latency_avg{cluster_id=\"$cluster_id\"}) by (clientId)",
               "format": "time_series",
               "interval": "",
@@ -1365,7 +1365,7 @@
           "type": "timeseries"
         },
         {
-          "datasource": "${DS_PROMETHEUS}",
+          "datasource": "${datasource}",
           "description": "",
           "fieldConfig": {
             "defaults": {
@@ -1445,7 +1445,7 @@
           "pluginVersion": "7.4.5",
           "targets": [
             {
-              "datasource": "${DS_PROMETHEUS}",
+              "datasource": "${datasource}",
               "expr": "sum(kafka_consumer_consumer_fetch_manager_metrics_fetch_rate{cluster_id=\"$cluster_id\"}) by (clientId)",
               "format": "time_series",
               "interval": "",
@@ -1458,7 +1458,7 @@
           "type": "timeseries"
         },
         {
-          "datasource": "${DS_PROMETHEUS}",
+          "datasource": "${datasource}",
           "description": "",
           "fieldConfig": {
             "defaults": {
@@ -1538,7 +1538,7 @@
           "pluginVersion": "7.4.5",
           "targets": [
             {
-              "datasource": "${DS_PROMETHEUS}",
+              "datasource": "${datasource}",
               "expr": "sum(kafka_consumer_consumer_fetch_manager_metrics_fetch_latency_avg{cluster_id=\"$cluster_id\"}) by (clientId)",
               "format": "time_series",
               "interval": "",
@@ -1588,7 +1588,7 @@
       "type": "row"
     },
     {
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "${datasource}",
       "description": "",
       "fieldConfig": {
         "defaults": {
@@ -1668,7 +1668,7 @@
       "pluginVersion": "7.4.5",
       "targets": [
         {
-          "datasource": "${DS_PROMETHEUS}",
+          "datasource": "${datasource}",
           "expr": "sum(rate(strimzi_bridge_http_server_requests_total{cluster_id=\"$cluster_id\",container=~\"^.+-bridge\"}[5m])) by (method)",
           "format": "time_series",
           "interval": "",
@@ -1681,7 +1681,7 @@
       "type": "timeseries"
     },
     {
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "${datasource}",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -1760,7 +1760,7 @@
       "pluginVersion": "7.4.5",
       "targets": [
         {
-          "datasource": "${DS_PROMETHEUS}",
+          "datasource": "${datasource}",
           "expr": "sum(rate(strimzi_bridge_http_server_requests_total{cluster_id=\"$cluster_id\",container=~\"^.+-bridge\"}[5m]))",
           "format": "time_series",
           "interval": "",
@@ -1769,7 +1769,7 @@
           "refId": "A"
         },
         {
-          "datasource": "${DS_PROMETHEUS}",
+          "datasource": "${datasource}",
           "expr": "sum(rate(strimzi_bridge_http_server_requests_total{cluster_id=\"$cluster_id\",code=~\"^2..$\", container=~\"^.+-bridge\"}[5m]))",
           "format": "time_series",
           "interval": "",
@@ -1778,7 +1778,7 @@
           "refId": "B"
         },
         {
-          "datasource": "${DS_PROMETHEUS}",
+          "datasource": "${datasource}",
           "expr": "sum(rate(strimzi_bridge_http_server_requests_total{cluster_id=\"$cluster_id\",code=~\"^4..$\", container=~\"^.+-bridge\"}[5m]))",
           "format": "time_series",
           "interval": "",
@@ -1787,7 +1787,7 @@
           "refId": "C"
         },
         {
-          "datasource": "${DS_PROMETHEUS}",
+          "datasource": "${datasource}",
           "expr": "sum(rate(strimzi_bridge_http_server_requests_total{cluster_id=\"$cluster_id\",code=~\"^5..$\", container=~\"^.+-bridge\"}[5m]))",
           "format": "time_series",
           "interval": "",
@@ -1800,7 +1800,7 @@
       "type": "timeseries"
     },
     {
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "${datasource}",
       "description": "",
       "fieldConfig": {
         "defaults": {
@@ -1880,7 +1880,7 @@
       "pluginVersion": "7.4.5",
       "targets": [
         {
-          "datasource": "${DS_PROMETHEUS}",
+          "datasource": "${datasource}",
           "expr": "sum(rate(strimzi_bridge_http_server_bytes_written_total{cluster_id=\"$cluster_id\",container=~\"^.+-bridge\"}[5m])) by (container)",
           "format": "time_series",
           "interval": "",
@@ -1893,7 +1893,7 @@
       "type": "timeseries"
     },
     {
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "${datasource}",
       "description": "",
       "fieldConfig": {
         "defaults": {
@@ -1973,7 +1973,7 @@
       "pluginVersion": "7.4.5",
       "targets": [
         {
-          "datasource": "${DS_PROMETHEUS}",
+          "datasource": "${datasource}",
           "expr": "sum(rate(strimzi_bridge_http_server_bytes_read_total{cluster_id=\"$cluster_id\",container=~\"^.+-bridge\"}[5m])) by (container)",
           "format": "time_series",
           "interval": "",
@@ -1986,7 +1986,7 @@
       "type": "timeseries"
     },
     {
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "${datasource}",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -2065,7 +2065,7 @@
       "pluginVersion": "7.4.5",
       "targets": [
         {
-          "datasource": "${DS_PROMETHEUS}",
+          "datasource": "${datasource}",
           "expr": "sum(rate(strimzi_bridge_http_server_requests_total{cluster_id=\"$cluster_id\",container=~\"^.+-bridge\",method=\"POST\",path=~\"/topics/[^/]+\"}[5m])) by (path)",
           "format": "time_series",
           "intervalFactor": 1,
@@ -2076,7 +2076,7 @@
       "type": "timeseries"
     },
     {
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "${datasource}",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -2155,7 +2155,7 @@
       "pluginVersion": "7.4.5",
       "targets": [
         {
-          "datasource": "${DS_PROMETHEUS}",
+          "datasource": "${datasource}",
           "expr": "sum(rate(strimzi_bridge_http_server_requests_total{cluster_id=\"$cluster_id\",container=~\"^.+-bridge\",method=\"POST\",path=~\"/topics/.+/partitions/[0-9]+\"}[5m])) by (path)",
           "format": "time_series",
           "interval": "",
@@ -2168,7 +2168,7 @@
       "type": "timeseries"
     },
     {
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "${datasource}",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -2247,7 +2247,7 @@
       "pluginVersion": "7.4.5",
       "targets": [
         {
-          "datasource": "${DS_PROMETHEUS}",
+          "datasource": "${datasource}",
           "expr": "sum(rate(strimzi_bridge_http_server_requests_total{cluster_id=\"$cluster_id\",container=~\"^.+-bridge\",method=\"POST\",path=~\"/consumers/[^/]+\"}[5m])) by (path)",
           "format": "time_series",
           "interval": "",
@@ -2260,7 +2260,7 @@
       "type": "timeseries"
     },
     {
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "${datasource}",
       "description": "",
       "fieldConfig": {
         "defaults": {
@@ -2340,7 +2340,7 @@
       "pluginVersion": "7.4.5",
       "targets": [
         {
-          "datasource": "${DS_PROMETHEUS}",
+          "datasource": "${datasource}",
           "expr": "sum(rate(strimzi_bridge_http_server_requests_total{cluster_id=\"$cluster_id\",container=~\"^.+-bridge\",method=\"POST\",path=~\"/consumers/.+/instances/.+/subscription\"}[5m])) by (path)",
           "format": "time_series",
           "interval": "",
@@ -2353,7 +2353,7 @@
       "type": "timeseries"
     },
     {
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "${datasource}",
       "description": "",
       "fieldConfig": {
         "defaults": {
@@ -2433,7 +2433,7 @@
       "pluginVersion": "7.4.5",
       "targets": [
         {
-          "datasource": "${DS_PROMETHEUS}",
+          "datasource": "${datasource}",
           "expr": "sum(rate(strimzi_bridge_http_server_requests_total{cluster_id=\"$cluster_id\",container=~\"^.+-bridge\",method=\"DELETE\",path=~\"/consumers/.+/instances/.+\"}[5m])) by (path)",
           "format": "time_series",
           "instant": false,
@@ -2447,7 +2447,7 @@
       "type": "timeseries"
     },
     {
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "${datasource}",
       "description": "",
       "fieldConfig": {
         "defaults": {
@@ -2527,7 +2527,7 @@
       "pluginVersion": "7.4.5",
       "targets": [
         {
-          "datasource": "${DS_PROMETHEUS}",
+          "datasource": "${datasource}",
           "expr": "sum(rate(strimzi_bridge_http_server_requests_total{cluster_id=\"$cluster_id\",container=~\"^.+-bridge\",method=\"GET\",path=~\"/consumers/.+/instances/.+/records\"}[5m])) by (path)",
           "format": "time_series",
           "interval": "",
@@ -2540,7 +2540,7 @@
       "type": "timeseries"
     },
     {
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "${datasource}",
       "description": "",
       "fieldConfig": {
         "defaults": {
@@ -2620,7 +2620,7 @@
       "pluginVersion": "7.4.5",
       "targets": [
         {
-          "datasource": "${DS_PROMETHEUS}",
+          "datasource": "${datasource}",
           "expr": "sum(rate(strimzi_bridge_http_server_requests_total{cluster_id=\"$cluster_id\",container=~\"^.+-bridge\",method=\"POST\",path=~\"/consumers/.+/instances/.+/offsets\"}[5m])) by (path)",
           "format": "time_series",
           "interval": "",
@@ -2657,7 +2657,7 @@
       "type": "row"
     },
     {
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "${datasource}",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -2735,7 +2735,7 @@
       "pluginVersion": "7.4.5",
       "targets": [
         {
-          "datasource": "${DS_PROMETHEUS}",
+          "datasource": "${datasource}",
           "expr": "sum(jvm_memory_used_bytes{cluster_id=\"$cluster_id\",container=~\"^.+-bridge\"})",
           "format": "time_series",
           "intervalFactor": 1,
@@ -2746,7 +2746,7 @@
       "type": "timeseries"
     },
     {
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "${datasource}",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -2824,7 +2824,7 @@
       "pluginVersion": "7.4.5",
       "targets": [
         {
-          "datasource": "${DS_PROMETHEUS}",
+          "datasource": "${datasource}",
           "expr": "sum(rate(jvm_gc_pause_seconds_sum{cluster_id=\"$cluster_id\",container=~\"^.+-bridge\"}[5m]))",
           "format": "time_series",
           "intervalFactor": 1,
@@ -2835,7 +2835,7 @@
       "type": "timeseries"
     },
     {
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "${datasource}",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -2913,7 +2913,7 @@
       "pluginVersion": "7.4.5",
       "targets": [
         {
-          "datasource": "${DS_PROMETHEUS}",
+          "datasource": "${datasource}",
           "expr": "sum(rate(jvm_gc_pause_seconds_count{cluster_id=\"$cluster_id\",container=~\"^.+-bridge\"}[5m]))",
           "format": "time_series",
           "intervalFactor": 1,
@@ -2927,15 +2927,18 @@
   "refresh": "5s",
   "schemaVersion": 39,
   "tags": [
-    "Strimzi",
     "Kafka",
-    "Kafka Bridge"
+    "Kafka Bridge",
+    "Strimzi",
+    "component:strimzi-kafka-bridge",
+    "owner:team-atlas",
+    "topic:kafka"
   ],
   "templating": {
     "list": [
       {
         "current": {},
-        "datasource": "${DS_PROMETHEUS}",
+        "datasource": "${datasource}",
         "definition": "label_values(cluster_id)",
         "hide": 0,
         "includeAll": false,
@@ -2958,9 +2961,9 @@
         "error": null,
         "hide": 0,
         "includeAll": false,
-        "label": "datasource",
+        "label": "Data source",
         "multi": false,
-        "name": "DS_PROMETHEUS",
+        "name": "datasource",
         "options": [],
         "query": "prometheus",
         "refresh": 1,
@@ -2970,7 +2973,7 @@
       },
       {
         "current": {},
-        "datasource": "${DS_PROMETHEUS}",
+        "datasource": "${datasource}",
         "definition": "",
         "hide": 0,
         "includeAll": false,
@@ -2990,7 +2993,7 @@
       },
       {
         "current": {},
-        "datasource": "${DS_PROMETHEUS}",
+        "datasource": "${datasource}",
         "definition": "",
         "hide": 0,
         "includeAll": false,

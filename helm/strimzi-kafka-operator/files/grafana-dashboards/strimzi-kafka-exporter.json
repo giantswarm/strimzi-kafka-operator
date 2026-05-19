@@ -39,7 +39,7 @@
     ]
   },
   "description": "Kafka topics and consumer groups",
-  "editable": true,
+  "editable": false,
   "fiscalYearStartMonth": 0,
   "gnetId": 7589,
   "graphTooltip": 0,
@@ -47,7 +47,7 @@
   "links": [],
   "panels": [
     {
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "${datasource}",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -108,7 +108,7 @@
       "pluginVersion": "7.4.5",
       "targets": [
         {
-          "datasource": "${DS_PROMETHEUS}",
+          "datasource": "${datasource}",
           "expr": "count(kafka_topic_partitions{cluster_id=\"$cluster_id\",topic=~\"$topic\", namespace=~\"$kubernetes_namespace\"})",
           "format": "time_series",
           "intervalFactor": 1,
@@ -119,7 +119,7 @@
       "type": "stat"
     },
     {
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "${datasource}",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -180,7 +180,7 @@
       "pluginVersion": "7.4.5",
       "targets": [
         {
-          "datasource": "${DS_PROMETHEUS}",
+          "datasource": "${datasource}",
           "expr": "sum(kafka_topic_partitions{cluster_id=\"$cluster_id\",topic=~\"$topic\", namespace=~\"$kubernetes_namespace\"})",
           "format": "time_series",
           "intervalFactor": 1,
@@ -191,7 +191,7 @@
       "type": "stat"
     },
     {
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "${datasource}",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -252,7 +252,7 @@
       "pluginVersion": "7.4.5",
       "targets": [
         {
-          "datasource": "${DS_PROMETHEUS}",
+          "datasource": "${datasource}",
           "expr": "sum(kafka_topic_partition_replicas{cluster_id=\"$cluster_id\",topic=~\"$topic\", namespace=\"$kubernetes_namespace\"})",
           "format": "time_series",
           "intervalFactor": 1,
@@ -263,7 +263,7 @@
       "type": "stat"
     },
     {
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "${datasource}",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -324,7 +324,7 @@
       "pluginVersion": "7.4.5",
       "targets": [
         {
-          "datasource": "${DS_PROMETHEUS}",
+          "datasource": "${datasource}",
           "expr": "sum(kafka_topic_partition_in_sync_replica{cluster_id=\"$cluster_id\",topic=~\"$topic\", namespace=~\"$kubernetes_namespace\"})",
           "format": "time_series",
           "intervalFactor": 1,
@@ -335,7 +335,7 @@
       "type": "stat"
     },
     {
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "${datasource}",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -400,7 +400,7 @@
       "pluginVersion": "7.4.5",
       "targets": [
         {
-          "datasource": "${DS_PROMETHEUS}",
+          "datasource": "${datasource}",
           "expr": "sum(kafka_topic_partition_under_replicated_partition{cluster_id=\"$cluster_id\",topic=~\"$topic\", namespace=~\"$kubernetes_namespace\"})",
           "format": "time_series",
           "intervalFactor": 1,
@@ -411,7 +411,7 @@
       "type": "stat"
     },
     {
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "${datasource}",
       "description": "Number of partitions which are at their minimum in sync replica count (| ISR | == | min.insync.replicas |)",
       "fieldConfig": {
         "defaults": {
@@ -477,7 +477,7 @@
       "pluginVersion": "7.4.5",
       "targets": [
         {
-          "datasource": "${DS_PROMETHEUS}",
+          "datasource": "${datasource}",
           "expr": "sum(kafka_cluster_partition_atminisr{cluster_id=\"$cluster_id\",topic=~\"$topic\", namespace=~\"$kubernetes_namespace\"})",
           "format": "time_series",
           "intervalFactor": 1,
@@ -488,7 +488,7 @@
       "type": "stat"
     },
     {
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "${datasource}",
       "description": "Number of partitions which are under their minimum in sync replica count (| ISR | < | min.insync.replicas |)",
       "fieldConfig": {
         "defaults": {
@@ -554,7 +554,7 @@
       "pluginVersion": "7.4.5",
       "targets": [
         {
-          "datasource": "${DS_PROMETHEUS}",
+          "datasource": "${datasource}",
           "expr": "sum(kafka_cluster_partition_underminisr{cluster_id=\"$cluster_id\",topic=~\"$topic\", namespace=~\"$kubernetes_namespace\"})",
           "format": "time_series",
           "intervalFactor": 1,
@@ -565,7 +565,7 @@
       "type": "stat"
     },
     {
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "${datasource}",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -630,7 +630,7 @@
       "pluginVersion": "7.4.5",
       "targets": [
         {
-          "datasource": "${DS_PROMETHEUS}",
+          "datasource": "${datasource}",
           "expr": "sum(kafka_topic_partition_leader_is_preferred{cluster_id=\"$cluster_id\",topic=~\"$topic\", namespace=~\"$kubernetes_namespace\"} < bool 1)",
           "format": "time_series",
           "intervalFactor": 1,
@@ -641,7 +641,7 @@
       "type": "stat"
     },
     {
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "${datasource}",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -724,7 +724,7 @@
       "pluginVersion": "7.4.5",
       "targets": [
         {
-          "datasource": "${DS_PROMETHEUS}",
+          "datasource": "${datasource}",
           "expr": "sum(rate(kafka_topic_partition_current_offset{cluster_id=\"$cluster_id\",topic=~\"$topic\", namespace=~\"$kubernetes_namespace\"}[5m])) by (topic)",
           "format": "time_series",
           "intervalFactor": 1,
@@ -736,7 +736,7 @@
       "type": "timeseries"
     },
     {
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "${datasource}",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -818,7 +818,7 @@
       "pluginVersion": "7.4.5",
       "targets": [
         {
-          "datasource": "${DS_PROMETHEUS}",
+          "datasource": "${datasource}",
           "expr": "sum(delta(kafka_consumergroup_current_offset{cluster_id=\"$cluster_id\",consumergroup=~\"$consumergroup\",topic=~\"$topic\", namespace=~\"$kubernetes_namespace\"}[5m])/300) by (consumergroup, topic)",
           "format": "time_series",
           "intervalFactor": 1,
@@ -830,7 +830,7 @@
       "type": "timeseries"
     },
     {
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "${datasource}",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -913,7 +913,7 @@
       "pluginVersion": "7.4.5",
       "targets": [
         {
-          "datasource": "${DS_PROMETHEUS}",
+          "datasource": "${datasource}",
           "expr": "sum(kafka_consumergroup_lag{cluster_id=\"$cluster_id\",consumergroup=~\"$consumergroup\",topic=~\"$topic\", namespace=~\"$kubernetes_namespace\"}) by (consumergroup, topic) ",
           "format": "time_series",
           "instant": false,
@@ -928,7 +928,7 @@
     },
     {
       "columns": [],
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "${datasource}",
       "fieldConfig": {
         "defaults": {
           "custom": {
@@ -1025,7 +1025,7 @@
       ],
       "targets": [
         {
-          "datasource": "${DS_PROMETHEUS}",
+          "datasource": "${datasource}",
           "expr": "sum(kafka_consumergroup_current_offset{cluster_id=\"$cluster_id\",consumergroup=~\"$consumergroup\",topic=~\"$topic\", namespace=~\"$kubernetes_namespace\"}) by (consumergroup,partition,topic)",
           "format": "table",
           "instant": true,
@@ -1040,7 +1040,7 @@
     },
     {
       "columns": [],
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "${datasource}",
       "fieldConfig": {
         "defaults": {
           "custom": {
@@ -1137,7 +1137,7 @@
       ],
       "targets": [
         {
-          "datasource": "${DS_PROMETHEUS}",
+          "datasource": "${datasource}",
           "expr": "sum(kafka_consumergroup_lag{cluster_id=\"$cluster_id\",consumergroup=~\"$consumergroup\",topic=~\"$topic\", namespace=~\"$kubernetes_namespace\"}) by (consumergroup,partition,topic)",
           "format": "table",
           "instant": true,
@@ -1152,7 +1152,7 @@
     },
     {
       "columns": [],
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "${datasource}",
       "fieldConfig": {
         "defaults": {
           "custom": {
@@ -1248,7 +1248,7 @@
       ],
       "targets": [
         {
-          "datasource": "${DS_PROMETHEUS}",
+          "datasource": "${datasource}",
           "expr": "sum(kafka_topic_partitions{cluster_id=\"$cluster_id\",topic=~\"$topic\", namespace=~\"$kubernetes_namespace\"}) by (topic)",
           "format": "table",
           "instant": true,
@@ -1263,7 +1263,7 @@
     },
     {
       "columns": [],
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "${datasource}",
       "fieldConfig": {
         "defaults": {
           "custom": {
@@ -1360,7 +1360,7 @@
       ],
       "targets": [
         {
-          "datasource": "${DS_PROMETHEUS}",
+          "datasource": "${datasource}",
           "expr": "sum(kafka_topic_partition_current_offset{cluster_id=\"$cluster_id\",topic=~\"$topic\", namespace=~\"$kubernetes_namespace\"}) by (partition,topic)",
           "format": "table",
           "instant": true,
@@ -1375,7 +1375,7 @@
     },
     {
       "columns": [],
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "${datasource}",
       "fieldConfig": {
         "defaults": {
           "custom": {
@@ -1472,7 +1472,7 @@
       ],
       "targets": [
         {
-          "datasource": "${DS_PROMETHEUS}",
+          "datasource": "${datasource}",
           "expr": "sum(kafka_topic_partition_oldest_offset{cluster_id=\"$cluster_id\",topic=~\"$topic\", namespace=~\"$kubernetes_namespace\"}) by (partition,topic)",
           "format": "table",
           "instant": true,
@@ -1489,15 +1489,18 @@
   "refresh": "5s",
   "schemaVersion": 39,
   "tags": [
-    "Strimzi",
     "Kafka",
-    "Kafka Exporter"
+    "Kafka Exporter",
+    "Strimzi",
+    "component:strimzi-kafka-exporter",
+    "owner:team-atlas",
+    "topic:kafka"
   ],
   "templating": {
     "list": [
       {
         "current": {},
-        "datasource": "${DS_PROMETHEUS}",
+        "datasource": "${datasource}",
         "definition": "label_values(cluster_id)",
         "hide": 0,
         "includeAll": false,
@@ -1520,9 +1523,9 @@
         "error": null,
         "hide": 0,
         "includeAll": false,
-        "label": "datasource",
+        "label": "Data source",
         "multi": false,
-        "name": "DS_PROMETHEUS",
+        "name": "datasource",
         "options": [],
         "query": "prometheus",
         "refresh": 1,
@@ -1532,7 +1535,7 @@
       },
       {
         "current": {},
-        "datasource": "${DS_PROMETHEUS}",
+        "datasource": "${datasource}",
         "definition": "",
         "hide": 0,
         "includeAll": false,
@@ -1552,7 +1555,7 @@
       },
       {
         "current": {},
-        "datasource": "${DS_PROMETHEUS}",
+        "datasource": "${datasource}",
         "definition": "",
         "hide": 0,
         "includeAll": false,
@@ -1572,7 +1575,7 @@
       },
       {
         "current": {},
-        "datasource": "${DS_PROMETHEUS}",
+        "datasource": "${datasource}",
         "definition": "label_values(kafka_consumergroup_current_offset{cluster_id=\"$cluster_id\",namespace=\"$kubernetes_namespace\",strimzi_io_cluster=\"$strimzi_cluster_name\"}, consumergroup)",
         "hide": 0,
         "includeAll": true,
@@ -1597,7 +1600,7 @@
             "$__all"
           ]
         },
-        "datasource": "${DS_PROMETHEUS}",
+        "datasource": "${datasource}",
         "definition": "label_values(kafka_topic_partition_current_offset{cluster_id=\"$cluster_id\",namespace=\"$kubernetes_namespace\",strimzi_io_cluster=\"$strimzi_cluster_name\"}, topic)",
         "hide": 0,
         "includeAll": true,
