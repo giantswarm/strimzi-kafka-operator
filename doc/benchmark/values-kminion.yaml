@@ -1,0 +1,41 @@
+kminion:
+  config:
+    kafka:
+      brokers:
+        - my-cluster-kafka-bootstrap:9092
+      clientId: kminion
+    minion:
+      consumerGroups:
+        enabled: false
+      topics:
+        enabled: false
+      logDirs:
+        enabled: false
+      endToEnd:
+        enabled: true
+        probeInterval: 1ms
+        topicManagement:
+          enabled: true
+          replicationFactor: 1
+          partitionsPerBroker: 4
+
+serviceMonitor:
+  create: true
+  additionalLabels:
+    observability.giantswarm.io/tenant: giantswarm
+
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 99
+  fsGroup: 99
+  seccompProfile:
+    type: RuntimeDefault
+
+securityContext:
+  allowPrivilegeEscalation: false
+  runAsNonRoot: true
+  capabilities:
+    drop:
+      - ALL
+  seccompProfile:
+    type: RuntimeDefault
