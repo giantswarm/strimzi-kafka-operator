@@ -10,8 +10,14 @@ tell us — where the cluster is comfortable, and where (if anywhere) it starts 
 
 1. Create a cluster with 3 control-plane and 2 worker nodes.
 
-- 4 CPU: AMD EPYC 7763 64-Core Processor
-- 16GB RAM
+Node spec:
+
+- Kubernetes v1.34.3
+- Giantswarm release v34.1.0
+- CPU: 4 x AMD EPYC 7763 64-Core Processor
+- RAM: 16GB
+
+See our [cluster creation docs](https://docs.giantswarm.io/getting-started/provision-your-first-workload-cluster/) for details.
 
 2. Install Strimzi
 
@@ -34,7 +40,7 @@ This deploys a **KRaft** cluster (Kafka ≥ v4.1) with a split topology:
 
 ### Load
 
-4. Run load testing with kminion
+4. Run load testing with KMinion
 
 Using a 1ms probe interval and 4 partitions per broker, targeting roughly **10,000 messages/sec**.
 
@@ -42,15 +48,14 @@ Using a 1ms probe interval and 4 partitions per broker, targeting roughly **10,0
 helm install kminion redpanda/kminion --version 0.15.1 -f values-kminion.yaml
 ```
 
-kminion runs its **end-to-end probe**: it continuously produces small messages to a dedicated
+KMinion runs its **end-to-end probe**: it continuously produces small messages to a dedicated
 `kminion-end-to-end` topic, consumes them back, and measures the full round-trip. So it's
-both the load generator and the latency source of truth.
+both the load generator and the latency source of truth. See [KMinion end to end monitoring](https://github.com/redpanda-data/kminion/blob/master/docs/end-to-end.md) for more information.
 
 ### Test window
 
 The run lasted ≈ 15 minutes (≈ 11:02 → 11:17). Traffic ramps from zero, reaches a steady
-plateau by 11:05, and holds there for 12 minutes before being torn down. All numbers below
-are read at steady state unless noted.
+plateau by 11:05, and holds there for 12 minutes. All numbers below are read at steady state unless noted.
 
 ## Results
 
