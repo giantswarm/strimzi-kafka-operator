@@ -10,8 +10,8 @@ import (
 
 	"github.com/giantswarm/apptest-framework/v4/pkg/state"
 	"github.com/giantswarm/apptest-framework/v4/pkg/suite"
-	crclient "github.com/giantswarm/clustertest/v4/pkg/client"
-	"github.com/giantswarm/clustertest/v4/pkg/wait"
+	crclient "github.com/giantswarm/clustertest/v5/pkg/client"
+	"github.com/giantswarm/clustertest/v5/pkg/wait"
 
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
