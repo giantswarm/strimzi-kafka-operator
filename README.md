@@ -144,7 +144,7 @@ and run the producer/consumer scripts from there.
 
 ### Topic auto-creation
 
-It is recommended to disable Kafka's automatic topic creation and manage topics declaratively through `KafkaTopic` custom resources.
+It is recommended to disable Kafka's automatic topic creation and manage topics declaratively through [`KafkaTopic`](https://strimzi.io/blog/2023/11/02/unidirectional-topic-operator/) custom resources.
 Mixing both can cause conflicts between topics managed by the Topic Operator and topics auto-created by Kafka.
 
 Set this in your Kafka CR:
