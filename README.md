@@ -142,6 +142,22 @@ kubectl exec -ti my-cluster-broker-0 -- /bin/sh
 `kubectl run` commands in the upstream quickstart. Instead, exec into a broker pod
 and run the producer/consumer scripts from there.
 
+### Topic auto-creation
+
+It is recommended to disable Kafka's automatic topic creation and manage topics declaratively through [`KafkaTopic`](https://strimzi.io/blog/2023/11/02/unidirectional-topic-operator/) custom resources.
+Mixing both can cause conflicts between topics managed by the Topic Operator and topics auto-created by Kafka.
+
+Set this in your Kafka CR:
+
+```yaml
+spec:
+  kafka:
+    config:
+      auto.create.topics.enable: "false"
+```
+
+See the upstream [application topic handling guide](https://github.com/strimzi/strimzi-kafka-operator/blob/1.0.0/documentation/modules/operators/con-application-topic-handling.adoc).
+
 ### Kafka cluster metrics
 
 The [`examples/kafka-single-node`](examples/kafka-single-node) Kafka CR enables Prometheus
