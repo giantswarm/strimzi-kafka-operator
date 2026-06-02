@@ -62,8 +62,7 @@ plateau by 11:05, and holds there for 12 minutes. All numbers below are read at 
 ### 1. Load generator — kminion end-to-end probe
 
 ![kminion end-to-end dashboard](kminion.png)
-
-[kminion end-to-end dashboard](doc/benchmark/kminion-dashboard.json).
+This dashboard is provided here [doc/benchmark/kminion-dashboard.json](doc/benchmark/kminion-dashboard.json).
 
 This is the most important view: it tells us what the client actually experienced.
 
