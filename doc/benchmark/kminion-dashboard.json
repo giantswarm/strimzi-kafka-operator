@@ -1,0 +1,344 @@
+{
+  "title": "kminion — Kafka Monitoring",
+  "uid": "kminion-overview",
+  "tags": ["kafka", "kminion"],
+  "schemaVersion": 39,
+  "editable": true,
+  "graphTooltip": 1,
+  "time": {"from": "now-6h", "to": "now"},
+  "refresh": "30s",
+  "timezone": "",
+  "templating": {
+    "list": [
+      {
+        "type": "datasource",
+        "name": "datasource",
+        "label": "Datasource",
+        "query": "prometheus",
+        "current": {"text": "GS Mimir", "value": "gs-mimir"},
+        "hide": 0
+      },
+      {
+        "type": "query",
+        "name": "installation",
+        "label": "Installation",
+        "datasource": {"type": "prometheus", "uid": "$datasource"},
+        "query": {"query": "label_values(kminion_exporter_up, installation)", "refId": "PrometheusVariableQueryEditor-VariableQuery"},
+        "refresh": 2,
+        "sort": 1,
+        "includeAll": true,
+        "multi": true,
+        "allValue": ".*"
+      },
+      {
+        "type": "query",
+        "name": "namespace",
+        "label": "Namespace",
+        "datasource": {"type": "prometheus", "uid": "$datasource"},
+        "query": {"query": "label_values(kminion_exporter_up{installation=~\"${installation:regex}\"}, namespace)", "refId": "PrometheusVariableQueryEditor-VariableQuery"},
+        "refresh": 2,
+        "sort": 1,
+        "includeAll": true,
+        "multi": true,
+        "allValue": ".*"
+      },
+      {
+        "type": "query",
+        "name": "pod",
+        "label": "Pod",
+        "datasource": {"type": "prometheus", "uid": "$datasource"},
+        "query": {"query": "label_values(kminion_exporter_up{installation=~\"${installation:regex}\",namespace=~\"${namespace:regex}\"}, pod)", "refId": "PrometheusVariableQueryEditor-VariableQuery"},
+        "refresh": 2,
+        "sort": 1,
+        "includeAll": true,
+        "multi": true,
+        "allValue": ".*"
+      }
+    ]
+  },
+  "annotations": {"list": []},
+  "panels": [
+    {
+      "id": 100,
+      "type": "row",
+      "title": "Overview",
+      "collapsed": false,
+      "gridPos": {"h": 1, "w": 24, "x": 0, "y": 0}
+    },
+    {
+      "id": 1,
+      "type": "stat",
+      "title": "Exporter up",
+      "description": "Health of the kminion exporter (kminion_exporter_up). 1 = scraping the Kafka cluster successfully, 0 = exporter cannot reach Kafka or is unhealthy. When DOWN, every other panel on this dashboard becomes unreliable — start by checking the kminion pod logs and its Kafka connectivity.",
+      "datasource": {"type": "prometheus", "uid": "$datasource"},
+      "gridPos": {"h": 4, "w": 4, "x": 0, "y": 1},
+      "targets": [
+        {"refId": "A", "expr": "min(kminion_exporter_up{installation=~\"${installation:regex}\",namespace=~\"${namespace:regex}\",pod=~\"${pod:regex}\"})", "instant": true}
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [
+            {"type": "value", "options": {"0": {"text": "DOWN", "color": "red"}, "1": {"text": "UP", "color": "green"}}}
+          ],
+          "thresholds": {"mode": "absolute", "steps": [{"color": "red", "value": null}, {"color": "green", "value": 1}]}
+        }
+      },
+      "options": {"colorMode": "background", "graphMode": "none", "reduceOptions": {"calcs": ["lastNotNull"]}}
+    },
+    {
+      "id": 2,
+      "type": "stat",
+      "title": "Broker count",
+      "description": "Distinct brokers reported via kminion_kafka_broker_info. Should match your expected cluster size; an unexpected drop means a broker is offline, partitioned, or unreachable from kminion's vantage point.",
+      "datasource": {"type": "prometheus", "uid": "$datasource"},
+      "gridPos": {"h": 4, "w": 4, "x": 4, "y": 1},
+      "targets": [
+        {"refId": "A", "expr": "count(count by (broker_id) (kminion_kafka_broker_info{installation=~\"${installation:regex}\",namespace=~\"${namespace:regex}\",pod=~\"${pod:regex}\"}))", "instant": true, "legendFormat": "brokers"}
+      ],
+      "fieldConfig": {"defaults": {"unit": "none", "thresholds": {"mode": "absolute", "steps": [{"color": "red", "value": null}, {"color": "green", "value": 1}]}}},
+      "options": {"colorMode": "value", "graphMode": "none", "reduceOptions": {"calcs": ["lastNotNull"]}}
+    },
+    {
+      "id": 3,
+      "type": "stat",
+      "title": "Kafka cluster version",
+      "description": "Kafka API version advertised by the cluster (cluster_version label of kminion_kafka_cluster_info). Useful to confirm broker upgrades have rolled out everywhere kminion can see.",
+      "datasource": {"type": "prometheus", "uid": "$datasource"},
+      "gridPos": {"h": 4, "w": 4, "x": 8, "y": 1},
+      "targets": [
+        {"refId": "A", "expr": "kminion_kafka_cluster_info{installation=~\"${installation:regex}\",namespace=~\"${namespace:regex}\",pod=~\"${pod:regex}\"}", "instant": true, "legendFormat": "{{cluster_version}}"}
+      ],
+      "fieldConfig": {"defaults": {"unit": "none"}},
+      "options": {"colorMode": "none", "graphMode": "none", "textMode": "name", "reduceOptions": {"calcs": ["lastNotNull"]}}
+    },
+    {
+      "id": 4,
+      "type": "stat",
+      "title": "Controller broker",
+      "description": "The broker currently elected as cluster controller (kminion_kafka_broker_info{is_controller=\"true\"}). Frequent flips of this value indicate controller instability, which often correlates with metadata churn and partition leader elections.",
+      "datasource": {"type": "prometheus", "uid": "$datasource"},
+      "gridPos": {"h": 4, "w": 4, "x": 12, "y": 1},
+      "targets": [
+        {"refId": "A", "expr": "kminion_kafka_broker_info{installation=~\"${installation:regex}\",namespace=~\"${namespace:regex}\",pod=~\"${pod:regex}\",is_controller=\"true\"}", "instant": true, "legendFormat": "id={{broker_id}} ({{address}})"}
+      ],
+      "options": {"colorMode": "none", "graphMode": "none", "textMode": "name", "reduceOptions": {"calcs": ["lastNotNull"]}}
+    },
+    {
+      "id": 5,
+      "type": "bargauge",
+      "title": "Log messages (totals by level)",
+      "description": "Cumulative kminion log entries grouped by severity level (kminion_log_messages_total). A quick view of exporter health — sustained warn/error counts mean kminion itself is having problems (Kafka connectivity, config, etc.). See the per-level rate panel below for timing.",
+      "datasource": {"type": "prometheus", "uid": "$datasource"},
+      "gridPos": {"h": 4, "w": 8, "x": 16, "y": 1},
+      "targets": [
+        {"refId": "A", "expr": "sum by (level) (kminion_log_messages_total{installation=~\"${installation:regex}\",namespace=~\"${namespace:regex}\",pod=~\"${pod:regex}\"})", "instant": true, "legendFormat": "{{level}}"}
+      ],
+      "fieldConfig": {"defaults": {"unit": "short", "thresholds": {"mode": "absolute", "steps": [{"color": "green", "value": null}, {"color": "orange", "value": 1}, {"color": "red", "value": 10}]}}},
+      "options": {"orientation": "horizontal", "displayMode": "gradient", "reduceOptions": {"calcs": ["lastNotNull"]}}
+    },
+
+    {
+      "id": 101,
+      "type": "row",
+      "title": "End-to-end probe",
+      "collapsed": false,
+      "gridPos": {"h": 1, "w": 24, "x": 0, "y": 5}
+    },
+    {
+      "id": 10,
+      "type": "timeseries",
+      "title": "Messages produced vs received (rate)",
+      "description": "Throughput of kminion's end-to-end probe. kminion continuously produces test messages to its e2e topic and consumes them back; the two lines should track each other closely. A persistent gap means messages are being dropped, delayed past the roundtrip SLA, or filtered out (minionID mismatch).",
+      "datasource": {"type": "prometheus", "uid": "$datasource"},
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 6},
+      "targets": [
+        {"refId": "A", "expr": "sum(rate(kminion_end_to_end_messages_produced_total{installation=~\"${installation:regex}\",namespace=~\"${namespace:regex}\",pod=~\"${pod:regex}\"}[$__rate_interval]))", "legendFormat": "produced"},
+        {"refId": "B", "expr": "sum(rate(kminion_end_to_end_messages_received_total{installation=~\"${installation:regex}\",namespace=~\"${namespace:regex}\",pod=~\"${pod:regex}\"}[$__rate_interval]))", "legendFormat": "received"}
+      ],
+      "fieldConfig": {"defaults": {"unit": "mps", "custom": {"drawStyle": "line", "lineWidth": 2, "fillOpacity": 10}}},
+      "options": {"legend": {"displayMode": "list", "placement": "bottom"}}
+    },
+    {
+      "id": 11,
+      "type": "timeseries",
+      "title": "Messages lost and produce failures (rate)",
+      "description": "Two distinct failure modes:\n• lost — message was produced and acked but never consumed back within consumer.roundtripSla (likely data loss, replication issue, or consumer-side stall).\n• produce failed — the broker returned an error or the produce timed out past producer.ackSla (the write itself failed).\nAny sustained non-zero rate here is actionable.",
+      "datasource": {"type": "prometheus", "uid": "$datasource"},
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 6},
+      "targets": [
+        {"refId": "A", "expr": "sum(rate(kminion_end_to_end_messages_lost_total{installation=~\"${installation:regex}\",namespace=~\"${namespace:regex}\",pod=~\"${pod:regex}\"}[$__rate_interval]))", "legendFormat": "lost"},
+        {"refId": "B", "expr": "sum(rate(kminion_end_to_end_messages_produced_failed_total{installation=~\"${installation:regex}\",namespace=~\"${namespace:regex}\",pod=~\"${pod:regex}\"}[$__rate_interval]))", "legendFormat": "produce failed"}
+      ],
+      "fieldConfig": {"defaults": {"unit": "mps", "custom": {"drawStyle": "line", "lineWidth": 2, "fillOpacity": 10}, "thresholds": {"mode": "absolute", "steps": [{"color": "green", "value": null}, {"color": "red", "value": 0.001}]}}},
+      "options": {"legend": {"displayMode": "list", "placement": "bottom"}}
+    },
+    {
+      "id": 12,
+      "type": "timeseries",
+      "title": "In-flight produces",
+      "description": "Probe messages that kminion has sent but for which it has not yet received an ack (kminion_end_to_end_messages_produced_in_flight). A steady, low value is normal. A growing trend means brokers are acking slower than kminion produces — often a precursor to produce_failed_total ticking up.",
+      "datasource": {"type": "prometheus", "uid": "$datasource"},
+      "gridPos": {"h": 8, "w": 8, "x": 0, "y": 14},
+      "targets": [
+        {"refId": "A", "expr": "sum(kminion_end_to_end_messages_produced_in_flight{installation=~\"${installation:regex}\",namespace=~\"${namespace:regex}\",pod=~\"${pod:regex}\"})", "legendFormat": "in-flight"}
+      ],
+      "fieldConfig": {"defaults": {"unit": "short", "custom": {"drawStyle": "line", "lineWidth": 2, "fillOpacity": 10}}}
+    },
+    {
+      "id": 13,
+      "type": "timeseries",
+      "title": "Offset commits (rate)",
+      "description": "Successful offset commits made by kminion's e2e consumer to the group coordinator (kminion_end_to_end_offset_commits_total). Should be a steady, periodic rate driven by consumer.commitInterval. A drop to zero while produce/receive continues indicates a coordinator problem — pair with the commit-latency and messages_lost panels.",
+      "datasource": {"type": "prometheus", "uid": "$datasource"},
+      "gridPos": {"h": 8, "w": 8, "x": 8, "y": 14},
+      "targets": [
+        {"refId": "A", "expr": "sum(rate(kminion_end_to_end_offset_commits_total{installation=~\"${installation:regex}\",namespace=~\"${namespace:regex}\",pod=~\"${pod:regex}\"}[$__rate_interval]))", "legendFormat": "commits/s"}
+      ],
+      "fieldConfig": {"defaults": {"unit": "ops", "custom": {"drawStyle": "line", "lineWidth": 2, "fillOpacity": 10}}}
+    },
+    {
+      "id": 14,
+      "type": "timeseries",
+      "title": "Roundtrip latency (p50 / p95 / p99)",
+      "description": "Time from producing a probe message to consuming it back, per percentile. Covers the entire path: producer → broker → replication → fetch → match. Histogram is bounded by consumer.roundtripSla — values clipping at the top bucket usually accompany a rise in messages_lost_total.",
+      "datasource": {"type": "prometheus", "uid": "$datasource"},
+      "gridPos": {"h": 8, "w": 8, "x": 16, "y": 14},
+      "targets": [
+        {"refId": "A", "expr": "histogram_quantile(0.50, sum by (le) (rate(kminion_end_to_end_roundtrip_latency_seconds_bucket{installation=~\"${installation:regex}\",namespace=~\"${namespace:regex}\",pod=~\"${pod:regex}\"}[$__rate_interval])))", "legendFormat": "p50"},
+        {"refId": "B", "expr": "histogram_quantile(0.95, sum by (le) (rate(kminion_end_to_end_roundtrip_latency_seconds_bucket{installation=~\"${installation:regex}\",namespace=~\"${namespace:regex}\",pod=~\"${pod:regex}\"}[$__rate_interval])))", "legendFormat": "p95"},
+        {"refId": "C", "expr": "histogram_quantile(0.99, sum by (le) (rate(kminion_end_to_end_roundtrip_latency_seconds_bucket{installation=~\"${installation:regex}\",namespace=~\"${namespace:regex}\",pod=~\"${pod:regex}\"}[$__rate_interval])))", "legendFormat": "p99"}
+      ],
+      "fieldConfig": {"defaults": {"unit": "s", "custom": {"drawStyle": "line", "lineWidth": 2, "fillOpacity": 5}}}
+    },
+    {
+      "id": 15,
+      "type": "timeseries",
+      "title": "Produce latency (p50 / p95 / p99)",
+      "description": "Time between sending a probe message and receiving the broker ack, per percentile. Isolates broker-side write latency from end-to-end delivery time — compare against the roundtrip panel to tell whether slowness is on the produce or the consume side. Histogram is bounded by producer.ackSla.",
+      "datasource": {"type": "prometheus", "uid": "$datasource"},
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 22},
+      "targets": [
+        {"refId": "A", "expr": "histogram_quantile(0.50, sum by (le) (rate(kminion_end_to_end_produce_latency_seconds_bucket{installation=~\"${installation:regex}\",namespace=~\"${namespace:regex}\",pod=~\"${pod:regex}\"}[$__rate_interval])))", "legendFormat": "p50"},
+        {"refId": "B", "expr": "histogram_quantile(0.95, sum by (le) (rate(kminion_end_to_end_produce_latency_seconds_bucket{installation=~\"${installation:regex}\",namespace=~\"${namespace:regex}\",pod=~\"${pod:regex}\"}[$__rate_interval])))", "legendFormat": "p95"},
+        {"refId": "C", "expr": "histogram_quantile(0.99, sum by (le) (rate(kminion_end_to_end_produce_latency_seconds_bucket{installation=~\"${installation:regex}\",namespace=~\"${namespace:regex}\",pod=~\"${pod:regex}\"}[$__rate_interval])))", "legendFormat": "p99"}
+      ],
+      "fieldConfig": {"defaults": {"unit": "s", "custom": {"drawStyle": "line", "lineWidth": 2, "fillOpacity": 5}}}
+    },
+    {
+      "id": 16,
+      "type": "timeseries",
+      "title": "Offset commit latency (p50 / p95 / p99)",
+      "description": "Time the group coordinator took to respond to a kminion offset commit, per percentile. Rising latency here points at coordinator load or __consumer_offsets partition issues, and frequently precedes commit failures. Histogram is bounded by consumer.commitSla.",
+      "datasource": {"type": "prometheus", "uid": "$datasource"},
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 22},
+      "targets": [
+        {"refId": "A", "expr": "histogram_quantile(0.50, sum by (le) (rate(kminion_end_to_end_offset_commit_latency_seconds_bucket{installation=~\"${installation:regex}\",namespace=~\"${namespace:regex}\",pod=~\"${pod:regex}\"}[$__rate_interval])))", "legendFormat": "p50"},
+        {"refId": "B", "expr": "histogram_quantile(0.95, sum by (le) (rate(kminion_end_to_end_offset_commit_latency_seconds_bucket{installation=~\"${installation:regex}\",namespace=~\"${namespace:regex}\",pod=~\"${pod:regex}\"}[$__rate_interval])))", "legendFormat": "p95"},
+        {"refId": "C", "expr": "histogram_quantile(0.99, sum by (le) (rate(kminion_end_to_end_offset_commit_latency_seconds_bucket{installation=~\"${installation:regex}\",namespace=~\"${namespace:regex}\",pod=~\"${pod:regex}\"}[$__rate_interval])))", "legendFormat": "p99"}
+      ],
+      "fieldConfig": {"defaults": {"unit": "s", "custom": {"drawStyle": "line", "lineWidth": 2, "fillOpacity": 5}}}
+    },
+
+    {
+      "id": 102,
+      "type": "row",
+      "title": "Kafka client traffic",
+      "collapsed": false,
+      "gridPos": {"h": 1, "w": 24, "x": 0, "y": 30}
+    },
+    {
+      "id": 20,
+      "type": "timeseries",
+      "title": "Bytes sent / received (rate)",
+      "description": "Network throughput of kminion's own Kafka client (franz-go) against the cluster — produce, fetch, metadata, and admin traffic combined. Useful as a heartbeat: if this flatlines, kminion has lost connectivity even if its process is still running.",
+      "datasource": {"type": "prometheus", "uid": "$datasource"},
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 31},
+      "targets": [
+        {"refId": "A", "expr": "sum(rate(kminion_kafka_sent_bytes{installation=~\"${installation:regex}\",namespace=~\"${namespace:regex}\",pod=~\"${pod:regex}\"}[$__rate_interval]))", "legendFormat": "sent"},
+        {"refId": "B", "expr": "sum(rate(kminion_kafka_received_bytes{installation=~\"${installation:regex}\",namespace=~\"${namespace:regex}\",pod=~\"${pod:regex}\"}[$__rate_interval]))", "legendFormat": "received"}
+      ],
+      "fieldConfig": {"defaults": {"unit": "Bps", "custom": {"drawStyle": "line", "lineWidth": 2, "fillOpacity": 10}}}
+    },
+    {
+      "id": 21,
+      "type": "timeseries",
+      "title": "Requests sent / received (rate)",
+      "description": "Kafka protocol request rate of the kminion client. Sent and received should match closely — a persistent gap means responses are being lost (timeouts, broker restarts, network drops).",
+      "datasource": {"type": "prometheus", "uid": "$datasource"},
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 31},
+      "targets": [
+        {"refId": "A", "expr": "sum(rate(kminion_kafka_requests_sent_total{installation=~\"${installation:regex}\",namespace=~\"${namespace:regex}\",pod=~\"${pod:regex}\"}[$__rate_interval]))", "legendFormat": "sent"},
+        {"refId": "B", "expr": "sum(rate(kminion_kafka_requests_received_total{installation=~\"${installation:regex}\",namespace=~\"${namespace:regex}\",pod=~\"${pod:regex}\"}[$__rate_interval]))", "legendFormat": "received"}
+      ],
+      "fieldConfig": {"defaults": {"unit": "reqps", "custom": {"drawStyle": "line", "lineWidth": 2, "fillOpacity": 10}}}
+    },
+
+    {
+      "id": 103,
+      "type": "row",
+      "title": "Brokers",
+      "collapsed": false,
+      "gridPos": {"h": 1, "w": 24, "x": 0, "y": 39}
+    },
+    {
+      "id": 30,
+      "type": "table",
+      "title": "Brokers",
+      "description": "Per-broker inventory reported by kminion (kminion_kafka_broker_info): broker ID, advertised address, port, and whether the broker is the active cluster controller. Cross-reference with the Broker count stat — rows missing here are brokers kminion can't see.",
+      "datasource": {"type": "prometheus", "uid": "$datasource"},
+      "gridPos": {"h": 7, "w": 24, "x": 0, "y": 40},
+      "targets": [
+        {"refId": "A", "expr": "kminion_kafka_broker_info{installation=~\"${installation:regex}\",namespace=~\"${namespace:regex}\",pod=~\"${pod:regex}\"}", "instant": true, "format": "table"}
+      ],
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true, "Value": true, "__name__": true, "app": true, "container": true,
+              "customer": true, "endpoint": true, "job": true, "organization": true,
+              "pipeline": true, "provider": true, "region": true, "service": true,
+              "service_priority": true, "cluster_type": true, "instance": true
+            },
+            "indexByName": {
+              "installation": 0, "cluster_id": 1, "namespace": 2, "pod": 3,
+              "broker_id": 4, "address": 5, "port": 6, "is_controller": 7
+            }
+          }
+        }
+      ]
+    },
+
+    {
+      "id": 104,
+      "type": "row",
+      "title": "Exporter internals",
+      "collapsed": false,
+      "gridPos": {"h": 1, "w": 24, "x": 0, "y": 47}
+    },
+    {
+      "id": 40,
+      "type": "timeseries",
+      "title": "Offset consumer records consumed (rate)",
+      "description": "Rate at which kminion ingests records from the internal __consumer_offsets topic. kminion uses this stream to derive every consumer-group lag/offset metric it exports. If this drops to zero, group and lag metrics stop updating even though kminion looks healthy.",
+      "datasource": {"type": "prometheus", "uid": "$datasource"},
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 48},
+      "targets": [
+        {"refId": "A", "expr": "sum(rate(kminion_exporter_offset_consumer_records_consumed_total{installation=~\"${installation:regex}\",namespace=~\"${namespace:regex}\",pod=~\"${pod:regex}\"}[$__rate_interval]))", "legendFormat": "records/s"}
+      ],
+      "fieldConfig": {"defaults": {"unit": "ops", "custom": {"drawStyle": "line", "lineWidth": 2, "fillOpacity": 10}}}
+    },
+    {
+      "id": 41,
+      "type": "timeseries",
+      "title": "Log messages by level (rate)",
+      "description": "Per-second rate of kminion log lines by level (kminion_log_messages_total). Stacked so warn/error spikes stand out against the info baseline — handy for correlating internal exporter problems with dips in the e2e or Kafka panels above.",
+      "datasource": {"type": "prometheus", "uid": "$datasource"},
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 48},
+      "targets": [
+        {"refId": "A", "expr": "sum by (level) (rate(kminion_log_messages_total{installation=~\"${installation:regex}\",namespace=~\"${namespace:regex}\",pod=~\"${pod:regex}\"}[$__rate_interval]))", "legendFormat": "{{level}}"}
+      ],
+      "fieldConfig": {"defaults": {"unit": "ops", "custom": {"drawStyle": "line", "lineWidth": 2, "fillOpacity": 10, "stacking": {"mode": "normal"}}}}
+    }
+  ]
+}
