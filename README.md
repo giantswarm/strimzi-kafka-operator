@@ -169,6 +169,47 @@ Upstream documentation:
 - [Strimzi overview](https://strimzi.io/docs/operators/latest/overview)
 - [Example Kafka resources](https://github.com/strimzi/strimzi-kafka-operator/tree/1.0.0/examples/kafka)
 
+### Kafka Exporter (consumer group lag)
+
+`metricsConfig` exposes broker-internal metrics (request rates, under-replicated
+partitions, JVM, ...), but the brokers do **not** report **consumer group lag** — how far
+each consumer group has fallen behind the latest messages on a partition. Lag is the
+single most useful signal for answering "are my consumers keeping up?", and it is the main
+reason to enable Kafka Exporter.
+
+[Kafka Exporter](https://github.com/danielqsj/kafka_exporter) is a separate component the
+operator deploys when you add a `kafkaExporter` section to the `Kafka` resource. It connects
+to Kafka as a client and exposes offset-derived metrics, including:
+
+- `kafka_consumergroup_lag` / `kafka_consumergroup_lag_sum` — per-partition and per-group lag
+- `kafka_consumergroup_current_offset` — committed offset per group/partition
+- `kafka_topic_partition_current_offset` / `kafka_topic_partition_oldest_offset` — topic offsets
+- `kafka_topic_partition_under_replicated_partition` — under-replication flag
+
+To enable it, add the following to `spec` of your `Kafka` resource (see the full example in
+[`examples/kafka-exporter`](examples/kafka-exporter)):
+
+```yaml
+spec:
+  # ...
+  kafkaExporter:
+    topicRegex: ".*"   # topics to report on
+    groupRegex: ".*"   # consumer groups to report on
+```
+
+The operator runs the exporter as a separate `<cluster-name>-kafka-exporter` pod, labelled
+`strimzi.io/kind: Kafka` and serving metrics on the standard `tcp-prometheus` port (9404).
+The same PodMonitor that scrapes the brokers therefore picks it up automatically — no extra
+scrape configuration is required.
+
+Apply the example and confirm the exporter pod is running:
+
+```shell
+kubectl apply --filename examples/kafka-exporter
+kubectl wait kafka/my-cluster --for=condition=Ready --timeout=10m
+kubectl get pods -l strimzi.io/name=my-cluster-kafka-exporter
+```
+
 ## Configuring the operator
 
 Here are some configuration options to consider when configuring your Helm chart values:
