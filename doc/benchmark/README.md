@@ -121,7 +121,7 @@ Saturation — this is where the story gets interesting:
   little log I/O, stay flat at ≈ 256 MiB.
 
 [^pagecache]: Kafka Design — *Persistence*: "Kafka relies heavily on the filesystem for storing and caching messages… All disk reads and writes will go through this unified cache." <https://kafka.apache.org/documentation/#design>
-- **Disk**: available space drops from 97.8 GiB to ≈ 97.0 GiB — roughly **0.8 GiB written in
+- **Disk**: available space drops from 97.8 GiB to ≈ 97.0 GiB — roughly **0.8 GiB written in. We will evaluate disk space more deeply in a following test scenario.
   15 min**, expected for a small-message workload.
 - **Open file descriptors**: flat at ≈ 330 per broker.
 
