@@ -10,9 +10,9 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	"github.com/giantswarm/apptest-framework/v4/pkg/state"
-	"github.com/giantswarm/apptest-framework/v4/pkg/suite"
-	crclient "github.com/giantswarm/clustertest/v4/pkg/client"
+	"github.com/giantswarm/apptest-framework/v5/pkg/state"
+	"github.com/giantswarm/apptest-framework/v5/pkg/suite"
+	crclient "github.com/giantswarm/clustertest/v5/pkg/client"
 
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -32,9 +32,9 @@ const (
 
 	// Minimum acceptable throughput thresholds.
 	// These are conservative baselines for a single-broker cluster on shared test infra.
-	minProducerMsgPerSec  = 10_000.0
-	minProducerMBPerSec   = 5.0
-	minConsumerMsgPerSec  = 20_000.0
+	minProducerMsgPerSec = 10_000.0
+	minProducerMBPerSec  = 5.0
+	minConsumerMsgPerSec = 20_000.0
 )
 
 func TestPerf(t *testing.T) {
@@ -114,7 +114,7 @@ func TestPerf(t *testing.T) {
 							}
 						}
 						return false, nil
-					}).WithPolling(15*time.Second).WithTimeout(15*time.Minute).Should(BeTrue())
+					}).WithPolling(15 * time.Second).WithTimeout(15 * time.Minute).Should(BeTrue())
 
 					By("creating perf topic")
 					topic := kafkaTopicManifest(perfTopic)
@@ -144,7 +144,7 @@ func TestPerf(t *testing.T) {
 							}
 						}
 						return false, nil
-					}).WithPolling(10*time.Second).WithTimeout(3*time.Minute).Should(BeTrue())
+					}).WithPolling(10 * time.Second).WithTimeout(3 * time.Minute).Should(BeTrue())
 				})
 
 				AfterAll(func() {

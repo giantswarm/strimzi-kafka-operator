@@ -9,10 +9,10 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	"github.com/giantswarm/apptest-framework/v4/pkg/state"
-	"github.com/giantswarm/apptest-framework/v4/pkg/suite"
-	crclient "github.com/giantswarm/clustertest/v4/pkg/client"
-	"github.com/giantswarm/clustertest/v4/pkg/wait"
+	"github.com/giantswarm/apptest-framework/v5/pkg/state"
+	"github.com/giantswarm/apptest-framework/v5/pkg/suite"
+	crclient "github.com/giantswarm/clustertest/v5/pkg/client"
+	"github.com/giantswarm/clustertest/v5/pkg/wait"
 	cr "sigs.k8s.io/controller-runtime/pkg/client"
 
 	appsv1 "k8s.io/api/apps/v1"
@@ -112,7 +112,7 @@ func TestFeatures(t *testing.T) {
 							}
 						}
 						return false, nil
-					}).WithPolling(15*time.Second).WithTimeout(10*time.Minute).Should(BeTrue())
+					}).WithPolling(15 * time.Second).WithTimeout(10 * time.Minute).Should(BeTrue())
 				})
 
 				AfterAll(func() {
@@ -336,10 +336,10 @@ func TestFeatures(t *testing.T) {
 				// Topic replication factor enforcement
 				// ------------------------------------------------------------
 				Describe("topic replication enforcement", Ordered, func() {
-					validTopicName   := "valid-rf-topic"
+					validTopicName := "valid-rf-topic"
 					invalidTopicName := "invalid-rf-topic"
-					validTopicRef    := kafkaTopicManifestWithRF(validTopicName, 1)
-					invalidTopicRef  := kafkaTopicManifestWithRF(invalidTopicName, 3)
+					validTopicRef := kafkaTopicManifestWithRF(validTopicName, 1)
+					invalidTopicRef := kafkaTopicManifestWithRF(invalidTopicName, 3)
 
 					AfterAll(func() {
 						_ = wcClient.Delete(state.GetContext(), validTopicRef)
@@ -502,9 +502,9 @@ func kafkaTopicManifestWithRF(name string, replicationFactor int64) *unstructure
 	u.SetNamespace(kafkaNamespace)
 	u.SetLabels(map[string]string{"strimzi.io/cluster": kafkaClusterName})
 	_ = unstructured.SetNestedField(u.Object, map[string]interface{}{
-		"partitions":        int64(1),
-		"replicas":          replicationFactor,
-		"config":            map[string]interface{}{},
+		"partitions": int64(1),
+		"replicas":   replicationFactor,
+		"config":     map[string]interface{}{},
 	}, "spec")
 	return u
 }

@@ -11,10 +11,10 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	"github.com/giantswarm/apptest-framework/v4/pkg/state"
-	"github.com/giantswarm/apptest-framework/v4/pkg/suite"
-	crclient "github.com/giantswarm/clustertest/v4/pkg/client"
-	"github.com/giantswarm/clustertest/v4/pkg/wait"
+	"github.com/giantswarm/apptest-framework/v5/pkg/state"
+	"github.com/giantswarm/apptest-framework/v5/pkg/suite"
+	crclient "github.com/giantswarm/clustertest/v5/pkg/client"
+	"github.com/giantswarm/clustertest/v5/pkg/wait"
 
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -210,7 +210,7 @@ func TestBasic(t *testing.T) {
 								return false, nil //nolint:nilerr
 							}
 							return p.Status.Phase == corev1.PodRunning, nil
-						}).WithPolling(5*time.Second).WithTimeout(2*time.Minute).Should(BeTrue())
+						}).WithPolling(5 * time.Second).WithTimeout(2 * time.Minute).Should(BeTrue())
 
 						promQL := fmt.Sprintf(`kafka_server_replicamanager_leadercount{cluster_id=%q,namespace=%q}`,
 							state.GetCluster().Name, kafkaNamespace)
