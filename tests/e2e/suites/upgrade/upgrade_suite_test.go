@@ -8,10 +8,10 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	"github.com/giantswarm/apptest-framework/v4/pkg/state"
-	"github.com/giantswarm/apptest-framework/v4/pkg/suite"
-	crclient "github.com/giantswarm/clustertest/v4/pkg/client"
-	"github.com/giantswarm/clustertest/v4/pkg/wait"
+	"github.com/giantswarm/apptest-framework/v5/pkg/state"
+	"github.com/giantswarm/apptest-framework/v5/pkg/suite"
+	crclient "github.com/giantswarm/clustertest/v5/pkg/client"
+	"github.com/giantswarm/clustertest/v5/pkg/wait"
 
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -166,10 +166,10 @@ func TestUpgrade(t *testing.T) {
 				It("Kafka CRs should still exist after upgrade", func() {
 					ctx := state.GetContext()
 					Eventually(wait.DoesResourceExist(ctx, wcClient, kafkaNodePoolRef)).
-						WithPolling(5 * time.Second).WithTimeout(1 * time.Minute).Should(BeTrue(),
+						WithPolling(5*time.Second).WithTimeout(1*time.Minute).Should(BeTrue(),
 						"KafkaNodePool CR missing after upgrade")
 					Eventually(wait.DoesResourceExist(ctx, wcClient, kafkaRef)).
-						WithPolling(5 * time.Second).WithTimeout(1 * time.Minute).Should(BeTrue(),
+						WithPolling(5*time.Second).WithTimeout(1*time.Minute).Should(BeTrue(),
 						"Kafka CR missing after upgrade")
 				})
 
