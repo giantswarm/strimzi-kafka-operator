@@ -179,12 +179,28 @@ reason to enable Kafka Exporter.
 
 [Kafka Exporter](https://github.com/danielqsj/kafka_exporter) is a separate component the
 operator deploys when you add a `kafkaExporter` section to the `Kafka` resource. It connects
-to Kafka as a client and exposes offset-derived metrics, including:
+to Kafka as a client and exposes offset-derived metrics that are **specific to the exporter**
+— they are scraped from the exporter pod, not the brokers, so they are easy to tell apart
+from the broker JMX metrics (`kafka_server_*`, `kafka_controller_*`, `kafka_network_*`,
+`jvm_*`).
+
+Consumer group metrics (the reason to run it):
 
 - `kafka_consumergroup_lag` / `kafka_consumergroup_lag_sum` — per-partition and per-group lag
-- `kafka_consumergroup_current_offset` — committed offset per group/partition
-- `kafka_topic_partition_current_offset` / `kafka_topic_partition_oldest_offset` — topic offsets
+- `kafka_consumergroup_current_offset` / `kafka_consumergroup_current_offset_sum` — committed offset per group/partition
+- `kafka_consumergroup_members` — number of members in a consumer group
+
+Topic / partition metrics:
+
+- `kafka_topic_partitions` — partition count per topic
+- `kafka_topic_partition_current_offset` / `kafka_topic_partition_oldest_offset` — newest and oldest offsets
+- `kafka_topic_partition_in_sync_replica` / `kafka_topic_partition_replicas` — in-sync and total replicas
+- `kafka_topic_partition_leader` / `kafka_topic_partition_leader_is_preferred` — leader broker and preferred-leader flag
 - `kafka_topic_partition_under_replicated_partition` — under-replication flag
+
+Cluster metric:
+
+- `kafka_brokers` — number of brokers in the cluster
 
 To enable it, add the following to `spec` of your `Kafka` resource (see the full example in
 [`examples/kafka-exporter`](examples/kafka-exporter)):
@@ -198,7 +214,7 @@ spec:
 ```
 
 The operator runs the exporter as a separate `<cluster-name>-kafka-exporter` pod, labelled
-`strimzi.io/kind: Kafka` and serving metrics on the standard `tcp-prometheus` port (9404).
+`strimzi.io/component-type: kafka-exporter` and serving metrics on the standard `tcp-prometheus` port (9404).
 The same PodMonitor that scrapes the brokers therefore picks it up automatically — no extra
 scrape configuration is required.
 
@@ -207,7 +223,7 @@ Apply the example and confirm the exporter pod is running:
 ```shell
 kubectl apply --filename examples/kafka-exporter
 kubectl wait kafka/my-cluster --for=condition=Ready --timeout=10m
-kubectl get pods -l strimzi.io/name=my-cluster-kafka-exporter
+kubectl get pods -l strimzi.io/component-type=kafka-exporter
 ```
 
 ## Configuring the operator
