@@ -14,6 +14,7 @@ workflows:
           chart: strimzi-kafka-operator
           persist_chart_archive: true
           ct_config: ".circleci/ct-config.yaml"
+          override_app_version: false
           filters:
             tags:
               only: /^v.*/
