@@ -158,73 +158,17 @@ spec:
 
 See the upstream [application topic handling guide](https://github.com/strimzi/strimzi-kafka-operator/blob/1.0.0/documentation/modules/operators/con-application-topic-handling.adoc).
 
-### Kafka cluster metrics
+### Metrics and monitoring
 
-The [`examples/kafka-single-node`](examples/kafka-single-node) Kafka CR enables Prometheus
-metrics via `metricsConfig.type: strimziMetricsReporter`. By enabling these, you can monitor your kafka clusters in the Giantswarm observability platform.
+Strimzi exposes Kafka metrics through several mechanisms — the Strimzi Metrics Reporter, the
+JMX Prometheus Exporter, Kafka Exporter, and raw JMX. Use
+`metricsConfig.type: strimziMetricsReporter` (broker/controller health) together with a
+`kafkaExporter` block (consumer-group lag) as the baseline; this matches
+[`examples/kafka-single-node`](examples/kafka-single-node) and
+[`examples/kafka-exporter`](examples/kafka-exporter) and the Giant Swarm dashboards.
 
-Upstream documentation:
-
-- [Strimzi Quickstart](https://strimzi.io/quickstarts/) — create a cluster, send and receive messages
-- [Strimzi overview](https://strimzi.io/docs/operators/latest/overview)
-- [Example Kafka resources](https://github.com/strimzi/strimzi-kafka-operator/tree/1.0.0/examples/kafka)
-
-### Kafka Exporter (consumer group lag)
-
-`metricsConfig` exposes broker-internal metrics (request rates, under-replicated
-partitions, JVM, ...), but the brokers do **not** report **consumer group lag** — how far
-each consumer group has fallen behind the latest messages on a partition. Lag is the
-single most useful signal for answering "are my consumers keeping up?", and it is the main
-reason to enable Kafka Exporter.
-
-[Kafka Exporter](https://github.com/danielqsj/kafka_exporter) is a separate component the
-operator deploys when you add a `kafkaExporter` section to the `Kafka` resource. It connects
-to Kafka as a client and exposes offset-derived metrics that are **specific to the exporter**
-— they are scraped from the exporter pod, not the brokers, so they are easy to tell apart
-from the broker JMX metrics (`kafka_server_*`, `kafka_controller_*`, `kafka_network_*`,
-`jvm_*`).
-
-Consumer group metrics (the reason to run it):
-
-- `kafka_consumergroup_lag` / `kafka_consumergroup_lag_sum` — per-partition and per-group lag
-- `kafka_consumergroup_current_offset` / `kafka_consumergroup_current_offset_sum` — committed offset per group/partition
-- `kafka_consumergroup_members` — number of members in a consumer group
-
-Topic / partition metrics:
-
-- `kafka_topic_partitions` — partition count per topic
-- `kafka_topic_partition_current_offset` / `kafka_topic_partition_oldest_offset` — newest and oldest offsets
-- `kafka_topic_partition_in_sync_replica` / `kafka_topic_partition_replicas` — in-sync and total replicas
-- `kafka_topic_partition_leader` / `kafka_topic_partition_leader_is_preferred` — leader broker and preferred-leader flag
-- `kafka_topic_partition_under_replicated_partition` — under-replication flag
-
-Cluster metric:
-
-- `kafka_brokers` — number of brokers in the cluster
-
-To enable it, add the following to `spec` of your `Kafka` resource (see the full example in
-[`examples/kafka-exporter`](examples/kafka-exporter)):
-
-```yaml
-spec:
-  # ...
-  kafkaExporter:
-    topicRegex: ".*"   # topics to report on
-    groupRegex: ".*"   # consumer groups to report on
-```
-
-The operator runs the exporter as a separate `<cluster-name>-kafka-exporter` pod, labelled
-`strimzi.io/component-type: kafka-exporter` and serving metrics on the standard `tcp-prometheus` port (9404).
-The same PodMonitor that scrapes the brokers therefore picks it up automatically — no extra
-scrape configuration is required.
-
-Apply the example and confirm the exporter pod is running:
-
-```shell
-kubectl apply --filename examples/kafka-exporter
-kubectl wait kafka/my-cluster --for=condition=Ready --timeout=10m
-kubectl get pods -l strimzi.io/component-type=kafka-exporter
-```
+See **[MONITORING.md](MONITORING.md)** for how the mechanisms relate, their trade-offs,
+selection guidance, and configuration.
 
 ## Configuring the operator
 
