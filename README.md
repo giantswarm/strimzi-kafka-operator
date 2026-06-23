@@ -158,18 +158,6 @@ spec:
 
 See the upstream [application topic handling guide](https://github.com/strimzi/strimzi-kafka-operator/blob/1.0.0/documentation/modules/operators/con-application-topic-handling.adoc).
 
-### Metrics and monitoring
-
-Strimzi exposes Kafka metrics through several mechanisms — the Strimzi Metrics Reporter, the
-JMX Prometheus Exporter, Kafka Exporter, and raw JMX. Use
-`metricsConfig.type: strimziMetricsReporter` (broker/controller health) together with a
-`kafkaExporter` block (consumer-group lag) as the baseline; this matches
-[`examples/kafka-single-node`](examples/kafka-single-node) and
-[`examples/kafka-exporter`](examples/kafka-exporter) and the Giant Swarm dashboards.
-
-See **[MONITORING.md](MONITORING.md)** for how the mechanisms relate, their trade-offs,
-selection guidance, and configuration.
-
 ## Configuring the operator
 
 Here are some configuration options to consider when configuring your Helm chart values:
