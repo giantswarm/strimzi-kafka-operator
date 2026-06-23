@@ -1,15 +1,32 @@
 # Monitoring a Kafka Cluster Deployed with Strimzi
 
-This guide documents the available methods for collecting metrics from a Kafka
-cluster managed by the Strimzi operator, explains how they differ, and shows how
-to configure each one. Use it to select a metrics collection method and wire the
-cluster into Prometheus and Grafana.
+This guide documents how to monitor a Kafka cluster managed by this operator. It
+explains the available metrics collection methods, how they differ, and how to
+configure them. Use it to select a method and understand what this chart already
+provides out of the box.
 
 > **Recommendation:** Use the **Strimzi Metrics Reporter** (`strimziMetricsReporter`).
-> It is the default and recommended method for new deployments. Use the
-> JMX Prometheus Exporter only when you require backward compatibility with
-> existing dashboards and alert rules, or when running a Strimzi version older
-> than 0.47.0.
+> It is the default and recommended method. The Grafana dashboards shipped with
+> this chart are built for the Strimzi Metrics Reporter and require it. Use the
+> JMX Prometheus Exporter only when running a Strimzi version older than 0.47.0,
+> or when integrating with external dashboards that depend on the JMX exporter
+> metric names.
+
+---
+
+## What this chart provides
+
+Scraping and visualization are already wired up by this chart. You do not need
+to deploy or configure Prometheus scraping or import dashboards manually:
+
+- **Scraping is enabled by default** through `PodMonitor` resources (see
+  [Metrics scraping](#metrics-scraping)).
+- **Grafana dashboards are deployed by default** as ConfigMaps (see
+  [Grafana dashboards](#grafana-dashboards)).
+
+What you must decide and configure yourself is the **metrics collection method**
+on your Kafka custom resources (`metricsConfig`), and whether to enable the
+**Kafka Exporter**.
 
 ---
 
@@ -24,17 +41,15 @@ Strimzi exposes metrics through two layers:
    - Strimzi Metrics Reporter (`strimziMetricsReporter`) — recommended.
    - JMX Prometheus Exporter (`jmxPrometheusExporter`) — legacy/compatibility.
 
-2. **Supplementary exporters** — additional components that surface metrics not
-   available through the component metrics layer:
+2. **Supplementary metrics sources** — surface metrics not available through the
+   component metrics layer:
    - **Kafka Exporter** — consumer group lag, offsets, and topic-level metrics.
-   - **Operator metrics** — emitted by the Cluster, Topic, and User Operators
-     (enabled by default, no configuration required).
-   - **kube-state-metrics** — Strimzi custom resource state at the Kubernetes
-     API level.
+   - **Operator metrics** — emitted by the Cluster Operator and the Entity
+     Operator (Topic and User Operators); enabled by default, no configuration
+     required.
 
 The `metricsConfig` mechanisms are **mutually exclusive** per component. The
-supplementary exporters are independent and may be combined with either
-mechanism.
+supplementary sources are independent and may be combined with either mechanism.
 
 ---
 
@@ -44,8 +59,8 @@ mechanism.
 
 The Strimzi Metrics Reporter is a Kafka `MetricsReporter` plugin that runs
 **inside** the Kafka process. It reads Kafka metrics directly through the
-internal metrics API and exposes them in Prometheus format over an HTTP
-endpoint. No JMX agent is involved.
+internal metrics API and exposes them in Prometheus format over an HTTP endpoint
+on the `tcp-prometheus` port (`9404`) at `/metrics`. No JMX agent is involved.
 
 ### How it differs
 
@@ -56,21 +71,29 @@ endpoint. No JMX agent is involved.
 - **Inline configuration.** Filtering is done with an `allowList` of regular
   expressions defined directly on the resource, rather than an external
   ConfigMap of translation rules.
+- **Dashboards.** The Grafana dashboards shipped with this chart are built for
+  and require this method.
 - **Availability.** Introduced in Strimzi **0.47.0**. Not available on older
   versions.
 
 ### How to configure
 
-Set `metricsConfig.type` to `strimziMetricsReporter` and provide an `allowList`
-of metric name patterns to expose:
+Set `metricsConfig.type` to `strimziMetricsReporter` on the Kafka resource:
 
 ```yaml
-apiVersion: kafka.strimzi.io/v1beta2
+apiVersion: kafka.strimzi.io/v1
 kind: Kafka
 metadata:
   name: my-cluster
 spec:
   kafka:
+    metricsConfig:
+      type: strimziMetricsReporter
+```
+
+Optionally narrow the exposed metrics with an `allowList`:
+
+```yaml
     metricsConfig:
       type: strimziMetricsReporter
       values:
@@ -82,8 +105,7 @@ spec:
 ```
 
 Apply the same `metricsConfig` block to other components as needed
-(`KafkaConnect`, `KafkaMirrorMaker2`, `KafkaBridge`). Metrics are exposed on the
-metrics port (`9404`) at `/metrics`.
+(`KafkaConnect`, `KafkaMirrorMaker2`, `KafkaBridge`).
 
 ---
 
@@ -93,28 +115,26 @@ metrics port (`9404`) at `/metrics`.
 
 The JMX Prometheus Exporter runs as a Java agent attached to the Kafka process.
 It reads Kafka metrics exposed as **JMX MBeans**, applies a set of relabeling
-rules to convert them into Prometheus metric names, and exposes the result over
-HTTP on port `9404` at `/metrics`.
+rules to convert them into Prometheus metric names, and exposes the result on
+the `tcp-prometheus` port (`9404`) at `/metrics`.
 
 ### How it differs
 
 - **Java agent.** Adds JVM overhead and increases the metrics scrape surface.
 - **Rule-driven naming.** Relies on an extensive set of regex-based translation
-  rules to map JMX MBean names to Prometheus metric names. These rules are
-  maintained in an external ConfigMap.
-- **Established ecosystem.** The official Strimzi example Grafana dashboards and
-  Prometheus alert rules were historically built around the metric names this
-  exporter produces.
+  rules to map JMX MBean names to Prometheus metric names, maintained in an
+  external ConfigMap.
+- **Dashboards.** The dashboards shipped with this chart do **not** target this
+  method. Using the JMX exporter requires supplying your own dashboards.
 - **Availability.** Supported across all current and older Strimzi versions.
 
 ### How to configure
 
 Create a ConfigMap containing the exporter rules, then reference it from the
-`metricsConfig` field. Strimzi ships ready-to-use rule files in the
-`examples/metrics` directory of the operator repository.
+`metricsConfig` field:
 
 ```yaml
-apiVersion: kafka.strimzi.io/v1beta2
+apiVersion: kafka.strimzi.io/v1
 kind: Kafka
 metadata:
   name: my-cluster
@@ -128,41 +148,51 @@ spec:
           key: kafka-metrics-config.yml
 ```
 
-Apply the corresponding example ConfigMap
-(`examples/metrics/kafka-metrics.yaml`) before deploying the Kafka resource.
+Apply the rules ConfigMap before deploying the Kafka resource.
 
 ---
 
 ## Choosing a method
 
-| Criterion                  | Strimzi Metrics Reporter        | JMX Prometheus Exporter            |
-| -------------------------- | ------------------------------- | ---------------------------------- |
-| Status                     | Default, recommended            | Legacy / compatibility             |
-| Mechanism                  | In-process reporter plugin      | JMX Java agent                     |
-| Overhead                   | Lower                           | Higher                             |
-| Metric names               | Fixed, predictable              | Derived from JMX via regex rules   |
-| Configuration              | Inline `allowList`              | External ConfigMap of rules        |
-| Minimum Strimzi version    | 0.47.0                          | All versions                       |
-| Existing dashboards/alerts | Require updated metric mappings | Match official examples directly   |
+| Criterion               | Strimzi Metrics Reporter        | JMX Prometheus Exporter          |
+| ----------------------- | ------------------------------- | -------------------------------- |
+| Status                  | Default, recommended            | Legacy / compatibility           |
+| Mechanism               | In-process reporter plugin      | JMX Java agent                   |
+| Overhead                | Lower                           | Higher                           |
+| Metric names            | Fixed, predictable              | Derived from JMX via regex rules |
+| Configuration           | Inline `allowList`              | External ConfigMap of rules      |
+| Chart Grafana dashboards| Supported (required)            | Not provided                     |
+| Minimum Strimzi version | 0.47.0                          | All versions                     |
 
 Select the **Strimzi Metrics Reporter** unless one of the following applies, in
 which case select the **JMX Prometheus Exporter**:
 
 - The cluster runs a Strimzi version older than 0.47.0.
-- Existing Grafana dashboards or Prometheus alert rules depend on the JMX
-  exporter metric names and must not be changed.
+- You integrate with external dashboards or tooling that depend on the JMX
+  exporter metric names.
 
 Do not enable both mechanisms on the same component.
 
 ---
 
-## Supplementary exporters
+## Supplementary metrics sources
 
 ### Kafka Exporter
 
-Enable the Kafka Exporter to collect consumer group lag, consumer offsets, and
-topic-level metrics, which are not available through either component metrics
-mechanism. Add the `kafkaExporter` section to the Kafka resource:
+The component metrics layer reports broker-internal metrics (request rates,
+under-replicated partitions, JVM) but **cannot** report consumer group lag,
+because lag is derived from the difference between committed consumer offsets and
+the log end offset. The Kafka Exporter fills this gap.
+
+When enabled, the operator deploys it as a separate `<cluster>-kafka-exporter`
+pod that connects to Kafka as a client and exposes:
+
+- **Consumer group lag** (`kafka_consumergroup_lag`, `kafka_consumergroup_lag_sum`)
+  — the primary reason to enable it.
+- Per-consumer-group committed offsets.
+- Per-topic and per-partition offsets.
+
+Enable it under `spec.kafkaExporter` on the Kafka resource:
 
 ```yaml
 spec:
@@ -171,42 +201,84 @@ spec:
     groupRegex: ".*"
 ```
 
+The exporter pod is labelled `strimzi.io/kind: Kafka` and serves metrics on the
+standard `tcp-prometheus` port (`9404`), so it is scraped by the same PodMonitor
+that scrapes the brokers — no additional scrape configuration is required. Its
+output is visualized by the `strimzi-kafka-exporter` dashboard.
+
+> **Scaling note:** `topicRegex` / `groupRegex` of `".*"` report on every topic
+> and consumer group. This is acceptable for small or demo clusters. On large
+> clusters, narrow these (or use `topicExcludeRegex` / `groupExcludeRegex`): a
+> broad regex queries every partition and group on every scrape, raising exporter
+> CPU, broker load, and Prometheus cardinality.
+
 ### Operator metrics
 
-The Cluster, Topic, and User Operators expose Prometheus metrics by default. No
-configuration is required; scrape the operator pods directly. Visualize with the
+The operators expose their own Prometheus metrics, enabled by default with no
+configuration required:
+
+- **Cluster Operator** — reconciliation counts, durations, and error rates for
+  the custom resources it manages. Scraped from the `strimzi-cluster-operator`
+  pod on the `http` port (`8080`) at `/metrics`.
+- **Entity Operator** — metrics from the Topic Operator and User Operator (e.g.
+  managed topic and user reconciliations). Scraped from the entity-operator pod
+  on the `healthcheck` port (`8080`) at `/metrics`.
+
+Use these to monitor the health of the operator itself: stalled reconciliations,
+rising error rates, or reconciliation latency. They are visualized by the
 `strimzi-operators` dashboard.
-
-### kube-state-metrics
-
-Deploy kube-state-metrics to monitor the state of Strimzi custom resources at
-the Kubernetes API level (resource readiness, counts, conditions). This is
-independent of the in-cluster Kafka metrics.
 
 ---
 
-## Collecting and visualizing metrics
+## Metrics scraping
 
-Regardless of the method selected, complete the monitoring pipeline:
+Scraping is enabled by default through `PodMonitor` resources created by this
+chart (`podMonitor.enabled: true`). The chart creates monitors for:
 
-1. **Scrape.** Configure Prometheus to scrape port `9404` of the relevant pods.
-   Use a `PodMonitor` or `ServiceMonitor` when running the Prometheus Operator.
-2. **Alert.** Apply the example Prometheus alerting rules
-   (`examples/metrics/prometheus-install/prometheus-rules.yaml`) and route
-   notifications through Alertmanager.
-3. **Visualize.** Add Prometheus as a Grafana data source and import the example
-   dashboards from `examples/metrics/grafana-dashboards/`:
-   - `strimzi-kafka.json` — broker metrics
-   - `strimzi-kraft.json` — KRaft controller metrics
-   - `strimzi-kafka-exporter.json` — consumer lag, offsets, topic metrics
-   - `strimzi-operators.json` — operator metrics
-   - `strimzi-cruise-control.json` — Cruise Control / rebalance metrics
-   - Component dashboards for Connect, MirrorMaker 2, and Bridge
+- The Cluster Operator pod (`http` / `8080`).
+- Kafka, KafkaConnect, and KafkaMirrorMaker2 pods (`tcp-prometheus` / `9404`) —
+  this also covers the Kafka Exporter pod.
+- KafkaBridge pods (`rest-api` / `8080`).
+- The Entity Operator pod (`healthcheck` / `8080`).
 
-> **Note:** The official example dashboards and alert rules are built around the
-> JMX Prometheus Exporter metric names. When using the Strimzi Metrics Reporter,
-> verify and adjust dashboard queries and alert expressions to match the
-> reporter's metric names.
+The workload PodMonitors select pods across **all namespaces**
+(`podMonitor.workloads.enabled: true`), so Kafka clusters deployed in any
+namespace are scraped automatically. Workload metrics still require
+`metricsConfig` to be set on the respective custom resource — without it, the
+pods expose no metrics endpoint to scrape.
+
+Configure the monitors through the `podMonitor` block in `values.yaml`. The
+`observability.giantswarm.io/tenant` label routes the scraped metrics to the
+appropriate Grafana organization.
+
+---
+
+## Grafana dashboards
+
+This chart ships a set of Grafana dashboards in
+`files/grafana-dashboards/`, deployed by default as ConfigMaps
+(`dashboards.enabled: true`) and discovered by Grafana through the
+`app.giantswarm.io/kind: dashboard` label. The
+`observability.giantswarm.io/organization` and `.../folder` annotations control
+where they appear.
+
+The dashboards are built for the **Strimzi Metrics Reporter** and depend on its
+metric names. They will not populate correctly when using the JMX Prometheus
+Exporter.
+
+Provided dashboards:
+
+- `strimzi-kafka` — broker metrics
+- `strimzi-kraft` — KRaft controller metrics
+- `strimzi-kafka-exporter` — consumer group lag, offsets, topic metrics
+- `strimzi-operators` — Cluster and Entity Operator metrics
+- `strimzi-kafka-connect` — Kafka Connect metrics
+- `strimzi-kafka-mirror-maker-2` — MirrorMaker 2 metrics
+- `strimzi-kafka-bridge` — Kafka Bridge metrics
+- `strimzi-cruise-control` — Cruise Control / rebalance metrics
+
+After bumping the operator version, run `make sync-dashboards` to refresh the
+dashboard JSON files from the upstream chart.
 
 ---
 
@@ -216,11 +288,7 @@ Regardless of the method selected, complete the monitoring pipeline:
   <https://strimzi.io/docs/operators/latest/deploying#assembly-metrics-str>
 - Strimzi configuration reference:
   <https://strimzi.io/docs/operators/latest/configuring.html>
-- Example metrics configuration and dashboards:
-  <https://github.com/strimzi/strimzi-kafka-operator/tree/main/examples/metrics>
 - Strimzi Metrics Reporter announcement:
   <https://strimzi.io/blog/2025/10/06/strimzi-metrics-reporter/>
 - Strimzi Metrics Reporter repository:
   <https://github.com/strimzi/metrics-reporter>
-- Prometheus Metrics Reporter proposal:
-  <https://github.com/strimzi/proposals/blob/main/064-prometheus-metrics-reporter.md>
