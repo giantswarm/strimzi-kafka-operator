@@ -6,22 +6,25 @@ configure them. Use it to select a method and understand what this chart already
 provides out of the box.
 
 > **Recommendation:** Use the **Strimzi Metrics Reporter** (`strimziMetricsReporter`).
-> It is the default and recommended method. The Grafana dashboards shipped with
-> this chart are built for the Strimzi Metrics Reporter and require it. Use the
+> It is the default and recommended method. The Grafana dashboards provided on
+> the Observability Platform are built for the Strimzi Metrics Reporter and
+> require it. Use the
 > JMX Prometheus Exporter only when running a Strimzi version older than 0.47.0,
 > or when integrating with external dashboards that depend on the JMX exporter
 > metric names.
 
 ---
 
-## What this chart provides
+## What is already provided
 
-Scraping and visualization are already wired up by this chart. You do not need
-to deploy or configure Prometheus scraping or import dashboards manually:
+Scraping and visualization are already handled for you. You do not need to
+configure Prometheus scraping or import dashboards manually:
 
-- **Scraping is enabled by default** through `PodMonitor` resources (see
-  [Metrics scraping](#metrics-scraping)).
-- **Grafana dashboards are deployed by default** as ConfigMaps (see
+- **Scraping is enabled by default** by this chart through `PodMonitor`
+  resources (see [Metrics scraping](#metrics-scraping)).
+- **Grafana dashboards are provided centrally** by the Observability Platform —
+  they are maintained in the [`giantswarm/dashboards`](https://github.com/giantswarm/dashboards)
+  repository and appear in Grafana (see
   [Grafana dashboards](#grafana-dashboards)).
 
 What you must decide and configure yourself is the **metrics collection method**
@@ -71,8 +74,8 @@ on the `tcp-prometheus` port (`9404`) at `/metrics`. No JMX agent is involved.
 - **Inline configuration.** Filtering is done with an `allowList` of regular
   expressions defined directly on the resource, rather than an external
   ConfigMap of translation rules.
-- **Dashboards.** The Grafana dashboards shipped with this chart are built for
-  and require this method.
+- **Dashboards.** The Grafana dashboards provided on the Observability Platform
+  are built for and require this method.
 - **Availability.** Introduced in Strimzi **0.47.0**. Not available on older
   versions.
 
@@ -124,8 +127,9 @@ the `tcp-prometheus` port (`9404`) at `/metrics`.
 - **Rule-driven naming.** Relies on an extensive set of regex-based translation
   rules to map JMX MBean names to Prometheus metric names, maintained in an
   external ConfigMap.
-- **Dashboards.** The dashboards shipped with this chart do **not** target this
-  method. Using the JMX exporter requires supplying your own dashboards.
+- **Dashboards.** The dashboards provided on the Observability Platform do
+  **not** target this method. Using the JMX exporter requires supplying your own
+  dashboards.
 - **Availability.** Supported across all current and older Strimzi versions.
 
 ### How to configure
@@ -161,7 +165,7 @@ Apply the rules ConfigMap before deploying the Kafka resource.
 | Overhead                | Lower                           | Higher                           |
 | Metric names            | Fixed, predictable              | Derived from JMX via regex rules |
 | Configuration           | Inline `allowList`              | External ConfigMap of rules      |
-| Chart Grafana dashboards| Supported (required)            | Not provided                     |
+| Platform dashboards     | Supported (required)            | Not provided                     |
 | Minimum Strimzi version | 0.47.0                          | All versions                     |
 
 Select the **Strimzi Metrics Reporter** unless one of the following applies, in
@@ -248,41 +252,67 @@ namespace are scraped automatically. Workload metrics still require
 pods expose no metrics endpoint to scrape.
 
 Configure the monitors through the `podMonitor` block in `values.yaml`. The
-`observability.giantswarm.io/tenant` label routes the scraped metrics to the
-appropriate Grafana organization.
+`observability.giantswarm.io/tenant` label is mandatory on the Observability
+Platform: it routes the scraped metrics to a tenant in Mimir and determines
+which Grafana organization can query them. For background on metric ingestion
+and the tenant model, see the Giant Swarm docs:
+
+- [Data ingestion (ServiceMonitor / PodMonitor + tenant label)](https://docs.giantswarm.io/overview/observability/data-management/data-ingestion/)
+- [Multi-tenancy (tenants and Grafana organizations)](https://docs.giantswarm.io/overview/observability/configuration/multi-tenancy/)
+- [Observe your clusters and apps (end-to-end walkthrough)](https://docs.giantswarm.io/getting-started/observe-your-clusters-and-apps/)
 
 ---
 
 ## Grafana dashboards
 
-This chart ships a set of Grafana dashboards in
-`files/grafana-dashboards/`, deployed by default as ConfigMaps
-(`dashboards.enabled: true`) and discovered by Grafana through the
-`app.giantswarm.io/kind: dashboard` label. The
-`observability.giantswarm.io/organization` and `.../folder` annotations control
-where they appear.
+The Kafka dashboards are maintained centrally and deployed to the Observability
+Platform — you do not deploy or import them per cluster. They live in the
+[`giantswarm/dashboards`](https://github.com/giantswarm/dashboards) repository,
+which provisions them into the **Shared Org** Grafana organization in the
+**Kafka** folder. Open Grafana on the Observability Platform and browse to that
+folder to find them.
 
 The dashboards are built for the **Strimzi Metrics Reporter** and depend on its
 metric names. They will not populate correctly when using the JMX Prometheus
-Exporter.
+Exporter — this is the main reason the Strimzi Metrics Reporter is the
+recommended method.
 
-Provided dashboards:
+Available dashboards:
 
-- `strimzi-kafka` — broker metrics
-- `strimzi-kraft` — KRaft controller metrics
-- `strimzi-kafka-exporter` — consumer group lag, offsets, topic metrics
-- `strimzi-operators` — Cluster and Entity Operator metrics
-- `strimzi-kafka-connect` — Kafka Connect metrics
-- `strimzi-kafka-mirror-maker-2` — MirrorMaker 2 metrics
-- `strimzi-kafka-bridge` — Kafka Bridge metrics
-- `strimzi-cruise-control` — Cruise Control / rebalance metrics
+- Broker metrics
+- KRaft controller metrics
+- Kafka Exporter — consumer group lag, offsets, topic metrics
+- Operator metrics — Cluster and Entity Operator
+- Kafka Connect, MirrorMaker 2, and Kafka Bridge
+- Cruise Control / rebalance metrics
 
-After bumping the operator version, run `make sync-dashboards` to refresh the
-dashboard JSON files from the upstream chart.
+To add or update a dashboard, contribute it to the `giantswarm/dashboards`
+repository (the path under a team chart determines the target Grafana
+organization and folder). See the Giant Swarm dashboard management docs:
+
+- [Dashboard management](https://docs.giantswarm.io/overview/observability/dashboard-management/)
+- [Dashboard creation](https://docs.giantswarm.io/overview/observability/dashboard-management/dashboard-creation/)
 
 ---
 
 ## References
+
+### Giant Swarm Observability Platform
+
+- Observability overview:
+  <https://docs.giantswarm.io/overview/observability/>
+- Observe your clusters and apps (end-to-end walkthrough):
+  <https://docs.giantswarm.io/getting-started/observe-your-clusters-and-apps/>
+- Data ingestion (ServiceMonitor / PodMonitor + tenant label):
+  <https://docs.giantswarm.io/overview/observability/data-management/data-ingestion/>
+- Multi-tenancy (tenants and Grafana organizations):
+  <https://docs.giantswarm.io/overview/observability/configuration/multi-tenancy/>
+- Dashboard management:
+  <https://docs.giantswarm.io/overview/observability/dashboard-management/>
+- Central dashboards repository:
+  <https://github.com/giantswarm/dashboards>
+
+### Strimzi
 
 - Strimzi metrics documentation:
   <https://strimzi.io/docs/operators/latest/deploying#assembly-metrics-str>
