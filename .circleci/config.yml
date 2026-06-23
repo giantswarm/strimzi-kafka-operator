@@ -1,6 +1,6 @@
 version: 2.1
 orbs:
-  architect: giantswarm/architect@9.4.1
+  architect: giantswarm/architect@9.5.3
 
 workflows:
   package-and-push-chart-on-tag:
@@ -14,6 +14,7 @@ workflows:
           chart: strimzi-kafka-operator
           persist_chart_archive: true
           ct_config: ".circleci/ct-config.yaml"
+          override_app_version: false
           filters:
             tags:
               only: /^v.*/
