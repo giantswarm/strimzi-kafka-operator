@@ -177,6 +177,14 @@ strimzi-kafka-operator:
 
 See [helm/strimzi-kafka-operator/values.yaml](helm/strimzi-kafka-operator/values.yaml) for all options.
 
+## Monitoring
+
+Metrics scraping is enabled by default and Grafana dashboards are provided on the
+Observability Platform. To collect metrics, set `metricsConfig` on your Kafka
+custom resources — the default and recommended method is the Strimzi Metrics
+Reporter. See [MONITORING.md](MONITORING.md) for the available methods, how they
+differ, and how to configure them.
+
 ## CRD management
 
 CRDs are managed by this chart's `templates/crds/` (updated on `helm upgrade`, kept on
@@ -205,6 +213,7 @@ All images are sourced from `gsoci.azurecr.io` (retagged from upstream `quay.io/
 
 ## References
 
+- Monitoring guide: [MONITORING.md](MONITORING.md)
 - Changelog: [CHANGELOG.md](CHANGELOG.md)
 - Contributing: [CONTRIBUTING.md](CONTRIBUTING.md)
 - Security policy: [SECURITY.md](SECURITY.md)
