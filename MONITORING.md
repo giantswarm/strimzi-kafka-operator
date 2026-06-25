@@ -155,6 +155,8 @@ spec:
           key: kafka-metrics-config.yml
 ```
 
+See this [example](https://github.com/strimzi/strimzi-kafka-operator/blob/1.0.0/examples/metrics/kafka-metrics.yaml#L82) for exporter rules.
+
 Apply the rules ConfigMap before deploying the Kafka resource.
 
 ---
