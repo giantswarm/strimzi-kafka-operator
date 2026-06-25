@@ -1,7 +1,13 @@
-[![CircleCI](https://dl.circleci.com/status-badge/img/gh/giantswarm/strimzi-kafka-operator/tree/main.svg?style=svg)](https://dl.circleci.com/status-badge/redirect/gh/giantswarm/strimzi-kafka-operator/tree/main)
-[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/giantswarm/strimzi-kafka-operator/badge)](https://securityscorecards.dev/viewer/?uri=github.com/giantswarm/strimzi-kafka-operator)
+<div align="center">
 
-# strimzi-kafka-operator app
+[![CircleCI](https://circleci.com/gh/giantswarm/strimzi-kafka-operator.svg?style=shield)](https://circleci.com/gh/giantswarm/strimzi-kafka-operator)
+[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/giantswarm/strimzi-kafka-operator/badge)](https://securityscorecards.dev/viewer/?uri=github.com/giantswarm/strimzi-kafka-operator)
+[![Latest
+  release](https://img.shields.io/badge/dynamic/yaml.svg?label=version&url=https://raw.githubusercontent.com/giantswarm/strimzi-kafka-operator/refs/heads/main/helm/strimzi-kafka-operator/Chart.yaml&query=$.appVersion&colorB=blue&logo=helm)](https://github.com/giantswarm/strimzi-kafka-operator/releases/latest)
+
+# Strimzi Kafka Operator
+
+</div>
 
 Giant Swarm app wrapping the [Strimzi Kafka Operator](https://strimzi.io/), which manages
 Apache Kafka clusters natively on Kubernetes via custom resources (CRDs).
