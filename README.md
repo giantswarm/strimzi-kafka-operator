@@ -17,8 +17,10 @@ This install method requires [`kubectl gs`](https://docs.giantswarm.io/reference
 Then run the following commands to deploy the app to your cluster. This will create the necessary `OCIRepository` and `HelmRelease` resources for Flux to deploy the app:
 
 ```shell
-kubectl gs deploy chart --chart-name strimzi-kafka-operator --version 0.1.1 --organization demo --target-cluster test --target-namespace kafka
-kubectl --namespace org-demo wait --for=condition=Ready helmrelease/test-strimzi-kafka-operator
+ORGANIZATION=demo
+CLUSTER=test
+kubectl gs deploy chart --chart-name strimzi-kafka-operator --version 0.1.1 --organization "$ORGANIZATION" --target-cluster "$CLUSTER" --target-namespace kafka
+kubectl --namespace "org-${ORGANIZATION}" wait --for=condition=Ready "helmrelease/${CLUSTER}-strimzi-kafka-operator"
 ```
 
 Example output:
