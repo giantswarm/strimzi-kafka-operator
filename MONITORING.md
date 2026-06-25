@@ -41,15 +41,18 @@ Strimzi exposes metrics through two layers:
    (brokers, controllers, Connect, MirrorMaker 2, Bridge, Cruise Control). These
    are configured per component through the `metricsConfig` field on the
    corresponding Kafka component resource. Choose **one** of two mechanisms:
-   - Strimzi Metrics Reporter (`strimziMetricsReporter`) — recommended.
-   - JMX Prometheus Exporter (`jmxPrometheusExporter`) — legacy/compatibility.
+   - [Strimzi Metrics Reporter](#method-1--strimzi-metrics-reporter-recommended-default)
+     (`strimziMetricsReporter`) — recommended.
+   - [JMX Prometheus Exporter](#method-2--jmx-prometheus-exporter-legacy--compatibility)
+     (`jmxPrometheusExporter`) — legacy/compatibility.
 
-2. **Supplementary metrics sources** — surface metrics not available through the
-   component metrics layer:
-   - **Kafka Exporter** — consumer group lag, offsets, and topic-level metrics.
-   - **Operator metrics** — emitted by the Cluster Operator and the Entity
-     Operator (Topic and User Operators); enabled by default, no configuration
-     required.
+2. **[Supplementary metrics sources](#supplementary-metrics-sources)** — surface
+   metrics not available through the component metrics layer:
+   - **[Kafka Exporter](#kafka-exporter)** — consumer group lag, offsets, and
+     topic-level metrics.
+   - **[Operator metrics](#operator-metrics)** — emitted by the Cluster Operator
+     and the Entity Operator (Topic and User Operators); enabled by default, no
+     configuration required.
 
 The `metricsConfig` mechanisms are **mutually exclusive** per component. The
 supplementary sources are independent and may be combined with either mechanism.
