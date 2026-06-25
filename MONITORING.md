@@ -40,7 +40,7 @@ Strimzi exposes metrics through two layers:
 1. **Component metrics** — JVM and Kafka MBean metrics emitted by each component
    (brokers, controllers, Connect, MirrorMaker 2, Bridge, Cruise Control). These
    are configured per component through the `metricsConfig` field on the
-   corresponding custom resource. Choose **one** of two mechanisms:
+   corresponding Kafka component resource. Choose **one** of two mechanisms:
    - Strimzi Metrics Reporter (`strimziMetricsReporter`) — recommended.
    - JMX Prometheus Exporter (`jmxPrometheusExporter`) — legacy/compatibility.
 
