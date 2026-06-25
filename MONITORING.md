@@ -20,7 +20,7 @@ provides out of the box.
 Scraping and visualization are already handled for you. You do not need to
 configure Prometheus scraping or import dashboards manually:
 
-- **Scraping is enabled by default** by this chart through `PodMonitor`
+- **Scraping is pre-configured and ready to enable** by this chart through `PodMonitor`
   resources (see [Metrics scraping](#metrics-scraping)).
 - **Grafana dashboards are provided centrally** by the Observability Platform —
   they are maintained in the [`giantswarm/dashboards`](https://github.com/giantswarm/dashboards)
@@ -236,7 +236,7 @@ rising error rates, or reconciliation latency. They are visualized by the
 
 ## Metrics scraping
 
-Scraping is enabled by default through `PodMonitor` resources created by this
+Scraping is pre-configured and ready to enable through `PodMonitor` resources created by this
 chart (`podMonitor.enabled: true`). The chart creates monitors for:
 
 - The Cluster Operator pod (`http` / `8080`).
