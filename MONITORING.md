@@ -28,7 +28,7 @@ configure Prometheus scraping or import dashboards manually:
   [Grafana dashboards](#grafana-dashboards)).
 
 What you must decide and configure yourself is the **metrics collection method**
-on your Kafka custom resources (`metricsConfig`), and whether to enable the
+on your Kafka resources (`metricsConfig`), and whether to enable the
 **Kafka Exporter**.
 
 ---
