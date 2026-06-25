@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Added CONTRIBUTING.md with development instructions
 - Add Grafana dashboards for Strimzi Cruise control and Strimzi operator
-- Add documentation about Kafak Exporter
+- Add documentation about Kafka Exporter
 - Add broker stuck after network partition runbook
 
 ### Changed
