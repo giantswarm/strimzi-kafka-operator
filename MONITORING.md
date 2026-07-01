@@ -134,13 +134,11 @@ configuration is required.
 
 #### Kafka Bridge — additional steps
 
-The Bridge needs two adjustments beyond setting `metricsConfig`:
-
-**1. Widen the `allowList`.** The Bridge's default reporter allowlist only
-covers `kafka_consumer_consumer_metrics.*` and
-`kafka_producer_producer_metrics.*`. The consumer **fetch** and **commit**
-latency metrics live under different prefixes. Because `allowList` **replaces**
-the default (it does not extend it), every wanted family must be listed:
+The Bridge's default reporter allowlist only covers
+`kafka_consumer_consumer_metrics.*` and `kafka_producer_producer_metrics.*`.
+The consumer **fetch** and **commit** latency metrics live under different
+prefixes. Because `allowList` **replaces** the default (it does not extend it),
+every wanted family must be listed:
 
 ```yaml
 spec:
@@ -158,13 +156,6 @@ spec:
 > are emitted by every component that runs a Kafka client (Bridge, Connect,
 > MirrorMaker 2). They only produce samples while a producer/consumer is active;
 > `*_latency_avg` reads `NaN` when idle, which is expected.
-
-**2. Scrape the management port.** The Bridge serves `/metrics` on its
-management port `rest-api-mgmt` (`8081`), **not** on `rest-api` (`8080`). The
-PodMonitor created by this chart scrapes `rest-api` by default, which returns
-`503` and yields no samples. Set the Bridge PodMonitor port to `rest-api-mgmt`
-in the chart / HelmRelease values so the fix is durable — a live
-`kubectl patch` of the PodMonitor is reverted on the next Flux reconcile.
 
 ---
 
