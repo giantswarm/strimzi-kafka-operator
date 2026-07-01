@@ -45,6 +45,7 @@ Strimzi exposes metrics through two layers:
      (`strimziMetricsReporter`) — recommended.
    - [JMX Prometheus Exporter](#method-2--jmx-prometheus-exporter-legacy--compatibility)
      (`jmxPrometheusExporter`) — legacy/compatibility.
+   If you don't set any, no metrics are exposed.
 
 2. **[Supplementary metrics sources](#supplementary-metrics-sources)** — surface
    metrics not available through the component metrics layer:
