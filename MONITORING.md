@@ -219,7 +219,7 @@ output is visualized by the `strimzi-kafka-exporter` dashboard.
 > and consumer group. This is acceptable for small or demo clusters. On large
 > clusters, narrow these (or use `topicExcludeRegex` / `groupExcludeRegex`): a
 > broad regex queries every partition and group on every scrape, raising exporter
-> CPU, broker load, and Prometheus cardinality.
+> CPU, broker load, and Prometheus cardinality. See https://strimzi.io/docs/operators/latest/configuring#type-KafkaExporterSpec-reference
 
 ### Operator metrics
 
