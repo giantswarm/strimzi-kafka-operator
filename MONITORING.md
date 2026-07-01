@@ -289,10 +289,7 @@ chart (`podMonitor.enabled: true`). The chart creates monitors for:
 - The Cluster Operator pod (`http` / `8080`).
 - Kafka, KafkaConnect, and KafkaMirrorMaker2 pods (`tcp-prometheus` / `9404`) —
   this also covers the Kafka Exporter pod.
-- KafkaBridge pods (`rest-api` / `8080`) — but the Bridge actually serves
-  `/metrics` on `rest-api-mgmt` (`8081`); this monitor must be pointed at
-  `rest-api-mgmt` to collect Bridge metrics (see
-  [Kafka Bridge — additional steps](#kafka-bridge--additional-steps)).
+- KafkaBridge pods (`rest-api-mgmt` /metrics `8081`).
 - The Entity Operator pod (`healthcheck` / `8080`).
 
 The workload PodMonitors select pods across **all namespaces**
