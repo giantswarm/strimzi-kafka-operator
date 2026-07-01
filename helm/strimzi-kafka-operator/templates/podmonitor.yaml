@@ -75,7 +75,7 @@ spec:
           action: replace
 ---
 # PodMonitor for KafkaBridge pods (cross-namespace).
-# Bridge exposes metrics on the rest-api port (8080), not tcp-prometheus.
+# Bridge serves /metrics on its management port rest-api-mgmt (8081).
 apiVersion: monitoring.coreos.com/v1
 kind: PodMonitor
 metadata:
@@ -93,7 +93,7 @@ spec:
     matchLabels:
       strimzi.io/kind: KafkaBridge
   podMetricsEndpoints:
-    - port: rest-api
+    - port: rest-api-mgmt
       path: /metrics
       scheme: http
       interval: 60s
