@@ -1,7 +1,12 @@
-[![CircleCI](https://dl.circleci.com/status-badge/img/gh/giantswarm/strimzi-kafka-operator/tree/main.svg?style=svg)](https://dl.circleci.com/status-badge/redirect/gh/giantswarm/strimzi-kafka-operator/tree/main)
-[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/giantswarm/strimzi-kafka-operator/badge)](https://securityscorecards.dev/viewer/?uri=github.com/giantswarm/strimzi-kafka-operator)
+<div align="center">
 
-# strimzi-kafka-operator app
+# Strimzi Kafka Operator
+
+[![CircleCI](https://circleci.com/gh/giantswarm/strimzi-kafka-operator.svg?style=shield)](https://circleci.com/gh/giantswarm/strimzi-kafka-operator)
+[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/giantswarm/strimzi-kafka-operator/badge)](https://securityscorecards.dev/viewer/?uri=github.com/giantswarm/strimzi-kafka-operator)
+[![Latest release](https://img.shields.io/badge/dynamic/yaml.svg?label=version&url=https://raw.githubusercontent.com/giantswarm/strimzi-kafka-operator/refs/heads/main/helm/strimzi-kafka-operator/Chart.yaml&query=$.appVersion&colorB=blue&logo=helm)](https://github.com/giantswarm/strimzi-kafka-operator/releases/latest)
+
+</div>
 
 Giant Swarm app wrapping the [Strimzi Kafka Operator](https://strimzi.io/), which manages
 Apache Kafka clusters natively on Kubernetes via custom resources (CRDs).
@@ -17,8 +22,10 @@ This install method requires [`kubectl gs`](https://docs.giantswarm.io/reference
 Then run the following commands to deploy the app to your cluster. This will create the necessary `OCIRepository` and `HelmRelease` resources for Flux to deploy the app:
 
 ```shell
-kubectl gs deploy chart --chart-name strimzi-kafka-operator --version 0.1.1 --organization demo --target-cluster test --target-namespace kafka
-kubectl --namespace org-demo wait --for=condition=Ready helmrelease/test-strimzi-kafka-operator
+export ORGANIZATION=demo
+export CLUSTER=test
+kubectl gs deploy chart --chart-name strimzi-kafka-operator --version 0.1.1 --organization "$ORGANIZATION" --target-cluster "$CLUSTER" --target-namespace kafka
+kubectl --namespace "org-${ORGANIZATION}" wait --for=condition=Ready "helmrelease/${CLUSTER}-strimzi-kafka-operator"
 ```
 
 Example output:
