@@ -107,8 +107,55 @@ Optionally narrow the exposed metrics with an `allowList`:
           - "kafka_controller.*"
 ```
 
-Apply the same `metricsConfig` block to other components as needed
-(`KafkaConnect`, `KafkaMirrorMaker2`, `KafkaBridge`).
+### Enabling metrics on other components
+
+The same `metricsConfig` block applies to `KafkaConnect`, `KafkaMirrorMaker2`,
+and `KafkaBridge`. By default these resources have **no** `metricsConfig`, so
+they expose no metrics endpoint at all — the dashboards and alerts for those
+components stay empty until you add it. Match the broker by setting the reporter
+on each resource:
+
+```yaml
+apiVersion: kafka.strimzi.io/v1
+kind: KafkaConnect # or KafkaMirrorMaker2, KafkaBridge
+metadata:
+  name: my-connect
+spec:
+  metricsConfig:
+    type: strimziMetricsReporter
+```
+
+Enabling `metricsConfig` makes the operator add the `tcp-prometheus` (`9404`)
+container port to Connect and MirrorMaker 2 pods, and a `/metrics` endpoint to
+the Bridge. Connect and MirrorMaker 2 are then scraped automatically by the same
+PodMonitor that scrapes the brokers (selector
+`strimzi.io/kind in (Kafka, KafkaConnect, KafkaMirrorMaker2)`) — no further
+configuration is required.
+
+#### Kafka Bridge — additional steps
+
+The Bridge's default reporter allowlist only covers
+`kafka_consumer_consumer_metrics.*` and `kafka_producer_producer_metrics.*`.
+The consumer **fetch** and **commit** latency metrics live under different
+prefixes. Because `allowList` **replaces** the default (it does not extend it),
+every wanted family must be listed:
+
+```yaml
+spec:
+  metricsConfig:
+    type: strimziMetricsReporter
+    values:
+      allowList:
+        - "kafka_producer_producer_metrics.*"               # producer request latency
+        - "kafka_consumer_consumer_fetch_manager_metrics.*" # consumer fetch latency
+        - "kafka_consumer_consumer_coordinator_metrics.*"   # consumer commit latency
+        - "kafka_consumer_consumer_metrics.*"
+```
+
+> The Kafka-client latency families (`kafka_producer_*` / `kafka_consumer_*`)
+> are emitted by every component that runs a Kafka client (Bridge, Connect,
+> MirrorMaker 2). They only produce samples while a producer/consumer is active;
+> `*_latency_avg` reads `NaN` when idle, which is expected.
 
 ---
 
@@ -242,7 +289,7 @@ chart (`podMonitor.enabled: true`). The chart creates monitors for:
 - The Cluster Operator pod (`http` / `8080`).
 - Kafka, KafkaConnect, and KafkaMirrorMaker2 pods (`tcp-prometheus` / `9404`) —
   this also covers the Kafka Exporter pod.
-- KafkaBridge pods (`rest-api` / `8080`).
+- KafkaBridge pods (`rest-api-mgmt` /metrics `8081`).
 - The Entity Operator pod (`healthcheck` / `8080`).
 
 The workload PodMonitors select pods across **all namespaces**
