@@ -22,6 +22,8 @@ For every dashboard JSON given as an argument:
       to datasource (also rewrites every ${DS_PROMETHEUS} reference)
     * relabel that variable to "Data source"
     * set `editable: false`
+    * set `graphTooltip: 1` (shared crosshair across panels)
+    * set `refresh: 2` on query template variables (reload on time range change)
     * add `owner:team-atlas`, `topic:kafka`, `component:<name>` tags
 """
 import json
@@ -142,8 +144,14 @@ def transform_dashboard(path: str) -> None:
     # Prepend the new cluster_id variable so it is the first one.
     templating.insert(0, json.loads(json.dumps(CLUSTER_VAR)))
 
+    # Reload query variables on time range change (datasource variables stay).
+    for var in templating:
+        if var.get("type") == "query":
+            var["refresh"] = 2
+
     # Dashboards repo conventions.
     dash["editable"] = False
+    dash["graphTooltip"] = 1
     component = f"component:{os.path.splitext(os.path.basename(path))[0]}"
     existing = dash.get("tags") or []
     dash["tags"] = sorted(set(existing) | set(BASE_TAGS) | {component})
