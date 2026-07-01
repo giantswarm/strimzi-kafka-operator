@@ -165,17 +165,6 @@ spec:
 
 See the upstream [application topic handling guide](https://github.com/strimzi/strimzi-kafka-operator/blob/1.0.0/documentation/modules/operators/con-application-topic-handling.adoc).
 
-### Kafka cluster metrics
-
-The [`examples/kafka-single-node`](examples/kafka-single-node) Kafka CR enables Prometheus
-metrics via `metricsConfig.type: strimziMetricsReporter`. By enabling these, you can monitor your kafka clusters in the Giantswarm observability platform.
-
-Upstream documentation:
-
-- [Strimzi Quickstart](https://strimzi.io/quickstarts/) — create a cluster, send and receive messages
-- [Strimzi overview](https://strimzi.io/docs/operators/latest/overview)
-- [Example Kafka resources](https://github.com/strimzi/strimzi-kafka-operator/tree/1.0.0/examples/kafka)
-
 ## Configuring the operator
 
 Here are some configuration options to consider when configuring your Helm chart values:
@@ -194,6 +183,14 @@ strimzi-kafka-operator:
 ```
 
 See [helm/strimzi-kafka-operator/values.yaml](helm/strimzi-kafka-operator/values.yaml) for all options.
+
+## Monitoring
+
+Metrics scraping is enabled by default and Grafana dashboards are provided on the
+Observability Platform. To collect metrics, set `metricsConfig` on your Kafka
+custom resources — the default and recommended method is the Strimzi Metrics
+Reporter. See [MONITORING.md](MONITORING.md) for the available methods, how they
+differ, and how to configure them.
 
 ## CRD management
 
@@ -223,6 +220,7 @@ All images are sourced from `gsoci.azurecr.io` (retagged from upstream `quay.io/
 
 ## References
 
+- Monitoring guide: [MONITORING.md](MONITORING.md)
 - Changelog: [CHANGELOG.md](CHANGELOG.md)
 - Contributing: [CONTRIBUTING.md](CONTRIBUTING.md)
 - Security policy: [SECURITY.md](SECURITY.md)
