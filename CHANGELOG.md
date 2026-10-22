@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.1.3] - 2026-10-22
 
+### Changed
+
+- The e2e tests now run on release PRs: the trigger matches the `chore(release): v…` title and posts `/run app-test-suites` as `giantswarm-release[bot]`.
+- Update the e2e test dependencies (test-only, the chart is unchanged): apptest-framework v5.4.1, clustertest v5.6.4, ginkgo v2.33.1, containerd v1.7.36.
+
 ## [0.1.2] - 2026-10-05
 
 ### Fixed
