@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Update architect to v10.18.0 (giantswarm/strimzi-kafka-operator#215)
+
 ## [0.1.2] - 2026-10-05
 
 ### Fixed
