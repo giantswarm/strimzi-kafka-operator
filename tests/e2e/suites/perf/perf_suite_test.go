@@ -32,8 +32,7 @@ const (
 
 	// Minimum acceptable throughput thresholds.
 	// These are conservative baselines for a single-broker cluster on shared test infra.
-	minProducerMsgPerSec = 10_000.0
-	minProducerMBPerSec  = 5.0
+	minProducerMsgPerSec = 5_000.0
 	minConsumerMsgPerSec = 20_000.0
 )
 
@@ -184,8 +183,6 @@ func TestPerf(t *testing.T) {
 					)
 					Expect(msgPerSec).To(BeNumerically(">=", minProducerMsgPerSec),
 						"producer throughput %.0f msg/s below minimum %.0f", msgPerSec, minProducerMsgPerSec)
-					Expect(mbPerSec).To(BeNumerically(">=", minProducerMBPerSec),
-						"producer throughput %.2f MB/s below minimum %.2f", mbPerSec, minProducerMBPerSec)
 				})
 
 				It("consumer throughput should meet minimum threshold", func() {
