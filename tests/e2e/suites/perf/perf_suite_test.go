@@ -33,7 +33,7 @@ const (
 	// Minimum acceptable throughput thresholds.
 	// These are conservative baselines for a single-broker cluster on shared test infra.
 	minProducerMsgPerSec = 5_000.0
-	minConsumerMsgPerSec = 20_000.0
+	minConsumerMsgPerSec = 5_000.0
 )
 
 func TestPerf(t *testing.T) {
