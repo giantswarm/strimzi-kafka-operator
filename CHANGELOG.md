@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Update architect to v10.18.0 (giantswarm/strimzi-kafka-operator#215)
 - Update actions/create-github-app-token to v3.4.0 (giantswarm/strimzi-kafka-operator#219)
 - Lower the e2e perf suite producer floor to 5,000 msg/s and drop its MB/s check.
+- Record e2e perf suite throughput as Ginkgo report entries.
 
 ## [0.1.2] - 2026-10-05
 

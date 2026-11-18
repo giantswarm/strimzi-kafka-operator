@@ -181,6 +181,8 @@ func TestPerf(t *testing.T) {
 						"msg/s", msgPerSec,
 						"MB/s", mbPerSec,
 					)
+					AddReportEntry("producer_msg_per_sec", msgPerSec, ReportEntryVisibilityNever)
+					AddReportEntry("producer_mb_per_sec", mbPerSec, ReportEntryVisibilityNever)
 					Expect(msgPerSec).To(BeNumerically(">=", minProducerMsgPerSec),
 						"producer throughput %.0f msg/s below minimum %.0f", msgPerSec, minProducerMsgPerSec)
 				})
@@ -208,6 +210,7 @@ func TestPerf(t *testing.T) {
 						"consumer perf test failed")
 
 					GinkgoLogr.Info("Consumer throughput", "msg/s", msgPerSec)
+					AddReportEntry("consumer_msg_per_sec", msgPerSec, ReportEntryVisibilityNever)
 					Expect(msgPerSec).To(BeNumerically(">=", minConsumerMsgPerSec),
 						"consumer throughput %.0f msg/s below minimum %.0f", msgPerSec, minConsumerMsgPerSec)
 				})
