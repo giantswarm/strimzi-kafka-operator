@@ -11,7 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Update architect to v10.18.0 (giantswarm/strimzi-kafka-operator#215)
 - Update actions/create-github-app-token to v3.4.0 (giantswarm/strimzi-kafka-operator#219)
-- Lower the e2e perf suite producer and consumer floors to 5,000 msg/s and drop the producer MB/s check.
+- Make the e2e perf suite report throughput without thresholds. It fails only when the perf tool output can't be parsed.
+- Fix a race in the e2e features suite: wait for a new operator pod after the pod deletion, and wait for the entity-operator before the KafkaTopic tests.
 - Record e2e perf suite throughput as Ginkgo report entries.
 
 ## [0.1.2] - 2026-10-05
