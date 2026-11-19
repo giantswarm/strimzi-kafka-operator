@@ -140,22 +140,28 @@ func TestFeatures(t *testing.T) {
 					By("deleting the operator pod")
 					Expect(wcClient.Delete(ctx, &operatorPod)).To(Succeed())
 
-					By("waiting for the operator Deployment to recover")
+					By("waiting for a new operator pod to be ready")
 					Eventually(func() (bool, error) {
-						var dep appsv1.Deployment
-						if err := wcClient.Get(ctx, types.NamespacedName{
-							Namespace: installNamespace,
-							Name:      operatorDeploymentName,
-						}, &dep); err != nil {
+						var pods corev1.PodList
+						if err := wcClient.List(ctx, &pods,
+							cr.InNamespace(installNamespace),
+							cr.MatchingLabels{"name": operatorDeploymentName},
+						); err != nil {
 							return false, nil //nolint:nilerr
 						}
-						if dep.Spec.Replicas == nil {
-							return false, nil
+						for _, p := range pods.Items {
+							if p.UID == operatorPod.UID || p.DeletionTimestamp != nil {
+								continue
+							}
+							for _, c := range p.Status.Conditions {
+								if c.Type == corev1.PodReady && c.Status == corev1.ConditionTrue {
+									return true, nil
+								}
+							}
 						}
-						return dep.Status.ReadyReplicas > 0 &&
-							dep.Status.ReadyReplicas == *dep.Spec.Replicas, nil
+						return false, nil
 					}).WithPolling(10*time.Second).WithTimeout(3*time.Minute).Should(BeTrue(),
-						"operator Deployment did not recover after pod deletion")
+						"no new operator pod became ready after pod deletion")
 
 					By("verifying the Kafka broker pod is still ready")
 					podName := fmt.Sprintf("%s-%s-0", kafkaClusterName, kafkaPoolName)
@@ -180,6 +186,26 @@ func TestFeatures(t *testing.T) {
 				Describe("KafkaTopic lifecycle", Ordered, func() {
 					topicName := "test-topic"
 					topicRef := kafkaTopicManifest(topicName)
+
+					BeforeAll(func() {
+						ctx := state.GetContext()
+						depName := fmt.Sprintf("%s-entity-operator", kafkaClusterName)
+						Eventually(func() (bool, error) {
+							var dep appsv1.Deployment
+							if err := wcClient.Get(ctx, types.NamespacedName{
+								Namespace: kafkaNamespace,
+								Name:      depName,
+							}, &dep); err != nil {
+								return false, nil //nolint:nilerr
+							}
+							if dep.Spec.Replicas == nil {
+								return false, nil
+							}
+							return dep.Status.ReadyReplicas > 0 &&
+								dep.Status.ReadyReplicas == *dep.Spec.Replicas, nil
+						}).WithPolling(10*time.Second).WithTimeout(5*time.Minute).Should(BeTrue(),
+							"entity-operator Deployment %s/%s never became ready", kafkaNamespace, depName)
+					})
 
 					AfterAll(func() {
 						_ = wcClient.Delete(state.GetContext(), topicRef)
