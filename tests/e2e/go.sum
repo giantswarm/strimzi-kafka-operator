@@ -166,6 +166,8 @@ github.com/fluxcd/helm-controller/api v1.7.0 h1:BygSQLjNazSLwtR7/TUPQ0bn3g9Rzd9e
 github.com/fluxcd/helm-controller/api v1.7.0/go.mod h1:cCTRZcz/hjvI+3AxRGgsGe/AeEjZHHKUYxV/+6uidNM=
 github.com/fluxcd/helm-controller/api v1.7.1 h1:kARTcSBiS05mQsY7nVdL+XGaIGPZd/oC5owFTN6NIyk=
 github.com/fluxcd/helm-controller/api v1.7.1/go.mod h1:cCTRZcz/hjvI+3AxRGgsGe/AeEjZHHKUYxV/+6uidNM=
+github.com/fluxcd/helm-controller/api v1.7.2 h1:nQfiNCBWRjGI5q020On7kHQh77WCl54+sBA9FY6TBug=
+github.com/fluxcd/helm-controller/api v1.7.2/go.mod h1:cCTRZcz/hjvI+3AxRGgsGe/AeEjZHHKUYxV/+6uidNM=
 github.com/fluxcd/pkg/apis/acl v0.10.0 h1:KPfAmELNvtvaz8wixnm/MYXqa+MJf7ntVVMUU93Aenk=
 github.com/fluxcd/pkg/apis/acl v0.10.0/go.mod h1:a87i2A7AlFO5N2J8CxtzaUCCDmuLLWOHwkKu3eJF5fY=
 github.com/fluxcd/pkg/apis/acl v0.11.0 h1:BxThatpA6qd5Qzwim6/hRu0gdAX0JxNm3PledDuJqXo=
@@ -264,6 +266,8 @@ github.com/giantswarm/apptest-framework/v5 v5.4.4 h1:UXcVDIxbvLZb0gVqLeNPPFxEJX6
 github.com/giantswarm/apptest-framework/v5 v5.4.4/go.mod h1:rnJKqpsZ6QzHs6UGX3AgYg2es7TuZka5g0UpYuZrl0Y=
 github.com/giantswarm/apptest-framework/v5 v5.4.5 h1:nxsiYWv38T9P07LiucUOTNAUhWSv8DMgjcaVcs7NaaI=
 github.com/giantswarm/apptest-framework/v5 v5.4.5/go.mod h1:ySfW+I1IdyJG4Oao3s/u5D96aVvsL26G5PqhVpbSRFs=
+github.com/giantswarm/apptest-framework/v5 v5.4.6 h1:VmqTv+gkrly/uaV90Cb0/AMGGaIDWK4bn0XfNyE9Px0=
+github.com/giantswarm/apptest-framework/v5 v5.4.6/go.mod h1:xy6CS9Kg7kYYN8/DP6+1YwNwlJAtwHgiS12mMErnGGU=
 github.com/giantswarm/cluster-standup-teardown/v6 v6.0.1 h1:ElldQMFe02zlSHxbV1n2B+9xlwhR8cEKGe1XDIWu28w=
 github.com/giantswarm/cluster-standup-teardown/v6 v6.0.1/go.mod h1:ZWF1n73ButDUKW6uH0+GI4/iYOu4wlVonr0PiuUgt7o=
 github.com/giantswarm/cluster-standup-teardown/v6 v6.0.2 h1:geOoVYlrgbAwam+OtQoT2YOGyrXYzeTyjqLQjrsVrfg=
